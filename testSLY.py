@@ -86,13 +86,29 @@ class CalcParser(Parser):
     def expr(self, p):
         return int(p.NUMBER)
 
-    @_('NAME')
+    # @_('NAME')
+    # def expr(self, p):
+    #     try:
+    #         return self.names[p.NAME]
+    #     except LookupError:
+    #         print(f'Undefined name {p.NAME!r}')
+    #         return 0
+
+    @_('namestar')
     def expr(self, p):
-        try:
-            return self.names[p.NAME]
-        except LookupError:
-            print(f'Undefined name {p.NAME!r}')
-            return 0
+        print(p.namestar)
+
+    @_('NAME namestar')
+    def namestar(self, p):
+        print(p.expr)
+
+    @_('empty')
+    def namestar(self, p):
+        print("empty")
+
+    @_('')
+    def empty(self, p):
+        pass
 
 if __name__ == '__main__':
     lexer = CalcLexer()
