@@ -6,12 +6,13 @@ from sly import Lexer, Parser
 import math
 
 class CalcLexer(Lexer):
-    tokens = { THING, PERIOD }
+    tokens = { THING, PERIOD, SUS }
     ignore = ' \t'
 
     # Tokens
     THING = r'[a-zA-Z_][a-zA-Z0-9_]*'
     PERIOD = r'\.'
+    SUS = r'SUS'
 
     # NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
     # NUMBER = r'\d+'
@@ -49,7 +50,7 @@ class CalcParser(Parser):
     def __init__(self):
         self.names = { }
 
-    @_('repeatingthing PERIOD')
+    @_('repeatingthing optionalthing PERIOD')
     def thing(self, p):
         print(p.PERIOD)
 
@@ -59,6 +60,16 @@ class CalcParser(Parser):
 
     @_('empty')
     def repeatingthing(self, p):
+        pass
+
+    # adding the optionalthing is silly since the repeating thing covers anything, but I could adjust that
+    
+    @_('SUS')
+    def optionalthing(self, p):
+        print(p.SUS)
+
+    @_('empty')
+    def optionalthing(self, p):
         pass
 
     @_('')
