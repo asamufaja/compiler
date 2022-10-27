@@ -4,6 +4,8 @@ from abc import abstractmethod
 class visitor:
     def visit(self, node):
         print(node.letter)
+        if node.next != None:
+            node.next.accept(self)
 
 
 class node:
@@ -20,8 +22,6 @@ class letterNode(node):
         self.next = None
     def accept(self, visitor):
         visitor.visit(self)
-        if self.next != None:
-            self.next.accept(visitor)
 
 
 def main():
