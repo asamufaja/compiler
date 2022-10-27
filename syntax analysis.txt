@@ -14,6 +14,31 @@ thing : optthing PERIOD
 optthing : THING
 	   | empty
 
+here's every case I noticed with * or ? and corrected for the grammar
+
+CompilationUnit ::= RepeatClassDefinition void kxi2022 main ( ) MethodBody
+RepeatClassDefinition ::= RepeatClassDefinition CompilationUnit
+| empty
+ClassDefinition ::= classidentifier {ClassMemberDefinition * }
+RepeatClassMemberDefinition ::= RepeatClassMemberDefinition ClassDefinition
+| empty
+MethodDeclaration ::= Modifier Type ([ ])? identifier MethodSuffix
+Brackets ::= 
+MethodSuffix ::= ( ParameterList  ) MethodBody
+MethodBody ::= { Statement * }
+ParameterList ::= Parameter (, Parameter)*
+Parameter ::= Type ([ ])? identifier
+VariableDeclaration ::= Type ([ ])? identifier Initializer  ;
+Statement ::= { Statement * }
+ if ( Expression ) Statement (else Statement)?
+ | return Expression  ;
+ CaseBlock ::= { Case * default : Statement * }
+Case ::= case (hnum-literal | char-literal) : Statement 
+Arguments ::= ( ArgumentList  )
+ArgumentList ::= Expression (, Expression)*
+
+
+
 Making an empty production to be used in any of these situations is simple in SLY.
 
 For object-oriented AST nodes...
