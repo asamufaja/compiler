@@ -77,3 +77,11 @@ The AST
 Will have a declaration at the top of the tree for the CompilationUnit
 Will have more declarations and some types to go with statements and expressions
 Most of the meat of the tree is expressions
+
+connecting nodes
+example:
+void kxi2022 main() {
+	cout << 3 + 4 * 5;
+}
+makin nodes, it'll go through and when it matches like the compilationunit, it makes a node
+to match, like the expression to the compilationunit, it will build the tree from bottom up

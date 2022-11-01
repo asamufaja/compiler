@@ -13,7 +13,7 @@ class Quad {
     }
 }
 void kxi2022 main() {
-    Quad q;
+    Quad q = new Quad();
     q.Get_ul().x = 5;
     q.Get_ul().x += 10;
 }

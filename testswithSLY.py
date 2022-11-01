@@ -76,6 +76,34 @@ class CalcParser(Parser):
     def empty(self, p):
         pass
 
+    class Expr:
+        pass
+
+    class BinOp(Expr):
+        def __init__(self, op, left, right)
+            self.op = op
+            self.left = left
+            self.right = right
+
+    class Number(Expr):
+        def __init__(self, value):
+            self.value = value
+
+    @_('expr PLUS expr',
+    'expr MINUS expr',
+    'expr TIMES expr',
+    'expr DIVIDE expr')
+    def expr(self, p):
+        return BinOp(p[1], p.expr0, p.expr1)
+
+    @_('LPAREN expr RPAREN')
+    def expr(self, p):
+        return p.expr
+
+    @_('NUMBER')
+    def expr(self, p):
+        return Number(p.NUMBER)
+
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
