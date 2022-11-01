@@ -1,0 +1,18 @@
+Semantics, doing some looking for errors with:
+variables undeclared, types, doubly declared
+out of place items like not-writeable expressions (ex: true = false)
+
+symbol table will keep a variables identifier, type, size, offset
+I'm thinking the symbol table would be like the symbol table for the vm
+could be fun to have it be a separate file, I did that with the vm
+class SymbolTableVisitor:
+    def __init__(self):
+        self.filename = "sym_table"
+        self.symfile = f.open(self.filename, "r+w")
+    def visit(self, n:Node):
+        if isinstance(n, Type):  # I think type is my node for variables
+            self.symfile.append(f"{n.name}\t{n.type}\t{n.calcSize()}\t0")
+            # For now I will put calcSize() in the Type node, 
+            # it will go through and calculate size if it's a class or method
+            # The offset is 0 because that isn't given until code gen
+        node.next.accept(this)  # I'll have to put a next in all nodes that visits tree in-order I think

@@ -1,0 +1,19 @@
+class Point {
+    public int x;
+    public int y;
+}
+class Quad {
+    private Point ul;
+    private Point lr;
+    private int count;
+    
+    public Point Get.ul() {
+        count += 1;
+        return ul;
+    }
+}
+void kxi2022 main() {
+    Quad q;
+    q.Get_ul().x = 5;
+    q.Get_ul().x += 10;
+}

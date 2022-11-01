@@ -1,7 +1,3 @@
-# -----------------------------------------------------------------------------
-# starting to convert the example to the real lexer and parser
-# -----------------------------------------------------------------------------
-
 from sly import Lexer, Parser
 import math
 
