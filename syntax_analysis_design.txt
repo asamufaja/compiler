@@ -1,0 +1,87 @@
+Syntax Analysis Design (the parser)
+
+TODO: add what I need to do to grammar to make it work (* and ? issues)
+	write small example of a node and visitor skeleton code
+		nodes don't have traversal logic BTW
+
+basic grammar to deal with *
+thing : repeatingthing PERIOD
+repeatingthing : repeatingthing THING
+		   | empty
+
+basic grammar to deal with ?
+thing : optthing PERIOD
+optthing : THING
+	   | empty
+
+here's every case I noticed with * or ? and corrected for the grammar
+
+CompilationUnit ::= RepeatClassDefinition void kxi2022 main ( ) MethodBody
+RepeatClassDefinition ::= RepeatClassDefinition CompilationUnit
+	| empty
+ClassDefinition ::= classidentifier {ClassMemberDefinition * }
+RepeatClassMemberDefinition ::= RepeatClassMemberDefinition ClassDefinition
+	| empty
+MethodDeclaration ::= Modifier Type OptionalBrackets identifier MethodSuffix
+OptionalBrackets ::= [ ]
+	| empty
+MethodBody ::= { RepeatStatement }
+RepeatStatement ::= RepeatStatement Statement
+	| empty
+ParameterList ::= Parameter RepeatCommaParameter
+RepeatCommaParameter ::= RepeatCommaParameter , Parameter
+	| empty
+Parameter ::= Type OptionalBrackets identifier
+VariableDeclaration ::= Type OptionalBrackets identifier Initializer  ;
+Statement ::= { RepeatStatement }
+	| if ( Expression ) Statement OptionalElseStatement
+	| return Expression  ;
+OptionalElseStatement ::= else Statement
+	| empty
+OptionalExpression ::= Expression
+	| empty
+CaseBlock ::= { RepeatCase default : RepeatStatement }
+RepeatCase ::= RepeatCase Case
+	| empty
+Case ::= case num-literal | char-literal : RepeatStatement
+Arguments ::= ( OptionalArgumentList )
+OptionalArgumentList ::= ArgumentList
+	| empty
+ArgumentList ::= Expression RepeatCommaExpression
+RepeatCommaExpression ::= RepeatCommaExpression , Expression
+	| empty
+
+Making an empty production to be used in any of these situations is simple in SLY.
+
+For object-oriented AST nodes...
+4 classes: expression
+	   statement
+	   declaration
+	   type
+
+class expression
+	Op_type enum, left, right, value, char, string, type, args
+class statement
+	Statement_type, exp, substatement, case_list for switch, 
+class declaration
+	ret_type:type, params: param_list, modifier:(public, private, none), ident:string, init:exp, body:statements[], (maybe put in classdecl:classdecl[] for making compilationunit a decl)
+class type
+	type_types:enum {
+		Void, int, char, bool, string, class, method
+	}
+	Name:str, array:bool, subtype: type, param_list: decl
+
+NOTE: might want more classes split out
+
+The AST
+Will have a declaration at the top of the tree for the CompilationUnit
+Will have more declarations and some types to go with statements and expressions
+Most of the meat of the tree is expressions
+
+connecting nodes
+example:
+void kxi2022 main() {
+	cout << 3 + 4 * 5;
+}
+makin nodes, it'll go through and when it matches like the compilationunit, it makes a node
+to match, like the expression to the compilationunit, it will build the tree from bottom up

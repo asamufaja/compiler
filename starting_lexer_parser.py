@@ -9,8 +9,19 @@ class CalcLexer(Lexer):
     ignore = ' \t'
 
     # Tokens
-    IDENT = r'[a-zA-Z_][a-zA-Z0-9_]*'
-    NUMBER = r'\d+'
+    alpha = r"[A-Za-z]"
+    digit = r"[0 - 9]"
+    identifier = r"[alpha | _] [alpha | _ | digit]*"
+    line_ending = r"[\r | \n | \r\n]"
+    comment = r"// . * line-ending"
+    unescaped_char = r""
+    # Any ASCII character from SPACE (32) to ~ (126)
+    # except " (34), ' (39), or \ (92)
+    escaped_char = r"[\r | \n | \t | \\]"
+    char = r"[unescaped-char | escaped-char]"
+    char_literal = r"'(?:char|\"|\\')'"
+    string_literal = r'"(?:char|\'|\\")*"'
+    num_literal = r"[0 - 9]+"
 
     # keywords
     BOOL = r'bool'
@@ -39,14 +50,29 @@ class CalcLexer(Lexer):
 
     # symbols  : ; { } [ ] == != >= <= > < && || += -= *= /= << >> . ,
     # COLON, SEMICOLON, LBRACE, RBRACE, LBRACKET, RBRACKET, EQUALS, NOTEQUALS, GREATEROREQUAL, LESSOREQUAL, GREATERTHAN, LESSTHAN, AND, OR, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT(for cout), RIGHTSHIFT(for cin), PERIOD, COMMA
-    PLUS = r'\+'
-    MINUS = r'-'
-    TIMES = r'\*'
-    DIVIDE = r'/'
-    ASSIGN = r'='
-    LPAREN = r'\('
-    RPAREN = r'\)'
-    NOT = r'!'
+    COLON = r":"
+    SEMICOLON = r";"
+    LBRACE = r"{"
+    RBRACE = r"}"
+    LBRACKET = r"\["
+    RBRACKET = r"\]"
+    EQUALS = r"="
+    NOTEQUALS = r"!="
+    GREATEROREQUAL = r">="
+    LESSOREQUAL = r"<="
+    GREATERTHAN = r">"
+    LESSTHAN = r"<"
+    AND = r"&&"
+    OR = r"\|\|"
+    PLUSEQUALS = r"\+="
+    MINUSEQUALS = r"-="
+    TIMESEQUALS = r"\*="
+    DIVIDEEQUALS = r"/="
+    LEFTSHIFT = r"<<"  # (for cout)
+    RIGHTSHIFT = r">>"  # (for cin)
+    PERIOD = r"\."
+    COMMA = r","
+
 
     # Ignored pattern
     ignore_newline = r'\n+'
