@@ -7,6 +7,7 @@ import math
 
 class CalcLexer(Lexer):
     tokens = { NAME, NUMBER, PLUS, TIMES, MINUS, DIVIDE, ASSIGN, LPAREN, RPAREN, FACTORIAL }
+
     ignore = ' \t'
 
     # Tokens
@@ -22,6 +23,7 @@ class CalcLexer(Lexer):
     LPAREN = r'\('
     RPAREN = r'\)'
     FACTORIAL = r'!'
+
 
     # Ignored pattern
     ignore_newline = r'\n+'
