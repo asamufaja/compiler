@@ -10,7 +10,7 @@ class BigLexer(Lexer):
             MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT, RIGHTSHIFT, PERIOD, COMMA,
             ALPHA, DIGIT, IDENTIFIER, LINE_ENDING, COMMENT, UNESCAPED_CHAR, ESCAPED_CHAR,
             CHAR, CHAR_LITERAL, STRING_LITERAL, NUM_LITERAL,
-            EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE
+            EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN
             }
     ignore = ' \t'
 
@@ -39,7 +39,7 @@ class BigLexer(Lexer):
     VOID = r'void'
     WHILE = r'while'
 
-    # symbols  : ; { } [ ] = == != >= <= > < && || ! + - * / += -= *= /= << >> . ,
+    # symbols  : ; { } ( ) [ ] = == != >= <= > < && || ! + - * / += -= *= /= << >> . ,
     # COLON, SEMICOLON, LBRACE, RBRACE, LBRACKET, RBRACKET, EQUALS, NOTEQUALS, GREATEROREQUAL, LESSOREQUAL, GREATERTHAN, LESSTHAN, AND, OR, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT(for cout), RIGHTSHIFT(for cin), PERIOD, COMMA
     COLON = r":"
     SEMICOLON = r";"
@@ -49,6 +49,8 @@ class BigLexer(Lexer):
     RBRACE = r"}"
     LBRACKET = r"\["
     RBRACKET = r"\]"
+    LPAREN = r"\("
+    RPAREN = r"\)"
     DOUBLEEQUALS = r"=="
     EQUALS = r"="
     NOTEQUALS = r"!="
@@ -107,66 +109,121 @@ class BigLexer(Lexer):
 class BigParser(Parser):
     tokens = BigLexer.tokens
 
-    precedence = (
-        ('left', PLUS, MINUS),
-        ('left', TIMES, DIVIDE),
-        ('right', UMINUS, NOT),
-        )
+    # precedence = (
+    #     ('left', PLUS, MINUS),
+    #     ('left', TIMES, DIVIDE),
+    #     ('right', UMINUS, NOT),
+    #     )
 
     def __init__(self):
         self.idents = { }
 
-    @_('IDENT ASSIGN expr')
-    def statement(self, p):
-        self.idents[p.NAME] = p.expr
+    '''
+    CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody
+    '''
+    @_(RepeatClassDefinition void kxi2022 main LPAREN RPAREN MethodBody)
+    def CompilationUnit(self, p):
+        pass
+    '''
+    RepeatClassDefinition = RepeatClassDefinition CompilationUnit
+        | empty
+    ClassDefinition = classidentifier {ClassMemberDefinition * }
+    RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassDefinition
+        | empty
 
-    @_('expr')
-    def statement(self, p):
-        print(p.expr)
+Type ::= void | int | char | bool | string | identifier
+Modifier ::= public | private
+ClassMemberDefinition ::= MethodDeclaration
+| DataMemberDeclaration
+| ConstructorDeclaration
+DataMemberDeclaration ::= Modifier VariableDeclaration
 
-    @_('expr PLUS expr')
-    def expr(self, p):
-        return p.expr0 + p.expr1
+    MethodDeclaration = Modifier Type OptionalBrackets identifier MethodSuffix
+    OptionalBrackets = [ ]
+        | empty
 
-    @_('expr MINUS expr')
-    def expr(self, p):
-        return p.expr0 - p.expr1
+ConstructorDeclaration ::= identifier MethodSuffix
+Initializer ::= = Expression
+MethodSuffix ::= ( OptionalParameterList ) MethodBody
+OptionalParameterList = ParameterList
+    | empty
 
-    @_('expr TIMES expr')
-    def expr(self, p):
-        return p.expr0 * p.expr1
+    MethodBody = { RepeatStatement }
+    RepeatStatement = RepeatStatement Statement
+        | empty
+    ParameterList = Parameter RepeatCommaParameter
+    RepeatCommaParameter = RepeatCommaParameter , Parameter
+        | empty
+    Parameter = Type OptionalBrackets identifier
+    VariableDeclaration = Type OptionalBrackets identifier Initializer  ;
 
-    @_('expr DIVIDE expr')
-    def expr(self, p):
-        return p.expr0 / p.expr1
+    Statement = { RepeatStatement }
+        | Expression;
+        | if ( Expression ) Statement OptionalElseStatement
+        | while ( Expression ) Statement
+        | return OptionalExpression  ;
+        | cout << Expression ;
+        | cin >> Expression ;
+        | switch ( Expression ) CaseBlock
+        | break ;
+        | VariableDeclaration
 
-    @_('expr NOT')
-    def expr(self, p):
-        return math.factorial(p.expr)
+    OptionalElseStatement = else Statement
+        | empty
+    OptionalExpression = Expression
+        | empty
+    CaseBlock = { RepeatCase default : RepeatStatement }
+    RepeatCase = RepeatCase Case
+        | empty
+    Case = case num-literal | char-literal : RepeatStatement
 
-    @_('MINUS expr %prec UMINUS')
-    def expr(self, p):
-        return -p.expr
+Expression ::= ( Expression )
+    | Expression = Expression
+    | Expression += Expression
+    | Expression -= Expression
+    | Expression *= Expression
+    | Expression /= Expression
+    | Expression + Expression
+    | Expression - Expression
+    | Expression * Expression
+    | Expression / Expression
+    | Expression == Expression
+    | Expression != Expression
+    | Expression < Expression
+    | Expression > Expression
+    | Expression <= Expression
+    | Expression >= Expression
+    | Expression && Expression
+    | Expression || Expression
+    | ! Expression
+    | + Expression
+    | - Expression
+    | num-literal
+    | char-literal
+    | string-literal
+    | true
+    | false
+    | null
+    | identifier
+    | new Type  Arguments | Index
+    | this
+    | Expression . identifier
+    | Expression Index
+    | Expression Arguments
 
-    @_('LPAREN expr RPAREN')
-    def expr(self, p):
-        return p.expr
+    Arguments = ( OptionalArgumentList )
+    OptionalArgumentList = ArgumentList
+        | empty
+    ArgumentList = Expression RepeatCommaExpression
+    RepeatCommaExpression = RepeatCommaExpression , Expression
+        | empty
+    Index ::= [ Expression ]
+'''
 
-    @_('NUMBER')
-    def expr(self, p):
-        return int(p.NUMBER)
-
-    @_('IDENT')
-    def expr(self, p):
-        try:
-            return self.idents[p.IDENT]
-        except LookupError:
-            print(f'Undefined name {p.IDENT!r}')
-            return 0
 
 if __name__ == '__main__':
     lexer = BigLexer()
-    # parser = BigParser()
+    parser = BigParser()
     # while True:
         # try:
         #     text = input('calc > ')
