@@ -118,6 +118,9 @@ class BigParser(Parser):
     def __init__(self):
         self.idents = { }
 
+    @_('')
+    def empty(self, p):
+        pass
     '''
     CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody
     '''
@@ -127,26 +130,68 @@ class BigParser(Parser):
     '''
     RepeatClassDefinition = RepeatClassDefinition CompilationUnit
         | empty
-    ClassDefinition = classidentifier {ClassMemberDefinition * }
+    '''
+    @_(RepeatClassDefinition CompilationUnit)
+    def RepeatClassDefinition(self, p):
+        pass
+    
+    @_(empty)
+    def RepeatClassDefinition(self, p):
+        pass
+    '''
+    ClassDefinition = CLASS IDENTIFIER { RepeatClassMemberDefinition }
+    '''
+    @_(CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE)
+    def ClassDefinition(self, p):
+        pass
+    '''
     RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassDefinition
         | empty
+    '''
+    @_(RepeatClassMemberDefinition ClassDefinition)
+    def RepeatClassMemberDefinition(self, p):
+        pass
 
-Type ::= void | int | char | bool | string | identifier
-Modifier ::= public | private
-ClassMemberDefinition ::= MethodDeclaration
-| DataMemberDeclaration
-| ConstructorDeclaration
-DataMemberDeclaration ::= Modifier VariableDeclaration
+    @_(empty)
+    def RepeatClassMemberDefinition(self, p):
+        pass
+    '''
+    Type ::= void | int | char | bool | string | identifier
+    '''
+    @_(VOID)
+    def Type(self, p):
+        pass
+    @_(INT)
+    def Type(self, p):
+        pass
+    @_(CHAR)
+    def Type(self, p):
+        pass
+    @_(BOOL)
+    def Type(self, p):
+        pass
+    @_(STRING)
+    def Type(self, p):
+        pass
+    @_(IDENTIFIER)
+    def Type(self, p):
+        pass
+    '''
+    Modifier ::= public | private
+    ClassMemberDefinition ::= MethodDeclaration
+    | DataMemberDeclaration
+    | ConstructorDeclaration
+    DataMemberDeclaration ::= Modifier VariableDeclaration
 
     MethodDeclaration = Modifier Type OptionalBrackets identifier MethodSuffix
     OptionalBrackets = [ ]
         | empty
 
-ConstructorDeclaration ::= identifier MethodSuffix
-Initializer ::= = Expression
-MethodSuffix ::= ( OptionalParameterList ) MethodBody
-OptionalParameterList = ParameterList
-    | empty
+    ConstructorDeclaration ::= identifier MethodSuffix
+    Initializer ::= = Expression
+    MethodSuffix ::= ( OptionalParameterList ) MethodBody
+    OptionalParameterList = ParameterList
+        | empty
 
     MethodBody = { RepeatStatement }
     RepeatStatement = RepeatStatement Statement
@@ -177,39 +222,39 @@ OptionalParameterList = ParameterList
         | empty
     Case = case num-literal | char-literal : RepeatStatement
 
-Expression ::= ( Expression )
-    | Expression = Expression
-    | Expression += Expression
-    | Expression -= Expression
-    | Expression *= Expression
-    | Expression /= Expression
-    | Expression + Expression
-    | Expression - Expression
-    | Expression * Expression
-    | Expression / Expression
-    | Expression == Expression
-    | Expression != Expression
-    | Expression < Expression
-    | Expression > Expression
-    | Expression <= Expression
-    | Expression >= Expression
-    | Expression && Expression
-    | Expression || Expression
-    | ! Expression
-    | + Expression
-    | - Expression
-    | num-literal
-    | char-literal
-    | string-literal
-    | true
-    | false
-    | null
-    | identifier
-    | new Type  Arguments | Index
-    | this
-    | Expression . identifier
-    | Expression Index
-    | Expression Arguments
+    Expression ::= ( Expression )
+        | Expression = Expression
+        | Expression += Expression
+        | Expression -= Expression
+        | Expression *= Expression
+        | Expression /= Expression
+        | Expression + Expression
+        | Expression - Expression
+        | Expression * Expression
+        | Expression / Expression
+        | Expression == Expression
+        | Expression != Expression
+        | Expression < Expression
+        | Expression > Expression
+        | Expression <= Expression
+        | Expression >= Expression
+        | Expression && Expression
+        | Expression || Expression
+        | ! Expression
+        | + Expression
+        | - Expression
+        | num-literal
+        | char-literal
+        | string-literal
+        | true
+        | false
+        | null
+        | identifier
+        | new Type  Arguments | Index
+        | this
+        | Expression . identifier
+        | Expression Index
+        | Expression Arguments
 
     Arguments = ( OptionalArgumentList )
     OptionalArgumentList = ArgumentList
@@ -218,7 +263,7 @@ Expression ::= ( Expression )
     RepeatCommaExpression = RepeatCommaExpression , Expression
         | empty
     Index ::= [ Expression ]
-'''
+    '''
 
 
 if __name__ == '__main__':
