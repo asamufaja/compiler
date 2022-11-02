@@ -9,15 +9,45 @@ class SymbolTableVisitor:
     def __init__(self):
         self.filename = "sym_table"
         self.symfile = f.open(self.filename, "r+w")
+        self.currentExpr = None
+        self.currentExprLeft = None
+        self.currentExprRight = None  # maybe I don't need the right, it will just be the current node.
     def visit(self, n:Node):
+        if isinstance(n, Expr):
+            self.currentExpr = n
+            # this is for knowing which expression I may be in, for type checking
         if isinstance(n, Decl):  # I think type is my node for variables
             self.symfile.append(f"{n.name}\t{n.type}\t{n.calcSize()}\t0")
             # also need to check if this var has been in a decl before
+
             # For now I will put calcSize() in the Type node, 
             # it will go through and calculate size if it's a class or method
             # The offset is 0 because that isn't given until code gen
         if isinstance(n, Type):
             # look up this variable in symbol table, it needs to have been decl'ed previously
-            # also checking if it's type is the same, and type stuff
+            # also checking if it's type is the same, and type stuff like
+            if self.currentExprLeft != None:
+                # this must be the right one, make sure it works with the left and the expr.
+            else:
+                self.currentExprLeft = n
         node.next.accept(this)  # I'll have to put a next in all nodes that visits tree I think pre-order
 
+I think the above is roughly what I need to do to cover undeclared, duplicate, and wrong type variables.
+
+for function call argument writing, 
+another visitor would look at function call nodes, and check if the types are the same
+
+for assignment operators, a visitor would look at the left hand side and make sure it is either
+    an ident, the example f().a, maybe others?
+    I think the f().a example is where f() is returning an object? and the object has an a
+I think it is easier to look at what can be on the left hand side than what can't. 
+for doing correct things on right hand side,
+    have literals, idents, ummmmm
+
+Also maybe in one of these current visitors, like the symbol table one, check
+if isinstance(n, Stmnt):
+    if n.type == break:
+        raise Exception("break in wrong place")
+
+So the main function calling these visitors will try each one and catch exceptions
+to have a moderately rough landing without exploding completely
