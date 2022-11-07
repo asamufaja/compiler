@@ -50,59 +50,73 @@ class CalcParser(Parser):
 
     @_('NAME ASSIGN expr')
     def statement(self, p):
-        self.names[p.NAME] = p.expr
+        # self.names[p.NAME] = p.expr
+        pass
 
     @_('expr')
     def statement(self, p):
-        print(p.expr)
+        # print(p.expr)
+        pass
 
     @_('expr PLUS expr')
     def expr(self, p):
-        return p.expr0 + p.expr1
+        # return p.expr0 + p.expr1
+        pass
 
     @_('expr MINUS expr')
     def expr(self, p):
-        return p.expr0 - p.expr1
+        # return p.expr0 - p.expr1
+        pass
 
     @_('expr TIMES expr')
     def expr(self, p):
-        return p.expr0 * p.expr1
+        # return p.expr0 * p.expr1
+        pass
 
     @_('expr DIVIDE expr')
     def expr(self, p):
-        return p.expr0 / p.expr1
+        # return p.expr0 / p.expr1
+        pass
 
     @_('expr FACTORIAL')
     def expr(self, p):
-        return math.factorial(p.expr)
+        # return math.factorial(p.expr)
+        pass
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        return -p.expr
+        # return -p.expr
+        pass
 
     @_('LPAREN expr RPAREN')
     def expr(self, p):
-        return p.expr
+        # return p.expr
+        pass
 
     @_('NUMBER')
     def expr(self, p):
-        return int(p.NUMBER)
+        # return int(p.NUMBER)
+        pass
 
     @_('NAME')
     def expr(self, p):
-        try:
-            return self.names[p.NAME]
-        except LookupError:
-            print(f'Undefined name {p.NAME!r}')
-            return 0
+        # try:
+        #     return self.names[p.NAME]
+        # except LookupError:
+        #     print(f'Undefined name {p.NAME!r}')
+        #     return 0
+        pass
 
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    while True:
-        try:
-            text = input('calc > ')
-        except EOFError:
-            break
-        if text:
-            parser.parse(lexer.tokenize(text))
+    # parser.parse(lexer.tokenize("9 + 10 * 11"))
+    for token in lexer.tokenize("9 + 10 * 11"):
+        print(f"{token.type}, {token.value}")
+    # while True:
+    #     try:
+    #         text = input('calc > ')
+    #     except EOFError:
+    #         break
+    #     if text:
+    #         parser.parse(lexer.tokenize(text))

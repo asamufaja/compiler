@@ -1,0 +1,116 @@
+// CompilationUnit ::= hClassDefinitioni ∗ void kxi2022 main ( ) hMethodBodyi
+// ClassDefinition ::= class hidentifieri { hClassMemberDefinitioni ∗ }
+// Type ::= void | int | char | bool | string | hidentifieri
+// Modifier ::= public | private
+// ClassMemberDefinition ::= hMethodDeclarationi
+// | hDataMemberDeclarationi
+// | hConstructorDeclarationi
+// DataMemberDeclaration ::= hModifieri hVariableDeclarationi
+// MethodDeclaration ::= hModifieri hTypei ([ ])? hidentifieri hMethodSuffixi
+// ConstructorDeclaration ::= hidentifieri hMethodSuffixi
+// MethodSuffix ::= ( hParameterListi? ) hMethodBodyi
+// MethodBody ::= { hStatementi ∗ }
+// ParameterList ::= hParameteri (, hParameteri)∗
+// Parameter ::= hTypei ([ ])? hidentifieri
+// VariableDeclaration ::= hTypei ([ ])? hidentifieri hInitializeri? ;
+
+
+class Quad {
+    private Point ul;
+    private Point lr;
+    private int count;
+    private int funny;
+
+    Quad(int funny) {
+        this.funny = funny;
+    }
+
+    public Point Get_ul() {
+        count += 1;
+        return ul;
+    }
+
+    public int count_to(int max) {
+        int start = 0;
+        while (start < max) {
+            cout << start;
+            start += 1;
+        }
+        return start;
+    }
+}
+
+// Initializer ::= = hExpressioni
+// Statement ::= { hStatementi ∗ }
+// | hExpressioni;
+// | if ( hExpressioni ) hStatementi (else hStatementi)?
+// | while ( hExpressioni ) hStatementi
+// | return hExpressioni? ;
+// | cout << hExpressioni ;
+// | cin >> hExpressioni ;
+// | switch ( hExpressioni ) hCaseBlocki
+// | break ;
+// | hVariableDeclarationi
+// CaseBlock ::= { hCasei ∗ default : hStatementi ∗ }
+// Case ::= case (hnum-literali | hchar-literali) : hStatementi∗
+
+
+void kxi2022 main() {
+    int a = 2;
+    char eee = 'e';
+    bool b = true;
+    string sus = "suuus";
+    if (b) {
+        while (a < 3) {
+            a += 1
+        }
+    }
+    cin >> a;
+    switch(eee) {
+        case 'a':
+            cout << "dumb";
+
+        case 'e':
+
+        default :
+            cout << "hi";
+    }
+}
+
+
+// Expression ::= ( hExpressioni )
+// | hExpressioni = hExpressioni
+// | hExpressioni += hExpressioni
+// | hExpressioni -= hExpressioni
+// | hExpressioni *= hExpressioni
+// | hExpressioni /= hExpressioni
+// | hExpressioni + hExpressioni
+// | hExpressioni - hExpressioni
+// | hExpressioni * hExpressioni
+// | hExpressioni / hExpressioni
+// | hExpressioni == hExpressioni
+// | hExpressioni != hExpressioni
+// | hExpressioni < hExpressioni
+// | hExpressioni > hExpressioni
+// | hExpressioni <= hExpressioni
+// | hExpressioni >= hExpressioni
+// | hExpressioni && hExpressioni
+// | hExpressioni || hExpressioni
+// | ! hExpressioni
+// | + hExpressioni
+// | - hExpressioni
+// | hnum-literali
+// | hchar-literali
+// | hstring-literali
+// | true
+// | false
+// | null
+// | hidentifieri
+// | new hTypei (hArgumentsi | hIndexi)
+// | this
+// | hExpressioni . hidentifieri
+// | hExpressioni hIndexi
+// | hExpressioni hArgumentsi
+// Arguments ::= ( hArgumentListi? )
+// ArgumentList ::= hExpressioni (, hExpressioni)∗
+// Index ::= [ hExpressioni ]

@@ -9,11 +9,14 @@ class BigLexer(Lexer):
               COLON, SEMICOLON, LBRACE, RBRACE, LBRACKET, RBRACKET, DOUBLEEQUALS, EQUALS, NOTEQUALS,
               GREATEROREQUAL, LESSOREQUAL, GREATERTHAN, LESSTHAN, AND, OR, PLUSEQUALS,
               MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT, RIGHTSHIFT, PERIOD, COMMA,
-              ALPHA, DIGIT, IDENTIFIER, LINE_ENDING, COMMENT, UNESCAPED_CHAR, ESCAPED_CHAR,
-              CHAR, CHAR_LITERAL, STRING_LITERAL, NUM_LITERAL, MAIN,
+              IDENTIFIER, CHAR_LITERAL, STRING_LITERAL, NUM_LITERAL, MAIN,
               EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, THIS
+              # ALPHA,  UNESCAPED_CHAR, ESCAPED_CHAR, LINE_ENDING, CHAR, DIGIT, COMMENT,
               }
     ignore = ' \t'
+    # Ignored pattern
+    ignore_newline = r'\n+'
+    ignore_comment = r'//[^\n]*'
 
     # keywords
     BOOL = r'bool'
@@ -42,6 +45,8 @@ class BigLexer(Lexer):
 
     MAIN = r'main'
     THIS = r'this'
+
+    # COMMENT = r"//[^\n]*"
 
     # symbols  : ; { } ( ) [ ] = == != >= <= > < && || ! + - * / += -= *= /= << >> . ,
     # COLON, SEMICOLON, LBRACE, RBRACE, LBRACKET, RBRACKET, EQUALS, NOTEQUALS, GREATEROREQUAL, LESSOREQUAL, GREATERTHAN, LESSTHAN, AND, OR, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT(for cout), RIGHTSHIFT(for cin), PERIOD, COMMA
@@ -77,30 +82,27 @@ class BigLexer(Lexer):
     DIVIDE = r"/"
 
     # Tokens
-    ALPHA = r"[A-Za-z]"
-    DIGIT = r"[0-9]"
+    # ALPHA = r"[A-Za-z]"
+    # DIGIT = r"[0-9]"
     IDENTIFIER = r"(?:[A-Za-z]|_)(?:[A-Za-z]|_|[0-9])*"
-    LINE_ENDING = r"(?:\r|\n|\r\n)"
-    COMMENT = r"//[^\n]*"
-    UNESCAPED_CHAR = r"[^\"'\\\n\t\r]"  # should not automatically match whitespace
-    # Any ASCII character from SPACE (32) to ~ (126)
-    # except " (34), ' (39), or \ (92)
-    ESCAPED_CHAR = r"(\r|\n|\t|\\)"
-    CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
+    # LINE_ENDING = r"(?:\r|\n|\r\n)"
+
+    # UNESCAPED_CHAR = r"[^\"'\\\n\t\r]"  # should not automatically match whitespace
+        # Any ASCII character from SPACE (32) to ~ (126)
+        # except " (34), ' (39), or \ (92)
+    # ESCAPED_CHAR = r"(\r|\n|\t|\\)"
+    # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
     CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
     STRING_LITERAL = r'"(?:(?:[^\"\'\\\n\t\r]|(\r|\n|\t|\\))|\'|\\")*"'
-    NUM_LITERAL = r"[0-9]+"
+    NUM_LITERAL = r"[1-9][0-9]*"
 
-    def DIGIT(self, t):
-        t.value = int(t.value)
-        return t
+    # def DIGIT(self, t):
+    #     t.value = int(t.value)
+    #     return t
 
     def NUM_LITERAL(self, t):
         t.value = int(t.value)
         return t
-
-    # Ignored pattern
-    ignore_newline = r'\n+'
 
     # Extra action for newlines
     def ignore_newline(self, t):
@@ -113,19 +115,15 @@ class BigLexer(Lexer):
 
 class BigParser(Parser):
     tokens = BigLexer.tokens
+    debugfile = 'parser.out'
 
-    # precedence = (
-    #     ('left', PLUS, MINUS),
-    #     ('left', TIMES, DIVIDE),
-    #     ('right', UMINUS, NOT),
-    #     )
+    precedence = (
+        ('left', PLUS, MINUS),
+        ('left', TIMES, DIVIDE),
+        )
 
     def __init__(self):
         self.idents = {}
-
-    @_('')
-    def empty(self, p):
-        pass
 
     '''CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody'''
 
@@ -133,9 +131,9 @@ class BigParser(Parser):
     def CompilationUnit(self, p):
         pass
 
-    '''RepeatClassDefinition = RepeatClassDefinition CompilationUnit | empty'''
+    '''RepeatClassDefinition = RepeatClassDefinition ClassDefinition | empty'''
 
-    @_('RepeatClassDefinition CompilationUnit')
+    @_('RepeatClassDefinition ClassDefinition')
     def RepeatClassDefinition(self, p):
         pass
 
@@ -170,7 +168,7 @@ class BigParser(Parser):
     def Type(self, p):
         pass
 
-    @_('CHAR')
+    @_('KEYWORDCHAR')
     def Type(self, p):
         pass
 
@@ -261,6 +259,7 @@ class BigParser(Parser):
     def OptionalParameterList(self, p):
         pass
 
+
     '''MethodBody = { RepeatStatement }'''
 
     @_('LBRACE RepeatStatement RBRACE')
@@ -276,6 +275,7 @@ class BigParser(Parser):
     @_('empty')
     def RepeatStatement(self, p):
         pass
+
 
     '''ParameterList = Parameter RepeatCommaParameter'''
 
@@ -299,10 +299,18 @@ class BigParser(Parser):
     def Parameter(self, p):
         pass
 
-    '''VariableDeclaration = Type OptionalBrackets identifier Initializer  ;'''
+    '''VariableDeclaration = Type OptionalBrackets identifier OptionalInitializer  ;'''
 
-    @_('Type OptionalBrackets IDENTIFIER Initializer SEMICOLON')
+    @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
     def VariableDeclaration(self, p):
+        pass
+
+    @_('Initializer')
+    def OptionalInitializer(self, p):
+        pass
+
+    @_('empty')
+    def OptionalInitializer(self, p):
         pass
 
     '''Statement = { RepeatStatement }
@@ -644,10 +652,30 @@ class BigParser(Parser):
     def Index(self, p):
         pass
 
+    @_('')
+    def empty(self, p):
+        pass
+
 
 if __name__ == '__main__':
     lexer = BigLexer()
     parser = BigParser()
+
+    # pointfile = open("point.kxy", 'r')
+    # parser.parse(lexer.tokenize(pointfile.read()))
+    # for token in lexer.tokenize(pointfile.read()):
+    #     print(f'{token.type}, {token.value}')
+
+    # otherTests = open("othertests.kxy", 'r')
+    # parser.parse(lexer.tokenize(otherTests.read()))
+    # for token in lexer.tokenize(otherTests.read()):
+    #     print(f'{token.type}, {token.value}')
+
+    messytest = open("messytest.kxy", 'r')
+    parser.parse(lexer.tokenize(messytest.read()))
+    # for token in lexer.tokenize(messytest.read()):
+    #     print(f'{token.type}, {token.value}')
+
     # while True:
     # try:
     #     text = input('calc > ')

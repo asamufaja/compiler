@@ -7,7 +7,7 @@ class Quad {
     private Point lr;
     private int count;
     
-    public Point Get.ul() {
+    public Point Get_ul() {
         count += 1;
         return ul;
     }
