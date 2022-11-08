@@ -3,22 +3,29 @@ variables undeclared, types, doubly declared
 out of place items like not-writeable expressions (ex: true = false)
 
 symbol table will keep a variables identifier, type, size, offset
-I'm thinking the symbol table would be like the symbol table for the vm
-could be fun to have it be a separate file, I did that with the vm
+for scope, will have a nested symbol table situation
+things that make new scope are methods, while, if/else, cases?, classes?
+How about each class has a symbol table, keep list of those. When hit new scope, 
+put that block’s symbol table on stack (if statement, function, yeah) 
+each symbol table be a hash like symtable[name]->entry 
+then can ask is x variable in this symbol table, and go down the stack finding the variable
+
 class SymbolTableVisitor:
     def __init__(self):
-        self.filename = "sym_table"
-        self.symfile = f.open(self.filename, "r+w")
+        self.symtableList = []
         self.currentExpr = None
         self.currentExprLeft = None
-        self.currentExprRight = None  # maybe I don't need the right, it will just be the current node.
+        self.currentClass = None
     def visit(self, n:Node):
         if isinstance(n, Expr):
             self.currentExpr = n
             # this is for knowing which expression I may be in, for type checking
         if isinstance(n, Decl):  # I think type is my node for variables
-            self.symfile.append(f"{n.name}\t{n.type}\t{n.calcSize()}\t0")
-            # also need to check if this var has been in a decl before
+            if n.type == class:
+                self.currentClass = n
+            else:
+                self.symtableList.append({n.name : [n.type, n.calcSize(), 0]})
+                # also need to check if this var has been in a decl before
 
             # For now I will put calcSize() in the Type node, 
             # it will go through and calculate size if it's a class or method
