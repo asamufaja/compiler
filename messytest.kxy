@@ -62,7 +62,7 @@ void kxi2022 main() {
     string sus = "suuus";
     if (b) {
         while (a < 3) {
-            a += 1
+            a += 1;
         }
     }
     cin >> a;

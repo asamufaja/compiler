@@ -1,6 +1,7 @@
 # from lib2to3.pgen2.token import MINUS, PLUS
 from sly import Lexer, Parser
 import math
+import astclasses as ast
 
 
 class BigLexer(Lexer):
@@ -94,7 +95,7 @@ class BigLexer(Lexer):
     # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
     CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
     STRING_LITERAL = r'"(?:(?:[^\"\'\\\n\t\r]|(\r|\n|\t|\\))|\'|\\")*"'
-    NUM_LITERAL = r"[1-9][0-9]*"
+    NUM_LITERAL = r"(?:0|[1-9])[0-9]*"
 
     # def DIGIT(self, t):
     #     t.value = int(t.value)
@@ -402,11 +403,11 @@ class BigParser(Parser):
 
     '''Case = case num-literal | char-literal : RepeatStatement'''
 
-    @_('CASE NUM_LITERAL')
+    @_('CASE NUM_LITERAL COLON RepeatStatement')
     def Case(self, p):
         pass
 
-    @_('CHAR_LITERAL COLON RepeatStatement')
+    @_('CASE CHAR_LITERAL COLON RepeatStatement')
     def Case(self, p):
         pass
 
@@ -661,25 +662,7 @@ if __name__ == '__main__':
     lexer = BigLexer()
     parser = BigParser()
 
-    # pointfile = open("point.kxy", 'r')
-    # parser.parse(lexer.tokenize(pointfile.read()))
-    # for token in lexer.tokenize(pointfile.read()):
-    #     print(f'{token.type}, {token.value}')
-
-    # otherTests = open("othertests.kxy", 'r')
-    # parser.parse(lexer.tokenize(otherTests.read()))
-    # for token in lexer.tokenize(otherTests.read()):
-    #     print(f'{token.type}, {token.value}')
-
     messytest = open("messytest.kxy", 'r')
     parser.parse(lexer.tokenize(messytest.read()))
-    # for token in lexer.tokenize(messytest.read()):
-    #     print(f'{token.type}, {token.value}')
 
-    # while True:
-    # try:
-    #     text = input('calc > ')
-    # except EOFError:
-    #     break
-    # if text:
-    #     parser.parse(lexer.tokenize(text))
+    mytype = ast.type(ast.Type_types.INT)
