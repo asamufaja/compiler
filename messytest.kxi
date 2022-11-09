@@ -84,42 +84,71 @@ void kxi2022 main() {
         cout << "bye";
     }
 
+    // Expression ::= ( hExpressioni )
+    // | hExpressioni = hExpressioni
+    // | hExpressioni += hExpressioni
+    // | hExpressioni -= hExpressioni
+    // | hExpressioni *= hExpressioni
+    // | hExpressioni /= hExpressioni
+    // | hExpressioni + hExpressioni
+    // | hExpressioni - hExpressioni
+    // | hExpressioni * hExpressioni
+    // | hExpressioni / hExpressioni
+    // | hExpressioni == hExpressioni
+    // | hExpressioni != hExpressioni
+    // | hExpressioni < hExpressioni
+    // | hExpressioni > hExpressioni
+    // | hExpressioni <= hExpressioni
+    // | hExpressioni >= hExpressioni
+    // | hExpressioni && hExpressioni
+    // | hExpressioni || hExpressioni
+
+    a += 1;
+    a -= 1;
+    a *= 1;
+    a /= 1;
+    1 + 1;
+    1 - 1;
+    1 * 1;
+    1 / 1;
+    1 == 1;
+    1 != 1;
+    1 < 1;
+    1 > 1;
+    1 <= 1;
+    1 >= 1;
+    true && true;
+    false || false;
+
+    // | ! hExpressioni
+    // | + hExpressioni
+    // | - hExpressioni
+    // | hnum-literali
+    // | hchar-literali
+    // | hstring-literali
+    // | true
+    // | false
+    // | null
+    // | hidentifieri
+    // | new hTypei (hArgumentsi | hIndexi)
+    // | this
+    // | hExpressioni . hidentifieri
+    // | hExpressioni hIndexi
+    // | hExpressioni hArgumentsi
+    // Arguments ::= ( hArgumentListi? )
+    // ArgumentList ::= hExpressioni (, hExpressioni)∗
+    // Index ::= [ hExpressioni ]
+
+    !true
+    +1
+    -1
+    1
+    'a'
+    "sus"
+    true
+    false
+    null
+    a
+    new int
+
 }
-
-
-// Expression ::= ( hExpressioni )
-// | hExpressioni = hExpressioni
-// | hExpressioni += hExpressioni
-// | hExpressioni -= hExpressioni
-// | hExpressioni *= hExpressioni
-// | hExpressioni /= hExpressioni
-// | hExpressioni + hExpressioni
-// | hExpressioni - hExpressioni
-// | hExpressioni * hExpressioni
-// | hExpressioni / hExpressioni
-// | hExpressioni == hExpressioni
-// | hExpressioni != hExpressioni
-// | hExpressioni < hExpressioni
-// | hExpressioni > hExpressioni
-// | hExpressioni <= hExpressioni
-// | hExpressioni >= hExpressioni
-// | hExpressioni && hExpressioni
-// | hExpressioni || hExpressioni
-// | ! hExpressioni
-// | + hExpressioni
-// | - hExpressioni
-// | hnum-literali
-// | hchar-literali
-// | hstring-literali
-// | true
-// | false
-// | null
-// | hidentifieri
-// | new hTypei (hArgumentsi | hIndexi)
-// | this
-// | hExpressioni . hidentifieri
-// | hExpressioni hIndexi
-// | hExpressioni hArgumentsi
-// Arguments ::= ( hArgumentListi? )
-// ArgumentList ::= hExpressioni (, hExpressioni)∗
-// Index ::= [ hExpressioni ]

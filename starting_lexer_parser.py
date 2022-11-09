@@ -662,7 +662,7 @@ if __name__ == '__main__':
     lexer = BigLexer()
     parser = BigParser()
 
-    messytest = open("messytest.kxy", 'r')
+    messytest = open("messytest.kxi", 'r')
     parser.parse(lexer.tokenize(messytest.read()))
 
     mytype = ast.Type(ast.TypeTypes.INT)
