@@ -89,8 +89,8 @@ class BigLexer(Lexer):
     # LINE_ENDING = r"(?:\r|\n|\r\n)"
 
     # UNESCAPED_CHAR = r"[^\"'\\\n\t\r]"  # should not automatically match whitespace
-        # Any ASCII character from SPACE (32) to ~ (126)
-        # except " (34), ' (39), or \ (92)
+    # Any ASCII character from SPACE (32) to ~ (126)
+    # except " (34), ' (39), or \ (92)
     # ESCAPED_CHAR = r"(\r|\n|\t|\\)"
     # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
     CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
@@ -119,543 +119,517 @@ class BigParser(Parser):
     debugfile = 'parser.out'
 
     precedence = (
+        ("right", EQUALS, PLUSEQUALS, MINUSEQUALS),
+        ("right", TIMESEQUALS, DIVIDEEQUALS),
+        ("left", OR, AND),
+        ("left", DOUBLEEQUALS, NOTEQUALS),
+        ("left", LESSTHAN, GREATERTHAN, LESSOREQUAL, GREATEROREQUAL),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
-        )
+        ("right", NEW, EXCLAMATIONMARK),
+        ("left", THIS),
+        ("left", NUM_LITERAL, CHAR_LITERAL, STRING_LITERAL, TRUE, FALSE, NULL, IDENTIFIER),
+        ("left", LPAREN, RPAREN)
+    )
 
     def __init__(self):
-        self.idents = {}
-
-    '''CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody'''
+        self.nodestack = []
+        '''
+        example: a program that declares an int variable
+        first have a compilation unit node made. put on stack
+        then have a statement node made, put on stack
+        then the variabledeclaration node
+        '''
 
     @_('RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     def CompilationUnit(self, p):
-        pass
-
-    '''RepeatClassDefinition = RepeatClassDefinition ClassDefinition | empty'''
+        """CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody"""
+        # print("compilation unit")
+        compu = ast.Declaration(ast.TypeTypes.VOID)
+        compu.ident = "compu"
+        compu.child = p.MethodBody
+        compu.classdecl = [p.RepeatClassDefinition]
 
     @_('RepeatClassDefinition ClassDefinition')
     def RepeatClassDefinition(self, p):
-        pass
+        """RepeatClassDefinition = RepeatClassDefinition ClassDefinition | empty"""
+        print("RepeatClassDefinition thing")
 
     @_('empty')
     def RepeatClassDefinition(self, p):
-        pass
-
-    '''ClassDefinition = CLASS IDENTIFIER { RepeatClassMemberDefinition }'''
+        print("RepeatClassDefinition empty")
 
     @_('CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE')
     def ClassDefinition(self, p):
-        pass
-
-    '''RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassMemberDefinition 
-        | empty'''
+        """ClassDefinition = CLASS IDENTIFIER { RepeatClassMemberDefinition }"""
+        print("ClassDefinition")
 
     @_('RepeatClassMemberDefinition ClassMemberDefinition')
     def RepeatClassMemberDefinition(self, p):
-        pass
+        """RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassMemberDefinition"""
+        print("RepeatClassMemberDefinition")
 
     @_('empty')
     def RepeatClassMemberDefinition(self, p):
-        pass
-
-    '''Type ::= void | int | char | bool | string | identifier'''
+        """RepeatClassMemberDefinition ::= empty"""
+        print("RepeatClassMemberDefinition empty")
 
     @_('VOID')
     def Type(self, p):
-        pass
+        """Type ::= void"""
+        print("Type VOID")
 
     @_('INT')
     def Type(self, p):
-        pass
+        """Type ::= int"""
+        print("Type INT")
 
     @_('KEYWORDCHAR')
     def Type(self, p):
-        pass
+        """Type ::= char"""
+        print("Type KEYWORDCHAR")
 
     @_('BOOL')
     def Type(self, p):
-        pass
+        """Type ::= bool"""
+        print("Type BOOL")
 
     @_('STRING')
     def Type(self, p):
-        pass
+        """Type ::= string"""
+        print("Type STRING")
 
     @_('IDENTIFIER')
     def Type(self, p):
-        pass
-
-    '''Modifier ::= public | private'''
+        """Type ::= identifier"""
+        print("Type IDENTIFIER")
 
     @_('PUBLIC')
     def Modifier(self, p):
-        pass
+        """Modifier ::= public"""
+        print("Modifier PUBLIC")
 
     @_('PRIVATE')
     def Modifier(self, p):
-        pass
-
-    '''ClassMemberDefinition ::= MethodDeclaration| DataMemberDeclaration
-        | ConstructorDeclaration'''
+        """Modifier ::= private"""
+        print("Modifier PRIVATE")
 
     @_('MethodDeclaration')
     def ClassMemberDefinition(self, p):
-        pass
+        """ClassMemberDefinition ::= MethodDeclaration"""
+        print("ClassMemberDefinition MethodDeclaration")
 
     @_('DataMemberDeclaration')
     def ClassMemberDefinition(self, p):
-        pass
+        """ClassMemberDefinition ::= DataMemberDeclaration"""
+        print("ClassMemberDefinition ::= DataMemberDeclaration")
 
     @_('ConstructorDeclaration')
     def ClassMemberDefinition(self, p):
-        pass
-
-    '''DataMemberDeclaration ::= Modifier VariableDeclaration'''
+        """ClassMemberDefinition ::= ConstructorDeclaration"""
+        print("ClassMemberDefinition ::= ConstructorDeclaration")
 
     @_('Modifier VariableDeclaration')
     def DataMemberDeclaration(self, p):
-        pass
-
-    '''MethodDeclaration = Modifier Type OptionalBrackets identifier MethodSuffix'''
+        """DataMemberDeclaration ::= Modifier VariableDeclaration"""
+        print("DataMemberDeclaration")
 
     @_('Modifier Type OptionalBrackets IDENTIFIER MethodSuffix')
     def MethodDeclaration(self, p):
-        pass
-
-    '''OptionalBrackets = [ ] | empty'''
+        """MethodDeclaration = Modifier Type OptionalBrackets identifier MethodSuffix"""
+        print("MethodDeclaration")
 
     @_('LBRACKET RBRACKET')
     def OptionalBrackets(self, p):
-        pass
+        """OptionalBrackets = [ ]"""
+        print("OptionalBrackets = [ ]")
 
     @_('empty')
     def OptionalBrackets(self, p):
-        pass
-
-    '''ConstructorDeclaration ::= identifier MethodSuffix'''
+        """OptionalBrackets = empty"""
+        print("OptionalBrackets = empty")
 
     @_('IDENTIFIER MethodSuffix')
     def ConstructorDeclaration(self, p):
-        pass
-
-    '''Initializer ::= = Expression'''
+        """ConstructorDeclaration ::= identifier MethodSuffix"""
+        print("ConstructorDeclaration")
 
     @_('EQUALS Expression')
     def Initializer(self, p):
-        pass
-
-    '''MethodSuffix ::= ( OptionalParameterList ) MethodBody'''
+        """Initializer ::= = Expression"""
+        print("Initializer")
 
     @_('LPAREN OptionalParameterList RPAREN MethodBody')
     def MethodSuffix(self, p):
-        pass
-
-    '''OptionalParameterList = ParameterList | empty'''
+        """MethodSuffix ::= ( OptionalParameterList ) MethodBody"""
+        print("MethodSuffix")
 
     @_('ParameterList')
     def OptionalParameterList(self, p):
-        pass
+        """OptionalParameterList = ParameterList"""
+        print("OptionalParameterList = ParameterList")
 
     @_('empty')
     def OptionalParameterList(self, p):
-        pass
-
-
-    '''MethodBody = { RepeatStatement }'''
+        """OptionalParameterList = empty"""
+        print("OptionalParameterList = empty")
 
     @_('LBRACE RepeatStatement RBRACE')
     def MethodBody(self, p):
-        pass
-
-    '''RepeatStatement = RepeatStatement Statement | empty'''
+        """MethodBody = { RepeatStatement }"""
+        print("MethodBody")
 
     @_('RepeatStatement Statement')
     def RepeatStatement(self, p):
-        pass
+        """RepeatStatement = RepeatStatement Statement"""
+        print("RepeatStatement = RepeatStatement Statement")
 
     @_('empty')
     def RepeatStatement(self, p):
-        pass
-
-
-    '''ParameterList = Parameter RepeatCommaParameter'''
+        """RepeatStatement = empty"""
+        print("RepeatStatement = empty")
 
     @_('Parameter RepeatCommaParameter')
     def ParameterList(self, p):
-        pass
+        """ParameterList = Parameter RepeatCommaParameter"""
+        print("ParameterList")
 
-    '''RepeatCommaParameter = RepeatCommaParameter , Parameter | empty'''
+    '''| empty'''
 
     @_('RepeatCommaParameter COMMA Parameter')
     def RepeatCommaParameter(self, p):
-        pass
+        """RepeatCommaParameter = RepeatCommaParameter , Parameter"""
+        print("RepeatCommaParameter = RepeatCommaParameter , Parameter")
 
     @_('empty')
     def RepeatCommaParameter(self, p):
-        pass
-
-    '''Parameter = Type OptionalBrackets identifier'''
+        """RepeatCommaParameter = empty"""
+        print("epeatCommaParameter = empty")
 
     @_('Type OptionalBrackets IDENTIFIER')
     def Parameter(self, p):
-        pass
-
-    '''VariableDeclaration = Type OptionalBrackets identifier OptionalInitializer  ;'''
+        """Parameter = Type OptionalBrackets identifier"""
+        print("Parameter")
 
     @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
     def VariableDeclaration(self, p):
-        pass
+        """VariableDeclaration = Type OptionalBrackets identifier OptionalInitializer  ;"""
+        print("VariableDeclaration")
 
     @_('Initializer')
     def OptionalInitializer(self, p):
-        pass
+        """OptionalInitializer = Initializer"""
+        print("OptionalInitializer = Initializer")
 
     @_('empty')
     def OptionalInitializer(self, p):
-        pass
-
-    '''Statement = { RepeatStatement }
-        | Expression;
-        | if ( Expression ) Statement OptionalElseStatement
-        | while ( Expression ) Statement
-        | return OptionalExpression  ;
-        | cout << Expression ;
-        | cin >> Expression ;
-        | switch ( Expression ) CaseBlock
-        | break ;
-        | VariableDeclaration'''
+        """OptionalInitializer = empty"""
+        print("OptionalInitializer = empty")
 
     @_('LBRACE RepeatStatement RBRACE')
     def Statement(self, p):
-        pass
+        """Statement = { RepeatStatement }"""
+        print("Statement = { RepeatStatement }")
 
     @_('Expression SEMICOLON')
     def Statement(self, p):
-        pass
+        """Statement = Expression;"""
+        print("Statement = Expression;")
 
     @_('IF LPAREN Expression RPAREN Statement OptionalElseStatement')
     def Statement(self, p):
-        pass
+        """Statement = if (Expression) Statement OptionalElseStatement"""
+        print("Statement = if (Expression) Statement OptionalElseStatement")
 
     @_('WHILE LPAREN Expression RPAREN Statement')
     def Statement(self, p):
-        pass
+        """Statement = while ( Expression ) Statement"""
+        print("Statement = while ( Expression ) Statement")
 
     @_('RETURN OptionalExpression SEMICOLON')
     def Statement(self, p):
-        pass
+        """Statement = return OptionalExpression;"""
+        print("Statement = return OptionalExpression;")
 
     @_('COUT LEFTSHIFT Expression SEMICOLON')
     def Statement(self, p):
-        pass
+        """Statement = cout << Expression ;"""
+        print("Statement = cout << Expression ;")
 
     @_('CIN RIGHTSHIFT Expression SEMICOLON')
     def Statement(self, p):
-        pass
+        """Statement = cin >> Expression ;"""
+        print("Statement = cin >> Expression ;")
 
     @_('SWITCH LPAREN Expression RPAREN CaseBlock')
     def Statement(self, p):
-        pass
+        """Statement = switch ( Expression ) CaseBlock"""
+        print("Statement = switch ( Expression ) CaseBlock")
 
     @_('BREAK SEMICOLON')
     def Statement(self, p):
-        pass
+        """Statement = break;"""
+        print("Statement = break;")
 
     @_('VariableDeclaration')
     def Statement(self, p):
-        pass
-
-    '''OptionalElseStatement = else Statement | empty'''
+        """Statement = VariableDeclaration"""
+        print("Statement = VariableDeclaration")
 
     @_('ELSE Statement')
     def OptionalElseStatement(self, p):
-        pass
+        """OptionalElseStatement = else Statement"""
+        print("OptionalElseStatement = else Statement")
 
     @_('empty')
     def OptionalElseStatement(self, p):
-        pass
-
-    '''OptionalExpression = Expression | empty'''
+        """OptionalElseStatement = empty"""
+        print("OptionalElseStatement = empty")
 
     @_('Expression')
     def OptionalExpression(self, p):
-        pass
+        """OptionalExpression = Expression"""
+        print("OptionalExpression = Expression")
 
     @_('empty')
     def OptionalExpression(self, p):
-        pass
-
-    '''CaseBlock = { RepeatCase default : RepeatStatement }'''
+        """OptionalExpression = empty"""
+        print("OptionalExpression = empty")
 
     @_('LBRACE RepeatCase DEFAULT COLON RepeatStatement RBRACE')
     def CaseBlock(self, p):
-        pass
-
-    '''RepeatCase = RepeatCase Case | empty'''
+        """CaseBlock = { RepeatCase default : RepeatStatement }"""
+        print("CaseBlock")
 
     @_('RepeatCase Case')
     def RepeatCase(self, p):
-        pass
+        """RepeatCase = RepeatCase Case"""
+        print("RepeatCase = RepeatCase Case")
 
     @_('empty')
     def RepeatCase(self, p):
-        pass
-
-    '''Case = case num-literal | char-literal : RepeatStatement'''
+        """RepeatCase = empty"""
+        print("RepeatCase = empty")
 
     @_('CASE NUM_LITERAL COLON RepeatStatement')
     def Case(self, p):
-        pass
+        """Case = case num-literal : RepeatStatement"""
+        print("Case = case num-literal : RepeatStatement")
 
     @_('CASE CHAR_LITERAL COLON RepeatStatement')
     def Case(self, p):
-        pass
-
-    '''Expression ::= ( Expression )'''
+        """Case = case char-literal : RepeatStatement"""
+        print("Case = case char-literal : RepeatStatement")
 
     @_('LPAREN Expression RPAREN')
     def Expression(self, p):
-        pass
-
-    '''| Expression = Expression '''
+        """Expression ::= ( Expression )"""
+        print("Expression ::= ( Expression )")
 
     @_('Expression EQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression += Expression '''
+        """| Expression = Expression """
+        print("| Expression = Expression ")
 
     @_('Expression PLUSEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression -= Expression'''
+        """| Expression += Expression """
+        print("| Expression += Expression ")
 
     @_('Expression MINUSEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression *= Expression'''
+        """| Expression -= Expression"""
+        print("| Expression -= Expression")
 
     @_('Expression TIMESEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression /= Expression'''
+        """| Expression *= Expression"""
+        print("| Expression *= Expression")
 
     @_('Expression DIVIDEEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression + Expression'''
+        """| Expression /= Expression"""
+        print("| Expression /= Expression")
 
     @_('Expression PLUS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression - Expression'''
+        """| Expression + Expression"""
+        print("| Expression + Expression")
 
     @_('Expression MINUS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression * Expression'''
+        """| Expression - Expression"""
+        print("| Expression - Expression")
 
     @_('Expression TIMES Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression / Expression'''
+        """| Expression * Expression"""
+        print("| Expression * Expression")
 
     @_('Expression DIVIDE Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression == Expression'''
+        """| Expression / Expression"""
+        print("| Expression / Expression")
 
     @_('Expression DOUBLEEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression != Expression'''
+        """| Expression == Expression"""
+        print("| Expression == Expression")
 
     @_('Expression NOTEQUALS Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression < Expression'''
+        """| Expression != Expression"""
+        print("| Expression != Expression")
 
     @_('Expression LESSTHAN Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression > Expression'''
+        """| Expression < Expression"""
+        print("| Expression < Expression")
 
     @_('Expression GREATERTHAN Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression <= Expression'''
+        """| Expression > Expression"""
+        print("| Expression > Expression")
 
     @_('Expression LESSOREQUAL Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression >= Expression'''
+        """| Expression <= Expression"""
+        print("| Expression <= Expression")
 
     @_('Expression GREATEROREQUAL Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression && Expression'''
+        """| Expression >= Expression"""
+        print("| Expression >= Expression")
 
     @_('Expression AND Expression')
     def Expression(self, p):
-        pass
-
-    '''| Expression || Expression'''
+        """| Expression && Expression"""
+        print("| Expression && Expression")
 
     @_('Expression OR Expression')
     def Expression(self, p):
-        pass
-
-    '''| ! Expression'''
+        """| Expression || Expression"""
+        print("| Expression || Expression")
 
     @_('EXCLAMATIONMARK Expression')
     def Expression(self, p):
-        pass
-
-    '''| + Expression'''
+        """| ! Expression"""
+        print("| ! Expression")
 
     @_('PLUS Expression')
     def Expression(self, p):
-        pass
-
-    '''| - Expression'''
+        """| + Expression"""
+        print("| + Expression")
 
     @_('MINUS Expression')
     def Expression(self, p):
-        pass
-
-    '''| num-literal'''
+        """| - Expression"""
+        print("| - Expression")
 
     @_('NUM_LITERAL')
     def Expression(self, p):
-        pass
-
-    '''| char-literal'''
+        """| num-literal"""
+        print("| num-literal")
 
     @_('CHAR_LITERAL')
     def Expression(self, p):
-        pass
-
-    '''| string-literal'''
+        """| char-literal"""
+        print("| char-literal")
 
     @_('STRING_LITERAL')
     def Expression(self, p):
-        pass
-
-    '''| true'''
+        """| string-literal"""
+        print("| string-literal")
 
     @_('TRUE')
     def Expression(self, p):
-        pass
-
-    '''| false'''
+        """| true"""
+        print("| true")
 
     @_('FALSE')
     def Expression(self, p):
-        pass
-
-    '''| null'''
+        """| false"""
+        print("| false")
 
     @_('NULL')
     def Expression(self, p):
-        pass
-
-    '''| identifier'''
+        """| null"""
+        print("| null")
 
     @_('IDENTIFIER')
     def Expression(self, p):
-        pass
-
-    '''| new Type  Arguments | Index'''
+        """| identifier"""
+        print("| identifier")
 
     @_('NEW Type Arguments')
     def Expression(self, p):
-        pass
+        """| new Type  Arguments """
+        print("| new Type  Arguments")
 
     @_('NEW Type Index')
     def Expression(self, p):
-        pass
-
-    '''| this'''
+        """new Type Index"""
+        print("new Type Index")
 
     @_('THIS')
     def Expression(self, p):
-        pass
-
-    '''| Expression . identifier'''
+        """| this"""
+        print("| this")
 
     @_('Expression PERIOD IDENTIFIER')
     def Expression(self, p):
-        pass
-
-    '''| Expression Index'''
+        """| Expression . identifier"""
+        print("| Expression . identifier")
 
     @_('Expression Index')
     def Expression(self, p):
-        pass
-
-    '''| Expression Arguments'''
+        """| Expression Index"""
+        print("| Expression Index")
 
     @_('Expression Arguments')
     def Expression(self, p):
-        pass
-
-    '''Arguments = ( OptionalArgumentList )'''
+        """| Expression Arguments"""
+        print("| Expression Arguments")
 
     @_('LPAREN OptionalArgumentList RPAREN')
     def Arguments(self, p):
-        pass
-
-    '''OptionalArgumentList = ArgumentList
-        | empty '''
+        """Arguments = ( OptionalArgumentList )"""
+        print("Arguments")
 
     @_('ArgumentList')
     def OptionalArgumentList(self, p):
-        pass
+        """OptionalArgumentList = ArgumentList"""
+        print("OptionalArgumentList = ArgumentList")
 
     @_('empty')
     def OptionalArgumentList(self, p):
-        pass
-
-    '''ArgumentList = Expression RepeatCommaExpression'''
+        """OptionalArgumentList = empty"""
+        print("OptionalArgumentList = empty")
 
     @_('Expression RepeatCommaExpression')
     def ArgumentList(self, p):
-        pass
-
-    '''RepeatCommaExpression = RepeatCommaExpression , Expression
-        | empty '''
+        """ArgumentList = Expression RepeatCommaExpression"""
+        print("ArgumentList = Expression RepeatCommaExpression")
 
     @_('RepeatCommaExpression COMMA Expression')
     def RepeatCommaExpression(self, p):
-        pass
+        """RepeatCommaExpression = RepeatCommaExpression , Expression"""
+        print("RepeatCommaExpression = RepeatCommaExpression , Expression")
 
     @_('empty')
     def RepeatCommaExpression(self, p):
-        pass
-
-    '''Index ::= [ Expression ]'''
+        """RepeatCommaExpression = empty"""
+        print("RepeatCommaExpression = empty")
 
     @_('LBRACKET Expression RBRACKET')
     def Index(self, p):
-        pass
+        """Index ::= [ Expression ]"""
+        print("Index ::= [ Expression ]")
 
     @_('')
     def empty(self, p):
-        pass
+        """ e m p t y """
+        print("e m p t y")
 
 
 if __name__ == '__main__':

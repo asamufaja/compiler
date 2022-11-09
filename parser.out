@@ -1,13 +1,13 @@
 Grammar:
 
 Rule 0     S' -> CompilationUnit
-Rule 1     CompilationUnit -> RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody
+Rule 1     CompilationUnit -> RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody  [precedence=left, level=11]
 Rule 2     RepeatClassDefinition -> empty
 Rule 3     RepeatClassDefinition -> RepeatClassDefinition ClassDefinition
 Rule 4     ClassDefinition -> CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE
 Rule 5     RepeatClassMemberDefinition -> empty
 Rule 6     RepeatClassMemberDefinition -> RepeatClassMemberDefinition ClassMemberDefinition
-Rule 7     Type -> IDENTIFIER
+Rule 7     Type -> IDENTIFIER  [precedence=left, level=10]
 Rule 8     Type -> STRING
 Rule 9     Type -> BOOL
 Rule 10    Type -> KEYWORDCHAR
@@ -19,12 +19,12 @@ Rule 15    ClassMemberDefinition -> ConstructorDeclaration
 Rule 16    ClassMemberDefinition -> DataMemberDeclaration
 Rule 17    ClassMemberDefinition -> MethodDeclaration
 Rule 18    DataMemberDeclaration -> Modifier VariableDeclaration
-Rule 19    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix
+Rule 19    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix  [precedence=left, level=10]
 Rule 20    OptionalBrackets -> empty
 Rule 21    OptionalBrackets -> LBRACKET RBRACKET
-Rule 22    ConstructorDeclaration -> IDENTIFIER MethodSuffix
-Rule 23    Initializer -> EQUALS Expression
-Rule 24    MethodSuffix -> LPAREN OptionalParameterList RPAREN MethodBody
+Rule 22    ConstructorDeclaration -> IDENTIFIER MethodSuffix  [precedence=left, level=10]
+Rule 23    Initializer -> EQUALS Expression  [precedence=right, level=1]
+Rule 24    MethodSuffix -> LPAREN OptionalParameterList RPAREN MethodBody  [precedence=left, level=11]
 Rule 25    OptionalParameterList -> empty
 Rule 26    OptionalParameterList -> ParameterList
 Rule 27    MethodBody -> LBRACE RepeatStatement RBRACE
@@ -33,18 +33,18 @@ Rule 29    RepeatStatement -> RepeatStatement Statement
 Rule 30    ParameterList -> Parameter RepeatCommaParameter
 Rule 31    RepeatCommaParameter -> empty
 Rule 32    RepeatCommaParameter -> RepeatCommaParameter COMMA Parameter
-Rule 33    Parameter -> Type OptionalBrackets IDENTIFIER
+Rule 33    Parameter -> Type OptionalBrackets IDENTIFIER  [precedence=left, level=10]
 Rule 34    VariableDeclaration -> Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON
 Rule 35    OptionalInitializer -> empty
 Rule 36    OptionalInitializer -> Initializer
 Rule 37    Statement -> VariableDeclaration
 Rule 38    Statement -> BREAK SEMICOLON
-Rule 39    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock
+Rule 39    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock  [precedence=left, level=11]
 Rule 40    Statement -> CIN RIGHTSHIFT Expression SEMICOLON
 Rule 41    Statement -> COUT LEFTSHIFT Expression SEMICOLON
 Rule 42    Statement -> RETURN OptionalExpression SEMICOLON
-Rule 43    Statement -> WHILE LPAREN Expression RPAREN Statement
-Rule 44    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement
+Rule 43    Statement -> WHILE LPAREN Expression RPAREN Statement  [precedence=left, level=11]
+Rule 44    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement  [precedence=left, level=11]
 Rule 45    Statement -> Expression SEMICOLON
 Rule 46    Statement -> LBRACE RepeatStatement RBRACE
 Rule 47    OptionalElseStatement -> empty
@@ -58,39 +58,39 @@ Rule 54    Case -> CASE CHAR_LITERAL COLON RepeatStatement
 Rule 55    Case -> CASE NUM_LITERAL COLON RepeatStatement
 Rule 56    Expression -> Expression Arguments
 Rule 57    Expression -> Expression Index
-Rule 58    Expression -> Expression PERIOD IDENTIFIER
-Rule 59    Expression -> THIS
-Rule 60    Expression -> NEW Type Index
-Rule 61    Expression -> NEW Type Arguments
-Rule 62    Expression -> IDENTIFIER
-Rule 63    Expression -> NULL
-Rule 64    Expression -> FALSE
-Rule 65    Expression -> TRUE
-Rule 66    Expression -> STRING_LITERAL
-Rule 67    Expression -> CHAR_LITERAL
-Rule 68    Expression -> NUM_LITERAL
-Rule 69    Expression -> MINUS Expression  [precedence=left, level=1]
-Rule 70    Expression -> PLUS Expression  [precedence=left, level=1]
-Rule 71    Expression -> EXCLAMATIONMARK Expression
-Rule 72    Expression -> Expression OR Expression
-Rule 73    Expression -> Expression AND Expression
-Rule 74    Expression -> Expression GREATEROREQUAL Expression
-Rule 75    Expression -> Expression LESSOREQUAL Expression
-Rule 76    Expression -> Expression GREATERTHAN Expression
-Rule 77    Expression -> Expression LESSTHAN Expression
-Rule 78    Expression -> Expression NOTEQUALS Expression
-Rule 79    Expression -> Expression DOUBLEEQUALS Expression
-Rule 80    Expression -> Expression DIVIDE Expression  [precedence=left, level=2]
-Rule 81    Expression -> Expression TIMES Expression  [precedence=left, level=2]
-Rule 82    Expression -> Expression MINUS Expression  [precedence=left, level=1]
-Rule 83    Expression -> Expression PLUS Expression  [precedence=left, level=1]
-Rule 84    Expression -> Expression DIVIDEEQUALS Expression
-Rule 85    Expression -> Expression TIMESEQUALS Expression
-Rule 86    Expression -> Expression MINUSEQUALS Expression
-Rule 87    Expression -> Expression PLUSEQUALS Expression
-Rule 88    Expression -> Expression EQUALS Expression
-Rule 89    Expression -> LPAREN Expression RPAREN
-Rule 90    Arguments -> LPAREN OptionalArgumentList RPAREN
+Rule 58    Expression -> Expression PERIOD IDENTIFIER  [precedence=left, level=10]
+Rule 59    Expression -> THIS  [precedence=left, level=9]
+Rule 60    Expression -> NEW Type Index  [precedence=right, level=8]
+Rule 61    Expression -> NEW Type Arguments  [precedence=right, level=8]
+Rule 62    Expression -> IDENTIFIER  [precedence=left, level=10]
+Rule 63    Expression -> NULL  [precedence=left, level=10]
+Rule 64    Expression -> FALSE  [precedence=left, level=10]
+Rule 65    Expression -> TRUE  [precedence=left, level=10]
+Rule 66    Expression -> STRING_LITERAL  [precedence=left, level=10]
+Rule 67    Expression -> CHAR_LITERAL  [precedence=left, level=10]
+Rule 68    Expression -> NUM_LITERAL  [precedence=left, level=10]
+Rule 69    Expression -> MINUS Expression  [precedence=left, level=6]
+Rule 70    Expression -> PLUS Expression  [precedence=left, level=6]
+Rule 71    Expression -> EXCLAMATIONMARK Expression  [precedence=right, level=8]
+Rule 72    Expression -> Expression OR Expression  [precedence=left, level=3]
+Rule 73    Expression -> Expression AND Expression  [precedence=left, level=3]
+Rule 74    Expression -> Expression GREATEROREQUAL Expression  [precedence=left, level=5]
+Rule 75    Expression -> Expression LESSOREQUAL Expression  [precedence=left, level=5]
+Rule 76    Expression -> Expression GREATERTHAN Expression  [precedence=left, level=5]
+Rule 77    Expression -> Expression LESSTHAN Expression  [precedence=left, level=5]
+Rule 78    Expression -> Expression NOTEQUALS Expression  [precedence=left, level=4]
+Rule 79    Expression -> Expression DOUBLEEQUALS Expression  [precedence=left, level=4]
+Rule 80    Expression -> Expression DIVIDE Expression  [precedence=left, level=7]
+Rule 81    Expression -> Expression TIMES Expression  [precedence=left, level=7]
+Rule 82    Expression -> Expression MINUS Expression  [precedence=left, level=6]
+Rule 83    Expression -> Expression PLUS Expression  [precedence=left, level=6]
+Rule 84    Expression -> Expression DIVIDEEQUALS Expression  [precedence=right, level=2]
+Rule 85    Expression -> Expression TIMESEQUALS Expression  [precedence=right, level=2]
+Rule 86    Expression -> Expression MINUSEQUALS Expression  [precedence=right, level=1]
+Rule 87    Expression -> Expression PLUSEQUALS Expression  [precedence=right, level=1]
+Rule 88    Expression -> Expression EQUALS Expression  [precedence=right, level=1]
+Rule 89    Expression -> LPAREN Expression RPAREN  [precedence=left, level=11]
+Rule 90    Arguments -> LPAREN OptionalArgumentList RPAREN  [precedence=left, level=11]
 Rule 91    OptionalArgumentList -> empty
 Rule 92    OptionalArgumentList -> ArgumentList
 Rule 93    ArgumentList -> Expression RepeatCommaExpression
@@ -3252,13 +3252,13 @@ state 115
     MINUSEQUALS     reduce using rule 69 (Expression -> MINUS Expression .)
     PLUSEQUALS      reduce using rule 69 (Expression -> MINUS Expression .)
     EQUALS          reduce using rule 69 (Expression -> MINUS Expression .)
-    LPAREN          reduce using rule 69 (Expression -> MINUS Expression .)
     LBRACKET        reduce using rule 69 (Expression -> MINUS Expression .)
     RPAREN          reduce using rule 69 (Expression -> MINUS Expression .)
     COMMA           reduce using rule 69 (Expression -> MINUS Expression .)
     RBRACKET        reduce using rule 69 (Expression -> MINUS Expression .)
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3305,13 +3305,13 @@ state 116
     MINUSEQUALS     reduce using rule 70 (Expression -> PLUS Expression .)
     PLUSEQUALS      reduce using rule 70 (Expression -> PLUS Expression .)
     EQUALS          reduce using rule 70 (Expression -> PLUS Expression .)
-    LPAREN          reduce using rule 70 (Expression -> PLUS Expression .)
     LBRACKET        reduce using rule 70 (Expression -> PLUS Expression .)
     RPAREN          reduce using rule 70 (Expression -> PLUS Expression .)
     COMMA           reduce using rule 70 (Expression -> PLUS Expression .)
     RBRACKET        reduce using rule 70 (Expression -> PLUS Expression .)
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3341,50 +3341,30 @@ state 117
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    PERIOD          reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    OR              reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    AND             reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    GREATEROREQUAL  reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    LESSOREQUAL     reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    GREATERTHAN     reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    LESSTHAN        reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    NOTEQUALS       reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    DOUBLEEQUALS    reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    DIVIDE          reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    TIMES           reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    MINUS           reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    PLUS            reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    DIVIDEEQUALS    reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    TIMESEQUALS     reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    MINUSEQUALS     reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    PLUSEQUALS      reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    EQUALS          reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
+    LBRACKET        reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
     RPAREN          reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
     COMMA           reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
     RBRACKET        reduce using rule 71 (Expression -> EXCLAMATIONMARK Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
-    GREATEROREQUAL  shift and go to state 89
-    LESSOREQUAL     shift and go to state 90
-    GREATERTHAN     shift and go to state 91
-    LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
-    DIVIDE          shift and go to state 95
-    TIMES           shift and go to state 96
-    MINUS           shift and go to state 97
-    PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3673,33 +3653,19 @@ state 130
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 72 (Expression -> Expression OR Expression .)
+    PERIOD          reduce using rule 72 (Expression -> Expression OR Expression .)
+    OR              reduce using rule 72 (Expression -> Expression OR Expression .)
+    AND             reduce using rule 72 (Expression -> Expression OR Expression .)
+    DIVIDEEQUALS    reduce using rule 72 (Expression -> Expression OR Expression .)
+    TIMESEQUALS     reduce using rule 72 (Expression -> Expression OR Expression .)
+    MINUSEQUALS     reduce using rule 72 (Expression -> Expression OR Expression .)
+    PLUSEQUALS      reduce using rule 72 (Expression -> Expression OR Expression .)
+    EQUALS          reduce using rule 72 (Expression -> Expression OR Expression .)
+    LBRACKET        reduce using rule 72 (Expression -> Expression OR Expression .)
     RPAREN          reduce using rule 72 (Expression -> Expression OR Expression .)
     COMMA           reduce using rule 72 (Expression -> Expression OR Expression .)
     RBRACKET        reduce using rule 72 (Expression -> Expression OR Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
     LESSOREQUAL     shift and go to state 90
     GREATERTHAN     shift and go to state 91
@@ -3710,13 +3676,7 @@ state 130
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3746,33 +3706,19 @@ state 131
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 73 (Expression -> Expression AND Expression .)
+    PERIOD          reduce using rule 73 (Expression -> Expression AND Expression .)
+    OR              reduce using rule 73 (Expression -> Expression AND Expression .)
+    AND             reduce using rule 73 (Expression -> Expression AND Expression .)
+    DIVIDEEQUALS    reduce using rule 73 (Expression -> Expression AND Expression .)
+    TIMESEQUALS     reduce using rule 73 (Expression -> Expression AND Expression .)
+    MINUSEQUALS     reduce using rule 73 (Expression -> Expression AND Expression .)
+    PLUSEQUALS      reduce using rule 73 (Expression -> Expression AND Expression .)
+    EQUALS          reduce using rule 73 (Expression -> Expression AND Expression .)
+    LBRACKET        reduce using rule 73 (Expression -> Expression AND Expression .)
     RPAREN          reduce using rule 73 (Expression -> Expression AND Expression .)
     COMMA           reduce using rule 73 (Expression -> Expression AND Expression .)
     RBRACKET        reduce using rule 73 (Expression -> Expression AND Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
     LESSOREQUAL     shift and go to state 90
     GREATERTHAN     shift and go to state 91
@@ -3783,13 +3729,7 @@ state 131
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3819,50 +3759,30 @@ state 132
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    PERIOD          reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    OR              reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    AND             reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    GREATEROREQUAL  reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    LESSOREQUAL     reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    GREATERTHAN     reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    LESSTHAN        reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    NOTEQUALS       reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    DOUBLEEQUALS    reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    DIVIDEEQUALS    reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    TIMESEQUALS     reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    MINUSEQUALS     reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    PLUSEQUALS      reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    EQUALS          reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
+    LBRACKET        reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
     RPAREN          reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
     COMMA           reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
     RBRACKET        reduce using rule 74 (Expression -> Expression GREATEROREQUAL Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
-    GREATEROREQUAL  shift and go to state 89
-    LESSOREQUAL     shift and go to state 90
-    GREATERTHAN     shift and go to state 91
-    LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3892,50 +3812,30 @@ state 133
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    PERIOD          reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    OR              reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    AND             reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    GREATEROREQUAL  reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    LESSOREQUAL     reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    GREATERTHAN     reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    LESSTHAN        reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    NOTEQUALS       reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    DOUBLEEQUALS    reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    DIVIDEEQUALS    reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    TIMESEQUALS     reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    MINUSEQUALS     reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    PLUSEQUALS      reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    EQUALS          reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
+    LBRACKET        reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
     RPAREN          reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
     COMMA           reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
     RBRACKET        reduce using rule 75 (Expression -> Expression LESSOREQUAL Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
-    GREATEROREQUAL  shift and go to state 89
-    LESSOREQUAL     shift and go to state 90
-    GREATERTHAN     shift and go to state 91
-    LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -3965,50 +3865,30 @@ state 134
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    PERIOD          reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    OR              reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    AND             reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    GREATEROREQUAL  reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    LESSOREQUAL     reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    GREATERTHAN     reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    LESSTHAN        reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    NOTEQUALS       reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    DOUBLEEQUALS    reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    DIVIDEEQUALS    reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    TIMESEQUALS     reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    MINUSEQUALS     reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    PLUSEQUALS      reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    EQUALS          reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
+    LBRACKET        reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
     RPAREN          reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
     COMMA           reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
     RBRACKET        reduce using rule 76 (Expression -> Expression GREATERTHAN Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
-    GREATEROREQUAL  shift and go to state 89
-    LESSOREQUAL     shift and go to state 90
-    GREATERTHAN     shift and go to state 91
-    LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4038,50 +3918,30 @@ state 135
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    PERIOD          reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    OR              reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    AND             reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    GREATEROREQUAL  reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    LESSOREQUAL     reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    GREATERTHAN     reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    LESSTHAN        reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    NOTEQUALS       reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    DOUBLEEQUALS    reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    DIVIDEEQUALS    reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    TIMESEQUALS     reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    MINUSEQUALS     reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    PLUSEQUALS      reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    EQUALS          reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
+    LBRACKET        reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
     RPAREN          reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
     COMMA           reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
     RBRACKET        reduce using rule 77 (Expression -> Expression LESSTHAN Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
-    GREATEROREQUAL  shift and go to state 89
-    LESSOREQUAL     shift and go to state 90
-    GREATERTHAN     shift and go to state 91
-    LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4111,50 +3971,30 @@ state 136
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    PERIOD          reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    OR              reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    AND             reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    NOTEQUALS       reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    DOUBLEEQUALS    reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    DIVIDEEQUALS    reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    TIMESEQUALS     reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    MINUSEQUALS     reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    PLUSEQUALS      reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    EQUALS          reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
+    LBRACKET        reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
     RPAREN          reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
     COMMA           reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
     RBRACKET        reduce using rule 78 (Expression -> Expression NOTEQUALS Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
     LESSOREQUAL     shift and go to state 90
     GREATERTHAN     shift and go to state 91
     LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4184,50 +4024,30 @@ state 137
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    PERIOD          reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    OR              reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    AND             reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    NOTEQUALS       reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    DOUBLEEQUALS    reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    DIVIDEEQUALS    reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    TIMESEQUALS     reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    MINUSEQUALS     reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    PLUSEQUALS      reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    EQUALS          reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
+    LBRACKET        reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
     RPAREN          reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
     COMMA           reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
     RBRACKET        reduce using rule 79 (Expression -> Expression DOUBLEEQUALS Expression .)
-    PERIOD          shift and go to state 86
-    OR              shift and go to state 87
-    AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
     LESSOREQUAL     shift and go to state 90
     GREATERTHAN     shift and go to state 91
     LESSTHAN        shift and go to state 92
-    NOTEQUALS       shift and go to state 93
-    DOUBLEEQUALS    shift and go to state 94
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
     MINUS           shift and go to state 97
     PLUS            shift and go to state 98
-    DIVIDEEQUALS    shift and go to state 99
-    TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4276,11 +4096,11 @@ state 138
     MINUSEQUALS     reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     PLUSEQUALS      reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     EQUALS          reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
-    LPAREN          reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     LBRACKET        reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     RPAREN          reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     COMMA           reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
     RBRACKET        reduce using rule 80 (Expression -> Expression DIVIDE Expression .)
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4329,11 +4149,11 @@ state 139
     MINUSEQUALS     reduce using rule 81 (Expression -> Expression TIMES Expression .)
     PLUSEQUALS      reduce using rule 81 (Expression -> Expression TIMES Expression .)
     EQUALS          reduce using rule 81 (Expression -> Expression TIMES Expression .)
-    LPAREN          reduce using rule 81 (Expression -> Expression TIMES Expression .)
     LBRACKET        reduce using rule 81 (Expression -> Expression TIMES Expression .)
     RPAREN          reduce using rule 81 (Expression -> Expression TIMES Expression .)
     COMMA           reduce using rule 81 (Expression -> Expression TIMES Expression .)
     RBRACKET        reduce using rule 81 (Expression -> Expression TIMES Expression .)
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4380,13 +4200,13 @@ state 140
     MINUSEQUALS     reduce using rule 82 (Expression -> Expression MINUS Expression .)
     PLUSEQUALS      reduce using rule 82 (Expression -> Expression MINUS Expression .)
     EQUALS          reduce using rule 82 (Expression -> Expression MINUS Expression .)
-    LPAREN          reduce using rule 82 (Expression -> Expression MINUS Expression .)
     LBRACKET        reduce using rule 82 (Expression -> Expression MINUS Expression .)
     RPAREN          reduce using rule 82 (Expression -> Expression MINUS Expression .)
     COMMA           reduce using rule 82 (Expression -> Expression MINUS Expression .)
     RBRACKET        reduce using rule 82 (Expression -> Expression MINUS Expression .)
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4433,13 +4253,13 @@ state 141
     MINUSEQUALS     reduce using rule 83 (Expression -> Expression PLUS Expression .)
     PLUSEQUALS      reduce using rule 83 (Expression -> Expression PLUS Expression .)
     EQUALS          reduce using rule 83 (Expression -> Expression PLUS Expression .)
-    LPAREN          reduce using rule 83 (Expression -> Expression PLUS Expression .)
     LBRACKET        reduce using rule 83 (Expression -> Expression PLUS Expression .)
     RPAREN          reduce using rule 83 (Expression -> Expression PLUS Expression .)
     COMMA           reduce using rule 83 (Expression -> Expression PLUS Expression .)
     RBRACKET        reduce using rule 83 (Expression -> Expression PLUS Expression .)
     DIVIDE          shift and go to state 95
     TIMES           shift and go to state 96
+    LPAREN          shift and go to state 104
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4469,31 +4289,15 @@ state 142
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
+    PERIOD          reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
+    MINUSEQUALS     reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
+    PLUSEQUALS      reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
+    EQUALS          reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
+    LBRACKET        reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
     RPAREN          reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
     COMMA           reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
     RBRACKET        reduce using rule 84 (Expression -> Expression DIVIDEEQUALS Expression .)
-    PERIOD          shift and go to state 86
     OR              shift and go to state 87
     AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
@@ -4508,11 +4312,7 @@ state 142
     PLUS            shift and go to state 98
     DIVIDEEQUALS    shift and go to state 99
     TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4542,31 +4342,15 @@ state 143
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
+    PERIOD          reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
+    MINUSEQUALS     reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
+    PLUSEQUALS      reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
+    EQUALS          reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
+    LBRACKET        reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
     RPAREN          reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
     COMMA           reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
     RBRACKET        reduce using rule 85 (Expression -> Expression TIMESEQUALS Expression .)
-    PERIOD          shift and go to state 86
     OR              shift and go to state 87
     AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
@@ -4581,11 +4365,7 @@ state 143
     PLUS            shift and go to state 98
     DIVIDEEQUALS    shift and go to state 99
     TIMESEQUALS     shift and go to state 100
-    MINUSEQUALS     shift and go to state 101
-    PLUSEQUALS      shift and go to state 102
-    EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4615,31 +4395,12 @@ state 144
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
+    PERIOD          reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
+    LBRACKET        reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
     RPAREN          reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
     COMMA           reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
     RBRACKET        reduce using rule 86 (Expression -> Expression MINUSEQUALS Expression .)
-    PERIOD          shift and go to state 86
     OR              shift and go to state 87
     AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
@@ -4658,7 +4419,6 @@ state 144
     PLUSEQUALS      shift and go to state 102
     EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4688,31 +4448,12 @@ state 145
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
+    PERIOD          reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
+    LBRACKET        reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
     RPAREN          reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
     COMMA           reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
     RBRACKET        reduce using rule 87 (Expression -> Expression PLUSEQUALS Expression .)
-    PERIOD          shift and go to state 86
     OR              shift and go to state 87
     AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
@@ -4731,7 +4472,6 @@ state 145
     PLUSEQUALS      shift and go to state 102
     EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -4761,31 +4501,12 @@ state 146
     (88) Expression -> Expression . EQUALS Expression
     (90) Arguments -> . LPAREN OptionalArgumentList RPAREN
     (96) Index -> . LBRACKET Expression RBRACKET
-  ! shift/reduce conflict for PERIOD resolved as shift
-  ! shift/reduce conflict for OR resolved as shift
-  ! shift/reduce conflict for AND resolved as shift
-  ! shift/reduce conflict for GREATEROREQUAL resolved as shift
-  ! shift/reduce conflict for LESSOREQUAL resolved as shift
-  ! shift/reduce conflict for GREATERTHAN resolved as shift
-  ! shift/reduce conflict for LESSTHAN resolved as shift
-  ! shift/reduce conflict for NOTEQUALS resolved as shift
-  ! shift/reduce conflict for DOUBLEEQUALS resolved as shift
-  ! shift/reduce conflict for DIVIDE resolved as shift
-  ! shift/reduce conflict for TIMES resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for PLUS resolved as shift
-  ! shift/reduce conflict for DIVIDEEQUALS resolved as shift
-  ! shift/reduce conflict for TIMESEQUALS resolved as shift
-  ! shift/reduce conflict for MINUSEQUALS resolved as shift
-  ! shift/reduce conflict for PLUSEQUALS resolved as shift
-  ! shift/reduce conflict for EQUALS resolved as shift
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for LBRACKET resolved as shift
     SEMICOLON       reduce using rule 88 (Expression -> Expression EQUALS Expression .)
+    PERIOD          reduce using rule 88 (Expression -> Expression EQUALS Expression .)
+    LBRACKET        reduce using rule 88 (Expression -> Expression EQUALS Expression .)
     RPAREN          reduce using rule 88 (Expression -> Expression EQUALS Expression .)
     COMMA           reduce using rule 88 (Expression -> Expression EQUALS Expression .)
     RBRACKET        reduce using rule 88 (Expression -> Expression EQUALS Expression .)
-    PERIOD          shift and go to state 86
     OR              shift and go to state 87
     AND             shift and go to state 88
     GREATEROREQUAL  shift and go to state 89
@@ -4804,7 +4525,6 @@ state 146
     PLUSEQUALS      shift and go to state 102
     EQUALS          shift and go to state 103
     LPAREN          shift and go to state 104
-    LBRACKET        shift and go to state 105
 
     Arguments                      shift and go to state 84
     Index                          shift and go to state 85
@@ -6542,286 +6262,6 @@ state 195
 
 Conflicts:
 
-shift/reduce conflict for PERIOD in state 117 resolved as shift
-shift/reduce conflict for OR in state 117 resolved as shift
-shift/reduce conflict for AND in state 117 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 117 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 117 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 117 resolved as shift
-shift/reduce conflict for LESSTHAN in state 117 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 117 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 117 resolved as shift
-shift/reduce conflict for DIVIDE in state 117 resolved as shift
-shift/reduce conflict for TIMES in state 117 resolved as shift
-shift/reduce conflict for MINUS in state 117 resolved as shift
-shift/reduce conflict for PLUS in state 117 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 117 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 117 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 117 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 117 resolved as shift
-shift/reduce conflict for EQUALS in state 117 resolved as shift
-shift/reduce conflict for LPAREN in state 117 resolved as shift
-shift/reduce conflict for LBRACKET in state 117 resolved as shift
-shift/reduce conflict for PERIOD in state 130 resolved as shift
-shift/reduce conflict for OR in state 130 resolved as shift
-shift/reduce conflict for AND in state 130 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 130 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 130 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 130 resolved as shift
-shift/reduce conflict for LESSTHAN in state 130 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 130 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 130 resolved as shift
-shift/reduce conflict for DIVIDE in state 130 resolved as shift
-shift/reduce conflict for TIMES in state 130 resolved as shift
-shift/reduce conflict for MINUS in state 130 resolved as shift
-shift/reduce conflict for PLUS in state 130 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 130 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 130 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 130 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 130 resolved as shift
-shift/reduce conflict for EQUALS in state 130 resolved as shift
-shift/reduce conflict for LPAREN in state 130 resolved as shift
-shift/reduce conflict for LBRACKET in state 130 resolved as shift
-shift/reduce conflict for PERIOD in state 131 resolved as shift
-shift/reduce conflict for OR in state 131 resolved as shift
-shift/reduce conflict for AND in state 131 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 131 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 131 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 131 resolved as shift
-shift/reduce conflict for LESSTHAN in state 131 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 131 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 131 resolved as shift
-shift/reduce conflict for DIVIDE in state 131 resolved as shift
-shift/reduce conflict for TIMES in state 131 resolved as shift
-shift/reduce conflict for MINUS in state 131 resolved as shift
-shift/reduce conflict for PLUS in state 131 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 131 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 131 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 131 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 131 resolved as shift
-shift/reduce conflict for EQUALS in state 131 resolved as shift
-shift/reduce conflict for LPAREN in state 131 resolved as shift
-shift/reduce conflict for LBRACKET in state 131 resolved as shift
-shift/reduce conflict for PERIOD in state 132 resolved as shift
-shift/reduce conflict for OR in state 132 resolved as shift
-shift/reduce conflict for AND in state 132 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 132 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 132 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 132 resolved as shift
-shift/reduce conflict for LESSTHAN in state 132 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 132 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 132 resolved as shift
-shift/reduce conflict for DIVIDE in state 132 resolved as shift
-shift/reduce conflict for TIMES in state 132 resolved as shift
-shift/reduce conflict for MINUS in state 132 resolved as shift
-shift/reduce conflict for PLUS in state 132 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 132 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 132 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 132 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 132 resolved as shift
-shift/reduce conflict for EQUALS in state 132 resolved as shift
-shift/reduce conflict for LPAREN in state 132 resolved as shift
-shift/reduce conflict for LBRACKET in state 132 resolved as shift
-shift/reduce conflict for PERIOD in state 133 resolved as shift
-shift/reduce conflict for OR in state 133 resolved as shift
-shift/reduce conflict for AND in state 133 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 133 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 133 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 133 resolved as shift
-shift/reduce conflict for LESSTHAN in state 133 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 133 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 133 resolved as shift
-shift/reduce conflict for DIVIDE in state 133 resolved as shift
-shift/reduce conflict for TIMES in state 133 resolved as shift
-shift/reduce conflict for MINUS in state 133 resolved as shift
-shift/reduce conflict for PLUS in state 133 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 133 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 133 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 133 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 133 resolved as shift
-shift/reduce conflict for EQUALS in state 133 resolved as shift
-shift/reduce conflict for LPAREN in state 133 resolved as shift
-shift/reduce conflict for LBRACKET in state 133 resolved as shift
-shift/reduce conflict for PERIOD in state 134 resolved as shift
-shift/reduce conflict for OR in state 134 resolved as shift
-shift/reduce conflict for AND in state 134 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 134 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 134 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 134 resolved as shift
-shift/reduce conflict for LESSTHAN in state 134 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 134 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 134 resolved as shift
-shift/reduce conflict for DIVIDE in state 134 resolved as shift
-shift/reduce conflict for TIMES in state 134 resolved as shift
-shift/reduce conflict for MINUS in state 134 resolved as shift
-shift/reduce conflict for PLUS in state 134 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 134 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 134 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 134 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 134 resolved as shift
-shift/reduce conflict for EQUALS in state 134 resolved as shift
-shift/reduce conflict for LPAREN in state 134 resolved as shift
-shift/reduce conflict for LBRACKET in state 134 resolved as shift
-shift/reduce conflict for PERIOD in state 135 resolved as shift
-shift/reduce conflict for OR in state 135 resolved as shift
-shift/reduce conflict for AND in state 135 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 135 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 135 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 135 resolved as shift
-shift/reduce conflict for LESSTHAN in state 135 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 135 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 135 resolved as shift
-shift/reduce conflict for DIVIDE in state 135 resolved as shift
-shift/reduce conflict for TIMES in state 135 resolved as shift
-shift/reduce conflict for MINUS in state 135 resolved as shift
-shift/reduce conflict for PLUS in state 135 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 135 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 135 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 135 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 135 resolved as shift
-shift/reduce conflict for EQUALS in state 135 resolved as shift
-shift/reduce conflict for LPAREN in state 135 resolved as shift
-shift/reduce conflict for LBRACKET in state 135 resolved as shift
-shift/reduce conflict for PERIOD in state 136 resolved as shift
-shift/reduce conflict for OR in state 136 resolved as shift
-shift/reduce conflict for AND in state 136 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 136 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 136 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 136 resolved as shift
-shift/reduce conflict for LESSTHAN in state 136 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 136 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 136 resolved as shift
-shift/reduce conflict for DIVIDE in state 136 resolved as shift
-shift/reduce conflict for TIMES in state 136 resolved as shift
-shift/reduce conflict for MINUS in state 136 resolved as shift
-shift/reduce conflict for PLUS in state 136 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 136 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 136 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 136 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 136 resolved as shift
-shift/reduce conflict for EQUALS in state 136 resolved as shift
-shift/reduce conflict for LPAREN in state 136 resolved as shift
-shift/reduce conflict for LBRACKET in state 136 resolved as shift
-shift/reduce conflict for PERIOD in state 137 resolved as shift
-shift/reduce conflict for OR in state 137 resolved as shift
-shift/reduce conflict for AND in state 137 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 137 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 137 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 137 resolved as shift
-shift/reduce conflict for LESSTHAN in state 137 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 137 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 137 resolved as shift
-shift/reduce conflict for DIVIDE in state 137 resolved as shift
-shift/reduce conflict for TIMES in state 137 resolved as shift
-shift/reduce conflict for MINUS in state 137 resolved as shift
-shift/reduce conflict for PLUS in state 137 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 137 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 137 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 137 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 137 resolved as shift
-shift/reduce conflict for EQUALS in state 137 resolved as shift
-shift/reduce conflict for LPAREN in state 137 resolved as shift
-shift/reduce conflict for LBRACKET in state 137 resolved as shift
-shift/reduce conflict for PERIOD in state 142 resolved as shift
-shift/reduce conflict for OR in state 142 resolved as shift
-shift/reduce conflict for AND in state 142 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 142 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 142 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 142 resolved as shift
-shift/reduce conflict for LESSTHAN in state 142 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 142 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 142 resolved as shift
-shift/reduce conflict for DIVIDE in state 142 resolved as shift
-shift/reduce conflict for TIMES in state 142 resolved as shift
-shift/reduce conflict for MINUS in state 142 resolved as shift
-shift/reduce conflict for PLUS in state 142 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 142 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 142 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 142 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 142 resolved as shift
-shift/reduce conflict for EQUALS in state 142 resolved as shift
-shift/reduce conflict for LPAREN in state 142 resolved as shift
-shift/reduce conflict for LBRACKET in state 142 resolved as shift
-shift/reduce conflict for PERIOD in state 143 resolved as shift
-shift/reduce conflict for OR in state 143 resolved as shift
-shift/reduce conflict for AND in state 143 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 143 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 143 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 143 resolved as shift
-shift/reduce conflict for LESSTHAN in state 143 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 143 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 143 resolved as shift
-shift/reduce conflict for DIVIDE in state 143 resolved as shift
-shift/reduce conflict for TIMES in state 143 resolved as shift
-shift/reduce conflict for MINUS in state 143 resolved as shift
-shift/reduce conflict for PLUS in state 143 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 143 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 143 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 143 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 143 resolved as shift
-shift/reduce conflict for EQUALS in state 143 resolved as shift
-shift/reduce conflict for LPAREN in state 143 resolved as shift
-shift/reduce conflict for LBRACKET in state 143 resolved as shift
-shift/reduce conflict for PERIOD in state 144 resolved as shift
-shift/reduce conflict for OR in state 144 resolved as shift
-shift/reduce conflict for AND in state 144 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 144 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 144 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 144 resolved as shift
-shift/reduce conflict for LESSTHAN in state 144 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 144 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 144 resolved as shift
-shift/reduce conflict for DIVIDE in state 144 resolved as shift
-shift/reduce conflict for TIMES in state 144 resolved as shift
-shift/reduce conflict for MINUS in state 144 resolved as shift
-shift/reduce conflict for PLUS in state 144 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 144 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 144 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 144 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 144 resolved as shift
-shift/reduce conflict for EQUALS in state 144 resolved as shift
-shift/reduce conflict for LPAREN in state 144 resolved as shift
-shift/reduce conflict for LBRACKET in state 144 resolved as shift
-shift/reduce conflict for PERIOD in state 145 resolved as shift
-shift/reduce conflict for OR in state 145 resolved as shift
-shift/reduce conflict for AND in state 145 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 145 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 145 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 145 resolved as shift
-shift/reduce conflict for LESSTHAN in state 145 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 145 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 145 resolved as shift
-shift/reduce conflict for DIVIDE in state 145 resolved as shift
-shift/reduce conflict for TIMES in state 145 resolved as shift
-shift/reduce conflict for MINUS in state 145 resolved as shift
-shift/reduce conflict for PLUS in state 145 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 145 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 145 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 145 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 145 resolved as shift
-shift/reduce conflict for EQUALS in state 145 resolved as shift
-shift/reduce conflict for LPAREN in state 145 resolved as shift
-shift/reduce conflict for LBRACKET in state 145 resolved as shift
-shift/reduce conflict for PERIOD in state 146 resolved as shift
-shift/reduce conflict for OR in state 146 resolved as shift
-shift/reduce conflict for AND in state 146 resolved as shift
-shift/reduce conflict for GREATEROREQUAL in state 146 resolved as shift
-shift/reduce conflict for LESSOREQUAL in state 146 resolved as shift
-shift/reduce conflict for GREATERTHAN in state 146 resolved as shift
-shift/reduce conflict for LESSTHAN in state 146 resolved as shift
-shift/reduce conflict for NOTEQUALS in state 146 resolved as shift
-shift/reduce conflict for DOUBLEEQUALS in state 146 resolved as shift
-shift/reduce conflict for DIVIDE in state 146 resolved as shift
-shift/reduce conflict for TIMES in state 146 resolved as shift
-shift/reduce conflict for MINUS in state 146 resolved as shift
-shift/reduce conflict for PLUS in state 146 resolved as shift
-shift/reduce conflict for DIVIDEEQUALS in state 146 resolved as shift
-shift/reduce conflict for TIMESEQUALS in state 146 resolved as shift
-shift/reduce conflict for MINUSEQUALS in state 146 resolved as shift
-shift/reduce conflict for PLUSEQUALS in state 146 resolved as shift
-shift/reduce conflict for EQUALS in state 146 resolved as shift
-shift/reduce conflict for LPAREN in state 146 resolved as shift
-shift/reduce conflict for LBRACKET in state 146 resolved as shift
 shift/reduce conflict for ELSE in state 176 resolved as shift
-reduce/reduce conflict in state 60 resolved using rule Type -> IDENTIFIER
-rejected rule (Expression -> IDENTIFIER) in state 60
+reduce/reduce conflict in state 60 resolved using rule Type -> IDENTIFIER  [precedence=left, level=10]
+rejected rule (Expression -> IDENTIFIER  [precedence=left, level=10]) in state 60

@@ -5,8 +5,9 @@
 from sly import Lexer, Parser
 import math
 
+
 class CalcLexer(Lexer):
-    tokens = { NAME, NUMBER, PLUS, TIMES, MINUS, DIVIDE, ASSIGN, LPAREN, RPAREN, FACTORIAL }
+    tokens = {NAME, NUMBER, PLUS, TIMES, MINUS, DIVIDE, ASSIGN, LPAREN, RPAREN, FACTORIAL}
 
     ignore = ' \t'
 
@@ -24,7 +25,6 @@ class CalcLexer(Lexer):
     RPAREN = r'\)'
     FACTORIAL = r'!'
 
-
     # Ignored pattern
     ignore_newline = r'\n+'
 
@@ -36,6 +36,7 @@ class CalcLexer(Lexer):
         print("Illegal character '%s'" % t.value[0])
         self.index += 1
 
+
 class CalcParser(Parser):
     tokens = CalcLexer.tokens
 
@@ -43,10 +44,10 @@ class CalcParser(Parser):
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE, FACTORIAL),
         ('right', UMINUS),
-        )
+    )
 
     def __init__(self):
-        self.names = { }
+        self.names = {}
 
     @_('NAME ASSIGN expr')
     def statement(self, p):
@@ -55,22 +56,25 @@ class CalcParser(Parser):
 
     @_('expr')
     def statement(self, p):
-        # print(p.expr)
-        pass
+        print(p.expr)
+        # pass
+
+    @_('expr TIMES expr')
+    def expr(self, p):
+        return p.expr0 * p.expr1
+        # pass
+
+    # here I put TIMES above PLUS to see if it would throw off the order
+    # it didn't, because of the precedence guy at the top
 
     @_('expr PLUS expr')
     def expr(self, p):
-        # return p.expr0 + p.expr1
-        pass
+        return p.expr0 + p.expr1
+        # pass
 
     @_('expr MINUS expr')
     def expr(self, p):
         # return p.expr0 - p.expr1
-        pass
-
-    @_('expr TIMES expr')
-    def expr(self, p):
-        # return p.expr0 * p.expr1
         pass
 
     @_('expr DIVIDE expr')
@@ -95,8 +99,8 @@ class CalcParser(Parser):
 
     @_('NUMBER')
     def expr(self, p):
-        # return int(p.NUMBER)
-        pass
+        return int(p.NUMBER)
+        # pass
 
     @_('NAME')
     def expr(self, p):
@@ -107,12 +111,13 @@ class CalcParser(Parser):
         #     return 0
         pass
 
+
 if __name__ == '__main__':
     lexer = CalcLexer()
     parser = CalcParser()
-    # parser.parse(lexer.tokenize("9 + 10 * 11"))
-    for token in lexer.tokenize("9 + 10 * 11"):
-        print(f"{token.Type}, {token.value}")
+    parser.parse(lexer.tokenize("9 + 10 * 11"))
+    # for token in lexer.tokenize("9 + 10 * 11"):
+    #     print(f"{token.Type}, {token.value}")
     # while True:
     #     try:
     #         text = input('calc > ')

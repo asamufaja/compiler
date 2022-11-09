@@ -139,16 +139,18 @@ void kxi2022 main() {
     // ArgumentList ::= hExpressioni (, hExpressioni)∗
     // Index ::= [ hExpressioni ]
 
-    !true
-    +1
-    -1
-    1
-    'a'
-    "sus"
-    true
-    false
-    null
-    a
-    new int
+    !true;
+    +1;
+    -1;
+    1;
+    'a';
+    "sus";
+    true;
+    false;
+    null;
+    a;
+    new int (5);
+    new int [5];
+
 
 }

@@ -64,17 +64,18 @@ class StatementTypes(Enum):
 
 class Expression(node):
     def __init__(self, op_type):
-        self.op_type = op_type
+        self.op_type: OpTypes = op_type
         self.left = None
         self.right = None
         self.value = None
         self.type = None
         self.args = None
+        self.child = None
 
 
 class Statement(node):
     def __init__(self, statement_type):
-        self.statement_type = statement_type
+        self.statement_type: StatementTypes = statement_type
         self.exp = None
         self.substatement = None
         self.case_list = None
@@ -82,18 +83,18 @@ class Statement(node):
 
 class Declaration(node):
     def __init__(self, ret_type):
-        self.ret_type = ret_type
+        self.ret_type: TypeTypes = ret_type
         self.params = None
         self.modifier = None
         self.ident = ""
         self.init = None
         self.body: list[Statement]
-        self.classdecl: list[classdecl]
+        self.classdecl: list[Declaration]
 
 
 class Type(node):
     def __init__(self, type_types):
-        self.type_type = type_types
+        self.type_type: TypeTypes = type_types
         self.name = ""
         self.array: bool
         self.subtype = ""
