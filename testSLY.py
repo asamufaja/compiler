@@ -112,7 +112,7 @@ if __name__ == '__main__':
     parser = CalcParser()
     # parser.parse(lexer.tokenize("9 + 10 * 11"))
     for token in lexer.tokenize("9 + 10 * 11"):
-        print(f"{token.type}, {token.value}")
+        print(f"{token.Type}, {token.value}")
     # while True:
     #     try:
     #         text = input('calc > ')

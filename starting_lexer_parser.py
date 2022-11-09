@@ -665,4 +665,4 @@ if __name__ == '__main__':
     messytest = open("messytest.kxy", 'r')
     parser.parse(lexer.tokenize(messytest.read()))
 
-    mytype = ast.type(ast.Type_types.INT)
+    mytype = ast.Type(ast.TypeTypes.INT)
