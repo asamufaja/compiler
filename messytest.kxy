@@ -69,12 +69,21 @@ void kxi2022 main() {
     switch(eee) {
         case 'a':
             cout << "dumb";
+            break;
 
         case 'e':
 
         default :
             cout << "hi";
     }
+
+    if (true) {
+        a = 2 + 2;
+    }
+    else {
+        cout << "bye";
+    }
+
 }
 
 
