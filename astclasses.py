@@ -4,7 +4,7 @@ import abc
 
 class Node:
     @abc.abstractmethod
-    def visit(self, Visitor):
+    def accept(self, v):
         pass
 
 
@@ -70,7 +70,7 @@ class Expression(Node):
         self.left = None
         self.right = None
         self.value = None
-        self.type: TypeTypes = None
+        self.type: TypeTypes
         self.args = None
 
     def accept(self, v):
@@ -99,7 +99,7 @@ class ClassAndMemberDeclaration(Node):
         self.modifier = None
         self.ident = ""
         self.body: list[Statement] = []
-        self.class_members: list[Declaration] = []
+        self.class_members: list[ClassAndMemberDeclaration] = []
         self.child = None
 
     def accept(self, v):
@@ -108,7 +108,8 @@ class ClassAndMemberDeclaration(Node):
 
 
 class VariableDeclaration(Node):
-    def __init__(self, type):
+    def __init__(self, var_type):
+        self.type: TypeTypes = var_type
         self.ident = ""
         self.init = None
         self.child = None

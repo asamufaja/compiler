@@ -142,7 +142,6 @@ class BigParser(Parser):
         then the variabledeclaration node
         '''
 
-    # @_('RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     @_('{ ClassDefinition } VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     def CompilationUnit(self, p):
         """CompilationUnit = ClassDefinition* void kxi2022 main ( ) MethodBody"""
@@ -150,24 +149,10 @@ class BigParser(Parser):
         compu = ast.ClassAndMemberDeclaration(None)
         compu.ident = "compunit"
         compu.child = p.MethodBody
-        # compu.class_members.append(p.RepeatClassDefinition)
         compu.class_members.extend(p.ClassDefinition)
-        # print(f"\nSUSUSUS\n{[c.ident for c in compu.class_members]}\nBYESUSSUS")
         print(f"\nSUSUSUS\n{compu.class_members}\nBYESUSSUS")
         return compu
 
-    # @_('RepeatClassDefinition ClassDefinition')
-    # def RepeatClassDefinition(self, p):
-    #     """RepeatClassDefinition = RepeatClassDefinition ClassDefinition"""
-    #     print("RepeatClassDefinition ClassDefinition")
-    #     return p.ClassDefinition
-
-    # @_('empty')
-    # def RepeatClassDefinition(self, p):
-    #     """RepeatClassDefinition = empty"""
-    #     print("RepeatClassDefinition empty")
-
-    # @_('CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE')
     @_('CLASS IDENTIFIER LBRACE { ClassMemberDefinition } RBRACE')
     def ClassDefinition(self, p):
         """ClassDefinition = CLASS IDENTIFIER { ClassMemberDefinition* }"""
@@ -175,20 +160,8 @@ class BigParser(Parser):
         classdef = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         classdef.ident = p.IDENTIFIER
         print(f"\nSUSUS\n{classdef.ident}\nSUSUS\n")
-        # classdef.class_members.append(p.RepeatClassMemberDefinition)
         classdef.class_members.extend(p.ClassMemberDefinition)
         return classdef
-
-    # @_('RepeatClassMemberDefinition ClassMemberDefinition')
-    # def RepeatClassMemberDefinition(self, p):
-    #     """RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassMemberDefinition"""
-    #     # print("RepeatClassMemberDefinition")
-    #     return p.ClassMemberDefinition
-
-    # @_('empty')
-    # def RepeatClassMemberDefinition(self, p):
-    #     """RepeatClassMemberDefinition ::= empty"""
-    #     print("RepeatClassMemberDefinition empty")
 
     @_('VOID')
     def Type(self, p):
@@ -251,7 +224,9 @@ class BigParser(Parser):
     @_('Modifier VariableDeclaration')
     def DataMemberDeclaration(self, p):
         """DataMemberDeclaration ::= Modifier VariableDeclaration"""
-        print("DataMemberDeclaration")
+        # print("DataMemberDeclaration")
+        memberdef = ast.ClassAndMemberDeclaration(p.VariableDeclaration.type)
+
 
     @_('Modifier Type OptionalBrackets IDENTIFIER MethodSuffix')
     def MethodDeclaration(self, p):
