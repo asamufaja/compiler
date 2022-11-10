@@ -2,6 +2,7 @@
 from sly import Lexer, Parser
 import math
 import astclasses as ast
+import sys
 
 
 class BigLexer(Lexer):
@@ -141,38 +142,53 @@ class BigParser(Parser):
         then the variabledeclaration node
         '''
 
-    @_('RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
+    # @_('RepeatClassDefinition VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
+    @_('{ ClassDefinition } VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     def CompilationUnit(self, p):
-        """CompilationUnit = RepeatClassDefinition void kxi2022 main ( ) MethodBody"""
+        """CompilationUnit = ClassDefinition* void kxi2022 main ( ) MethodBody"""
         # print("compilation unit")
-        compu = ast.Declaration(ast.TypeTypes.VOID)
-        compu.ident = "compu"
+        compu = ast.ClassAndMemberDeclaration(None)
+        compu.ident = "compunit"
         compu.child = p.MethodBody
-        compu.classdecl = [p.RepeatClassDefinition]
+        # compu.class_members.append(p.RepeatClassDefinition)
+        compu.class_members.extend(p.ClassDefinition)
+        # print(f"\nSUSUSUS\n{[c.ident for c in compu.class_members]}\nBYESUSSUS")
+        print(f"\nSUSUSUS\n{compu.class_members}\nBYESUSSUS")
+        return compu
 
-    @_('RepeatClassDefinition ClassDefinition')
-    def RepeatClassDefinition(self, p):
-        """RepeatClassDefinition = RepeatClassDefinition ClassDefinition | empty"""
-        print("RepeatClassDefinition thing")
+    # @_('RepeatClassDefinition ClassDefinition')
+    # def RepeatClassDefinition(self, p):
+    #     """RepeatClassDefinition = RepeatClassDefinition ClassDefinition"""
+    #     print("RepeatClassDefinition ClassDefinition")
+    #     return p.ClassDefinition
 
-    @_('empty')
-    def RepeatClassDefinition(self, p):
-        print("RepeatClassDefinition empty")
+    # @_('empty')
+    # def RepeatClassDefinition(self, p):
+    #     """RepeatClassDefinition = empty"""
+    #     print("RepeatClassDefinition empty")
 
-    @_('CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE')
+    # @_('CLASS IDENTIFIER LBRACE RepeatClassMemberDefinition RBRACE')
+    @_('CLASS IDENTIFIER LBRACE { ClassMemberDefinition } RBRACE')
     def ClassDefinition(self, p):
-        """ClassDefinition = CLASS IDENTIFIER { RepeatClassMemberDefinition }"""
+        """ClassDefinition = CLASS IDENTIFIER { ClassMemberDefinition* }"""
         print("ClassDefinition")
+        classdef = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
+        classdef.ident = p.IDENTIFIER
+        print(f"\nSUSUS\n{classdef.ident}\nSUSUS\n")
+        # classdef.class_members.append(p.RepeatClassMemberDefinition)
+        classdef.class_members.extend(p.ClassMemberDefinition)
+        return classdef
 
-    @_('RepeatClassMemberDefinition ClassMemberDefinition')
-    def RepeatClassMemberDefinition(self, p):
-        """RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassMemberDefinition"""
-        print("RepeatClassMemberDefinition")
+    # @_('RepeatClassMemberDefinition ClassMemberDefinition')
+    # def RepeatClassMemberDefinition(self, p):
+    #     """RepeatClassMemberDefinition = RepeatClassMemberDefinition ClassMemberDefinition"""
+    #     # print("RepeatClassMemberDefinition")
+    #     return p.ClassMemberDefinition
 
-    @_('empty')
-    def RepeatClassMemberDefinition(self, p):
-        """RepeatClassMemberDefinition ::= empty"""
-        print("RepeatClassMemberDefinition empty")
+    # @_('empty')
+    # def RepeatClassMemberDefinition(self, p):
+    #     """RepeatClassMemberDefinition ::= empty"""
+    #     print("RepeatClassMemberDefinition empty")
 
     @_('VOID')
     def Type(self, p):
@@ -217,17 +233,20 @@ class BigParser(Parser):
     @_('MethodDeclaration')
     def ClassMemberDefinition(self, p):
         """ClassMemberDefinition ::= MethodDeclaration"""
-        print("ClassMemberDefinition MethodDeclaration")
+        # print("ClassMemberDefinition MethodDeclaration")
+        return p.MethodDeclaration
 
     @_('DataMemberDeclaration')
     def ClassMemberDefinition(self, p):
         """ClassMemberDefinition ::= DataMemberDeclaration"""
-        print("ClassMemberDefinition ::= DataMemberDeclaration")
+        # print("ClassMemberDefinition ::= DataMemberDeclaration")
+        return p.DataMemberDeclaration
 
     @_('ConstructorDeclaration')
     def ClassMemberDefinition(self, p):
         """ClassMemberDefinition ::= ConstructorDeclaration"""
-        print("ClassMemberDefinition ::= ConstructorDeclaration")
+        # print("ClassMemberDefinition ::= ConstructorDeclaration")
+        return p.ConstructorDeclaration
 
     @_('Modifier VariableDeclaration')
     def DataMemberDeclaration(self, p):
@@ -632,11 +651,18 @@ class BigParser(Parser):
         print("e m p t y")
 
 
-if __name__ == '__main__':
+def main(args):
     lexer = BigLexer()
     parser = BigParser()
 
-    messytest = open("messytest.kxi", 'r')
-    parser.parse(lexer.tokenize(messytest.read()))
+    kxi = open(args[0], 'r')
+    parser.parse(lexer.tokenize(kxi.read()))
 
-    mytype = ast.Type(ast.TypeTypes.INT)
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+    # lexer = BigLexer()
+    # parser = BigParser()
+
+    # messytest = open("messytest.kxi", 'r')
+    # parser.parse(lexer.tokenize(messytest.read()))

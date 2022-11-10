@@ -4,6 +4,10 @@ TODO: add what I need to do to grammar to make it work (* and ? issues)
 	write small example of a node and visitor skeleton code
 		nodes don't have traversal logic BTW
 
+after I did all of the below modifying the grammar...
+if you put a grammar rule in { } when making a rule, that means * number
+if you put it in [ ] that means ? number of that rule
+
 basic grammar to deal with *
 thing : repeatingthing PERIOD
 repeatingthing : repeatingthing THING

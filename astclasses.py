@@ -1,8 +1,10 @@
 from enum import Enum
+import abc
 
 
-class node:
-    def visit(self):
+class Node:
+    @abc.abstractmethod
+    def visit(self, Visitor):
         pass
 
 
@@ -50,7 +52,7 @@ class TypeTypes(Enum):
 
 
 class StatementTypes(Enum):
-    BRACES = "{}"
+    BRACES = "{ statement* }"
     EXPRESSION = "expr"
     IF = "if"
     WHILE = "while"
@@ -62,53 +64,81 @@ class StatementTypes(Enum):
     VAR_DECL = "var_decl"
 
 
-class Expression(node):
+class Expression(Node):
     def __init__(self, op_type):
         self.op_type: OpTypes = op_type
         self.left = None
         self.right = None
         self.value = None
-        self.type = None
+        self.type: TypeTypes = None
         self.args = None
-        self.child = None
+
+    def accept(self, v):
+        self.left.accept(v)
+        self.right.accept(v)
+        v.visitExpr(self)
 
 
-class Statement(node):
+class Statement(Node):
     def __init__(self, statement_type):
         self.statement_type: StatementTypes = statement_type
-        self.exp = None
-        self.substatement = None
+        self.expr = None
+        self.substatement = []
         self.case_list = None
 
+    def accept(self, v):
+        for substmnt in self.substatement:
+            substmnt.accept(v)
+        v.visitStmnt(self)
 
-class Declaration(node):
+
+class ClassAndMemberDeclaration(Node):
     def __init__(self, ret_type):
         self.ret_type: TypeTypes = ret_type
         self.params = None
         self.modifier = None
         self.ident = ""
+        self.body: list[Statement] = []
+        self.class_members: list[Declaration] = []
+        self.child = None
+
+    def accept(self, v):
+        self.child.accept(v)
+        v.visitMemberDecl(self)
+
+
+class VariableDeclaration(Node):
+    def __init__(self, type):
+        self.ident = ""
         self.init = None
-        self.body: list[Statement]
-        self.classdecl: list[Declaration]
+        self.child = None
+
+    def accept(self, v):
+        self.child.accept(v)
+        v.visitVarDecl(self)
 
 
-class Type(node):
-    def __init__(self, type_types):
-        self.type_type: TypeTypes = type_types
-        self.name = ""
-        self.array: bool
-        self.subtype = ""
-        self.param_list: list[Declaration]
+# class Variable(Node):  # what if variable is an expression actually? lol
+#     def __init__(self, type_types):
+#         self.type_type: TypeTypes = type_types
+#         self.name = ""
+#         self.array: bool
+#         self.subtype = ""
+#         self.param_list: list[Declaration] = []
+#         self.child = None
 
 
-if __name__ == '__main__':
-    myexpr = Expression(OpTypes.PLUS)
-    # print(myexpr.op_type)
-    mystmnt = Statement(StatementTypes.IF)
-    # print(mystmnt.statement_type)
-    mydecl = Declaration(TypeTypes.INT)
-    # print(mydecl.ret_type)
-    mytype = Type(TypeTypes.BOOL)
-    # print(mytype.type_type)
-    mytype.param_list = "error?"
-    # print(mytype.param_list)  # prints "error?". confirmed python types are just recommendations
+"""
+alduous says node does traverse, because it knows its children
+typically post order, children accept visitor first.
+the visitor then is maybe just existing and it gets called sometimes.
+if we say child.accept(), we want to have it go to right visitor use virtual dispatch because it's taht type
+visitor is gonna have like visit_if() and such, simulate overloading
+have abstract visitor that do nothing,
+if the specific visitors don't ask for it, then it goes to the do nothing
+in python can change visit methods to get intermediate results from child accepts
+and can pass forward. 
+
+DOT NOTATION we actually do (x.y).z not x.(y.z)
+
+"""
