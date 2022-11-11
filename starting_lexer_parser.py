@@ -166,42 +166,50 @@ class BigParser(Parser):
     @_('VOID')
     def Type(self, p):
         """Type ::= void"""
-        print("Type VOID")
+        # print("Type VOID")
+        return ast.TypeTypes.VOID
 
     @_('INT')
     def Type(self, p):
         """Type ::= int"""
-        print("Type INT")
+        # print("Type INT")
+        return ast.TypeTypes.INT
 
     @_('KEYWORDCHAR')
     def Type(self, p):
         """Type ::= char"""
-        print("Type KEYWORDCHAR")
+        # print("Type KEYWORDCHAR")
+        return ast.TypeTypes.CHAR
 
     @_('BOOL')
     def Type(self, p):
         """Type ::= bool"""
-        print("Type BOOL")
+        # print("Type BOOL")
+        return ast.TypeTypes.BOOL
 
     @_('STRING')
     def Type(self, p):
         """Type ::= string"""
-        print("Type STRING")
+        # print("Type STRING")
+        return ast.TypeTypes.STRING
 
     @_('IDENTIFIER')
     def Type(self, p):
         """Type ::= identifier"""
-        print("Type IDENTIFIER")
+        # print("Type IDENTIFIER")
+        return ast.TypeTypes.CLASS
 
     @_('PUBLIC')
     def Modifier(self, p):
         """Modifier ::= public"""
-        print("Modifier PUBLIC")
+        # print("Modifier PUBLIC")
+        return ast.ModifierTypes.PUBLIC
 
     @_('PRIVATE')
     def Modifier(self, p):
         """Modifier ::= private"""
-        print("Modifier PRIVATE")
+        # print("Modifier PRIVATE")
+        return ast.ModifierTypes.PRIVATE
 
     @_('MethodDeclaration')
     def ClassMemberDefinition(self, p):
@@ -226,7 +234,8 @@ class BigParser(Parser):
         """DataMemberDeclaration ::= Modifier VariableDeclaration"""
         # print("DataMemberDeclaration")
         memberdef = ast.ClassAndMemberDeclaration(p.VariableDeclaration.type)
-
+        memberdef.modifier = p.Modifier
+        memberdef.ident = p.VariableDeclaration.ident
 
     @_('Modifier Type OptionalBrackets IDENTIFIER MethodSuffix')
     def MethodDeclaration(self, p):
@@ -308,7 +317,8 @@ class BigParser(Parser):
     @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
     def VariableDeclaration(self, p):
         """VariableDeclaration = Type OptionalBrackets identifier OptionalInitializer  ;"""
-        print("VariableDeclaration")
+        # print("VariableDeclaration")
+        vardecl = ast.VariableDeclaration(p.Type)
 
     @_('Initializer')
     def OptionalInitializer(self, p):

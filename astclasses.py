@@ -64,6 +64,12 @@ class StatementTypes(Enum):
     VAR_DECL = "var_decl"
 
 
+class ModifierTypes(Enum):
+    PUBLIC = "public"
+    PRIVATE = "private"
+    NONE = "none"
+
+
 class Expression(Node):
     def __init__(self, op_type):
         self.op_type: OpTypes = op_type
