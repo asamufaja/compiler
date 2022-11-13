@@ -63,17 +63,37 @@ For object-oriented AST nodes...
 	   declaration
 	   type
 
-class expression
-	Op_type enum, left, right, value, char, string, type, args
-class statement
-	Statement_type, exp, substatement, case_list for switch, 
-class declaration
-	ret_type:type, params: param_list, modifier:(public, private, none), ident:string, init:exp, body:statements[], (maybe put in classdecl:classdecl[] for making compilationunit a decl)
-class type
-	type_types:enum {
-		Void, int, char, bool, string, class, method
-	}
-	Name:str, array:bool, subtype: type, param_list: decl
+class Expression(Node):
+    def __init__(self, op_type):
+        self.op_type: OpTypes = op_type
+        self.left = None
+        self.right = None
+        self.value = None
+        self.type: TypeTypes
+        self.args = None
+class Statement(Node):
+    def __init__(self, statement_type):
+        self.statement_type: StatementTypes = statement_type
+        self.expr = None
+        self.substatement = []
+        self.case_list = None
+class ClassAndMemberDeclaration(Node):
+    def __init__(self, ret_type):
+        self.ret_type: TypeTypes = ret_type
+        self.params = list[VariableDeclaration]
+        self.modifier = None
+        self.ident = ""
+        self.body: list[Statement] = []
+        self.class_members: list[ClassAndMemberDeclaration] = []
+        self.array: bool
+        self.child = None
+class VariableDeclaration(Node):
+    def __init__(self, var_type):
+        self.type: TypeTypes = var_type
+        self.ident = ""
+        self.init = None
+        self.array: bool
+        self.child = None
 
 NOTE: might want more classes split out
 

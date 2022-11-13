@@ -150,7 +150,6 @@ class BigParser(Parser):
         compu.ident = "compunit"
         compu.child = p.MethodBody
         compu.class_members.extend(p.ClassDefinition)
-        print(f"\nSUSUSUS\n{compu.class_members}\nBYESUSSUS")
         return compu
 
     @_('CLASS IDENTIFIER LBRACE { ClassMemberDefinition } RBRACE')
@@ -159,7 +158,6 @@ class BigParser(Parser):
         print("ClassDefinition")
         classdef = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         classdef.ident = p.IDENTIFIER
-        print(f"\nSUSUS\n{classdef.ident}\nSUSUS\n")
         classdef.class_members.extend(p.ClassMemberDefinition)
         return classdef
 
@@ -236,154 +234,227 @@ class BigParser(Parser):
         memberdef = ast.ClassAndMemberDeclaration(p.VariableDeclaration.type)
         memberdef.modifier = p.Modifier
         memberdef.ident = p.VariableDeclaration.ident
+        return memberdef
 
     @_('Modifier Type OptionalBrackets IDENTIFIER MethodSuffix')
     def MethodDeclaration(self, p):
         """MethodDeclaration = Modifier Type OptionalBrackets identifier MethodSuffix"""
-        print("MethodDeclaration")
+        # print("MethodDeclaration")
+        methoddecl = ast.ClassAndMemberDeclaration(p.Type)
+        methoddecl.modifier = p.Modifier
+        methoddecl.array = p.OptionalBrackets
+        methoddecl.ident = p.IDENTIFIER
+        methoddecl.params = p.MethodSuffix.params
+        methoddecl.body.extend(p.MethodSuffix.body)
+        return methoddecl
 
     @_('LBRACKET RBRACKET')
     def OptionalBrackets(self, p):
         """OptionalBrackets = [ ]"""
-        print("OptionalBrackets = [ ]")
+        # print("OptionalBrackets = [ ]")
+        return True
 
     @_('empty')
     def OptionalBrackets(self, p):
         """OptionalBrackets = empty"""
-        print("OptionalBrackets = empty")
+        # print("OptionalBrackets = empty")
+        return False
 
     @_('IDENTIFIER MethodSuffix')
     def ConstructorDeclaration(self, p):
         """ConstructorDeclaration ::= identifier MethodSuffix"""
-        print("ConstructorDeclaration")
+        # print("ConstructorDeclaration")
+        constrdecl = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
+        constrdecl.ident = p.IDENTIFIER
+        constrdecl.modifier = ast.ModifierTypes.PUBLIC
+        constrdecl.params.extend(p.MethodSuffix.params)
+        constrdecl.body.extend(p.MethodSuffix.body)
+        return constrdecl
 
     @_('EQUALS Expression')
     def Initializer(self, p):
         """Initializer ::= = Expression"""
-        print("Initializer")
+        # print("Initializer")
+        # expr = ast.Expression(p.Expression.type)
+        # return expr
+        return p.Expression
 
-    @_('LPAREN OptionalParameterList RPAREN MethodBody')
+    # @_('LPAREN OptionalParameterList RPAREN MethodBody')
+    @_('LPAREN [ ParameterList ] RPAREN MethodBody')
     def MethodSuffix(self, p):
         """MethodSuffix ::= ( OptionalParameterList ) MethodBody"""
-        print("MethodSuffix")
+        # print("MethodSuffix")
+        methodsuff = ast.ClassAndMemberDeclaration(None)
+        methodsuff.params = p.ParameterList
+        methodsuff.body = p.MethodBody
+        return methodsuff
 
-    @_('ParameterList')
-    def OptionalParameterList(self, p):
-        """OptionalParameterList = ParameterList"""
-        print("OptionalParameterList = ParameterList")
+    # @_('ParameterList')
+    # def OptionalParameterList(self, p):
+    #     """OptionalParameterList = ParameterList"""
+    #     print("OptionalParameterList = ParameterList")
 
-    @_('empty')
-    def OptionalParameterList(self, p):
-        """OptionalParameterList = empty"""
-        print("OptionalParameterList = empty")
+    # @_('empty')
+    # def OptionalParameterList(self, p):
+    #     """OptionalParameterList = empty"""
+    #     print("OptionalParameterList = empty")
 
-    @_('LBRACE RepeatStatement RBRACE')
+    # @_('LBRACE RepeatStatement RBRACE')
+    @_('LBRACE { Statement } RBRACE')
     def MethodBody(self, p):
         """MethodBody = { RepeatStatement }"""
-        print("MethodBody")
+        # print("MethodBody")
+        # methodbody = ast.ClassAndMemberDeclaration(None)
+        # methodbody.body.extend(p.Statement)
+        return p.Statement
 
-    @_('RepeatStatement Statement')
-    def RepeatStatement(self, p):
-        """RepeatStatement = RepeatStatement Statement"""
-        print("RepeatStatement = RepeatStatement Statement")
+    # @_('RepeatStatement Statement')
+    # def RepeatStatement(self, p):
+    #     """RepeatStatement = RepeatStatement Statement"""
+    #     print("RepeatStatement = RepeatStatement Statement")
 
-    @_('empty')
-    def RepeatStatement(self, p):
-        """RepeatStatement = empty"""
-        print("RepeatStatement = empty")
+    # @_('empty')
+    # def RepeatStatement(self, p):
+    #     """RepeatStatement = empty"""
+    #     print("RepeatStatement = empty")
 
-    @_('Parameter RepeatCommaParameter')
+    # @_('Parameter RepeatCommaParameter')
+    @_('Parameter { COMMA Parameter }')
     def ParameterList(self, p):
         """ParameterList = Parameter RepeatCommaParameter"""
-        print("ParameterList")
+        # print("ParameterList")
+        paramlist = []
+        paramlist.append(p.Parameter0)
+        paramlist.extend(p.Parameter1)
+        return paramlist
 
-    '''| empty'''
+    # @_('RepeatCommaParameter COMMA Parameter')
+    # def RepeatCommaParameter(self, p):
+    #     """RepeatCommaParameter = RepeatCommaParameter , Parameter"""
+    #     print("RepeatCommaParameter = RepeatCommaParameter , Parameter")
 
-    @_('RepeatCommaParameter COMMA Parameter')
-    def RepeatCommaParameter(self, p):
-        """RepeatCommaParameter = RepeatCommaParameter , Parameter"""
-        print("RepeatCommaParameter = RepeatCommaParameter , Parameter")
-
-    @_('empty')
-    def RepeatCommaParameter(self, p):
-        """RepeatCommaParameter = empty"""
-        print("epeatCommaParameter = empty")
+    # @_('empty')
+    # def RepeatCommaParameter(self, p):
+    #     """RepeatCommaParameter = empty"""
+    #     print("epeatCommaParameter = empty")
 
     @_('Type OptionalBrackets IDENTIFIER')
     def Parameter(self, p):
         """Parameter = Type OptionalBrackets identifier"""
-        print("Parameter")
+        # print("Parameter")
+        param = ast.VariableDeclaration(p.Type)
+        param.array = p.OptionalBrackets
+        param.ident = p.IDENTIFIER
+        return param
 
-    @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
+    # @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
+    @_('Type OptionalBrackets IDENTIFIER [ Initializer ] SEMICOLON')
     def VariableDeclaration(self, p):
         """VariableDeclaration = Type OptionalBrackets identifier OptionalInitializer  ;"""
         # print("VariableDeclaration")
         vardecl = ast.VariableDeclaration(p.Type)
+        vardecl.array = p.OptionalBrackets
+        vardecl.ident = p.IDENTIFIER
+        vardecl.init = p.Initializer
+        return vardecl
 
-    @_('Initializer')
-    def OptionalInitializer(self, p):
-        """OptionalInitializer = Initializer"""
-        print("OptionalInitializer = Initializer")
+    # @_('Initializer')
+    # def OptionalInitializer(self, p):
+    #     """OptionalInitializer = Initializer"""
+    #     print("OptionalInitializer = Initializer")
 
-    @_('empty')
-    def OptionalInitializer(self, p):
-        """OptionalInitializer = empty"""
-        print("OptionalInitializer = empty")
+    # @_('empty')
+    # def OptionalInitializer(self, p):
+    #     """OptionalInitializer = empty"""
+    #     print("OptionalInitializer = empty")
 
-    @_('LBRACE RepeatStatement RBRACE')
+    # @_('LBRACE RepeatStatement RBRACE')
+    @_('LBRACE { Statement } RBRACE')
     def Statement(self, p):
         """Statement = { RepeatStatement }"""
-        print("Statement = { RepeatStatement }")
+        # print("Statement = { RepeatStatement }")
+        stmntlist = p.Statement  # should automatically be a list
+        return stmntlist
 
     @_('Expression SEMICOLON')
     def Statement(self, p):
         """Statement = Expression;"""
-        print("Statement = Expression;")
+        # print("Statement = Expression;")
+        exprstmnt = ast.Statement(ast.StatementTypes.EXPRESSION)
+        exprstmnt.expr = p.Expression
+        return exprstmnt
 
     @_('IF LPAREN Expression RPAREN Statement OptionalElseStatement')
     def Statement(self, p):
         """Statement = if (Expression) Statement OptionalElseStatement"""
-        print("Statement = if (Expression) Statement OptionalElseStatement")
+        # print("Statement = if (Expression) Statement OptionalElseStatement")
+        ifstmnt = ast.Statement(ast.StatementTypes.IF)
+        ifstmnt.expr = p.Expression
+        ifstmnt.substatement.extend(Statement)
+        ifstmnt.else_statement = p.OptionalElseStatement
+        return ifstmnt
 
     @_('WHILE LPAREN Expression RPAREN Statement')
     def Statement(self, p):
         """Statement = while ( Expression ) Statement"""
-        print("Statement = while ( Expression ) Statement")
+        # print("Statement = while ( Expression ) Statement")
+        whilestmnt = ast.Statement(ast.StatementTypes.WHILE)
+        whilestmnt.expr = p.Expression
+        whilestmnt.substatement.extend(p.Statement)
+        return whilestmnt
 
     @_('RETURN OptionalExpression SEMICOLON')
     def Statement(self, p):
         """Statement = return OptionalExpression;"""
-        print("Statement = return OptionalExpression;")
+        # print("Statement = return OptionalExpression;")
+        retstmnt = ast.Statement(ast.StatementTypes.RETURN)
+        retstmnt.expr = p.OptionalExpression
+        return retstmnt
 
     @_('COUT LEFTSHIFT Expression SEMICOLON')
     def Statement(self, p):
         """Statement = cout << Expression ;"""
-        print("Statement = cout << Expression ;")
+        # print("Statement = cout << Expression ;")
+        coutstmnt = ast.Statement(ast.StatementTypes.COUT)
+        coutstmnt.expr = p.Expression
+        return coutstmnt
 
     @_('CIN RIGHTSHIFT Expression SEMICOLON')
     def Statement(self, p):
         """Statement = cin >> Expression ;"""
-        print("Statement = cin >> Expression ;")
+        # print("Statement = cin >> Expression ;")
+        cinstmnt = ast.Statement(ast.StatementTypes.CIN)
+        cinstmnt.expr = p.Expression
+        return cinstmnt
 
     @_('SWITCH LPAREN Expression RPAREN CaseBlock')
     def Statement(self, p):
         """Statement = switch ( Expression ) CaseBlock"""
-        print("Statement = switch ( Expression ) CaseBlock")
+        # print("Statement = switch ( Expression ) CaseBlock")
+        switchstmnt = ast.Statement(ast.StatementTypes.SWITCH)
+        switchstmnt.expr = p.Expression
+        switchstmnt.case_list = p.CaseBlock.case_list
+        switchstmnt.default_stmnts = p.CaseBlock.default_stmnts
+        return switchstmnt
 
     @_('BREAK SEMICOLON')
     def Statement(self, p):
         """Statement = break;"""
-        print("Statement = break;")
+        # print("Statement = break;")
+        breakstmnt = ast.Statement(ast.StatementTypes.BREAK)
+        return breakstmnt
 
     @_('VariableDeclaration')
     def Statement(self, p):
         """Statement = VariableDeclaration"""
-        print("Statement = VariableDeclaration")
+        # print("Statement = VariableDeclaration")
+        return p.VariableDeclaration
 
     @_('ELSE Statement')
     def OptionalElseStatement(self, p):
         """OptionalElseStatement = else Statement"""
-        print("OptionalElseStatement = else Statement")
+        # print("OptionalElseStatement = else Statement")
+        return p.Statement  # in a normal situation it will be a list from { statement* }
 
     @_('empty')
     def OptionalElseStatement(self, p):
@@ -393,227 +464,426 @@ class BigParser(Parser):
     @_('Expression')
     def OptionalExpression(self, p):
         """OptionalExpression = Expression"""
-        print("OptionalExpression = Expression")
+        # print("OptionalExpression = Expression")
+        return p.Expression
 
     @_('empty')
     def OptionalExpression(self, p):
         """OptionalExpression = empty"""
         print("OptionalExpression = empty")
 
-    @_('LBRACE RepeatCase DEFAULT COLON RepeatStatement RBRACE')
+    # @_('LBRACE RepeatCase DEFAULT COLON RepeatStatement RBRACE')
+    @_('LBRACE { Case } DEFAULT COLON { Statement } RBRACE')
     def CaseBlock(self, p):
         """CaseBlock = { RepeatCase default : RepeatStatement }"""
-        print("CaseBlock")
+        # print("CaseBlock")
+        caseblock = ast.Statement(None)
+        caseblock.case_list.extend(p.Case)
+        caseblock.default_stmnts = p.Statement
+        return caseblock
 
-    @_('RepeatCase Case')
-    def RepeatCase(self, p):
-        """RepeatCase = RepeatCase Case"""
-        print("RepeatCase = RepeatCase Case")
+    # @_('RepeatCase Case')
+    # def RepeatCase(self, p):
+    #     """RepeatCase = RepeatCase Case"""
+    #     print("RepeatCase = RepeatCase Case")
 
-    @_('empty')
-    def RepeatCase(self, p):
-        """RepeatCase = empty"""
-        print("RepeatCase = empty")
+    # @_('empty')
+    # def RepeatCase(self, p):
+    #     """RepeatCase = empty"""
+    #     print("RepeatCase = empty")
 
-    @_('CASE NUM_LITERAL COLON RepeatStatement')
+    # @_('CASE NUM_LITERAL COLON RepeatStatement')
+    @_('CASE NUM_LITERAL COLON { Statement }')
     def Case(self, p):
         """Case = case num-literal : RepeatStatement"""
-        print("Case = case num-literal : RepeatStatement")
+        # print("Case = case num-literal : RepeatStatement")
+        case = ast.Case(p.NUM_LITERAL)
+        case.statements = p.Statement
+        return case
 
-    @_('CASE CHAR_LITERAL COLON RepeatStatement')
+    # @_('CASE CHAR_LITERAL COLON RepeatStatement')
+    @_('CASE CHAR_LITERAL COLON { Statement }')
     def Case(self, p):
         """Case = case char-literal : RepeatStatement"""
-        print("Case = case char-literal : RepeatStatement")
+        # print("Case = case char-literal : RepeatStatement")
+        case = ast.Case(p.CHAR_LITERAL)
+        case.statements = p.Statement
+        return case
 
     @_('LPAREN Expression RPAREN')
     def Expression(self, p):
         """Expression ::= ( Expression )"""
-        print("Expression ::= ( Expression )")
+        # print("Expression ::= ( Expression )")
+        # TODO IDK about this one
+        return p.Expression
 
     @_('Expression EQUALS Expression')
     def Expression(self, p):
         """| Expression = Expression """
-        print("| Expression = Expression ")
+        # print("| Expression = Expression ")
+        expr = ast.Expression(ast.OpTypes.EQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type  # IDK
+        expr.value = p.Expression1.value
+        return expr
 
     @_('Expression PLUSEQUALS Expression')
     def Expression(self, p):
         """| Expression += Expression """
-        print("| Expression += Expression ")
+        # print("| Expression += Expression ")
+        expr = ast.Expression(ast.OpTypes.PLUSEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 + p.Expression1  # risky? probably
+        return expr
 
     @_('Expression MINUSEQUALS Expression')
     def Expression(self, p):
         """| Expression -= Expression"""
-        print("| Expression -= Expression")
+        # print("| Expression -= Expression")
+        expr = ast.Expression(ast.OpTypes.MINUSEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 - p.Expression1
+        return expr
 
     @_('Expression TIMESEQUALS Expression')
     def Expression(self, p):
         """| Expression *= Expression"""
-        print("| Expression *= Expression")
+        # print("| Expression *= Expression")
+        expr = ast.Expression(ast.OpTypes.TIMESEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression DIVIDEEQUALS Expression')
     def Expression(self, p):
         """| Expression /= Expression"""
-        print("| Expression /= Expression")
+        # print("| Expression /= Expression")
+        expr = ast.Expression(ast.OpTypes.DIVIDEEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression PLUS Expression')
     def Expression(self, p):
         """| Expression + Expression"""
-        print("| Expression + Expression")
+        # print("| Expression + Expression")
+        expr = ast.Expression(ast.OpTypes.PLUS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression MINUS Expression')
     def Expression(self, p):
         """| Expression - Expression"""
-        print("| Expression - Expression")
+        # print("| Expression - Expression")
+        expr = ast.Expression(ast.OpTypes.MINUS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression TIMES Expression')
     def Expression(self, p):
         """| Expression * Expression"""
-        print("| Expression * Expression")
+        # print("| Expression * Expression")
+        expr = ast.Expression(ast.OpTypes.TIMES)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression DIVIDE Expression')
     def Expression(self, p):
         """| Expression / Expression"""
-        print("| Expression / Expression")
+        # print("| Expression / Expression")
+        expr = ast.Expression(ast.OpTypes.DIVIDE)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression DOUBLEEQUALS Expression')
     def Expression(self, p):
         """| Expression == Expression"""
-        print("| Expression == Expression")
+        # print("| Expression == Expression")
+        expr = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression NOTEQUALS Expression')
     def Expression(self, p):
         """| Expression != Expression"""
-        print("| Expression != Expression")
+        # print("| Expression != Expression")
+        expr = ast.Expression(ast.OpTypes.NOTEQUALS)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression LESSTHAN Expression')
     def Expression(self, p):
         """| Expression < Expression"""
-        print("| Expression < Expression")
+        # print("| Expression < Expression")
+        expr = ast.Expression(ast.OpTypes.LESSTHAN)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression GREATERTHAN Expression')
     def Expression(self, p):
         """| Expression > Expression"""
-        print("| Expression > Expression")
+        # print("| Expression > Expression")
+        expr = ast.Expression(ast.OpTypes.GREATERTHAN)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression LESSOREQUAL Expression')
     def Expression(self, p):
         """| Expression <= Expression"""
-        print("| Expression <= Expression")
+        # print("| Expression <= Expression")
+        expr = ast.Expression(ast.OpTypes.LESSOREQUAL)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression GREATEROREQUAL Expression')
     def Expression(self, p):
         """| Expression >= Expression"""
-        print("| Expression >= Expression")
+        # print("| Expression >= Expression")
+        expr = ast.Expression(ast.OpTypes.GREATEROREQUAL)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression AND Expression')
     def Expression(self, p):
         """| Expression && Expression"""
-        print("| Expression && Expression")
+        # print("| Expression && Expression")
+        expr = ast.Expression(ast.OpTypes.AND)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('Expression OR Expression')
     def Expression(self, p):
         """| Expression || Expression"""
-        print("| Expression || Expression")
+        # print("| Expression || Expression")
+        expr = ast.Expression(ast.OpTypes.OR)
+        expr.left = p.Expression0
+        expr.right = p.Expression1
+        expr.type = p.Expression0.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('EXCLAMATIONMARK Expression')
     def Expression(self, p):
         """| ! Expression"""
-        print("| ! Expression")
+        # print("| ! Expression")
+        expr = ast.Expression(ast.OpTypes.EXCLAMATIONMARK)
+        expr.right = p.Expression
+        expr.type = p.Expression.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('PLUS Expression')
     def Expression(self, p):
         """| + Expression"""
-        print("| + Expression")
+        # print("| + Expression")
+        expr = ast.Expression(ast.OpTypes.PLUS)
+        expr.right = p.Expression
+        expr.type = p.Expression.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('MINUS Expression')
     def Expression(self, p):
         """| - Expression"""
-        print("| - Expression")
+        # print("| - Expression")
+        expr = ast.Expression(ast.OpTypes.MINUS)
+        expr.right = p.Expression
+        expr.type = p.Expression.type
+        # expr.value = p.Expression0 * p.Expression1
+        return expr
 
     @_('NUM_LITERAL')
     def Expression(self, p):
         """| num-literal"""
-        print("| num-literal")
+        # print("| num-literal")
+        expr = ast.Expression(ast.OpTypes.NUM_LITERAL)
+        expr.type = ast.TypeTypes.INT
+        expr.value = p.NUM_LITERAL
+        return expr
 
     @_('CHAR_LITERAL')
     def Expression(self, p):
         """| char-literal"""
-        print("| char-literal")
+        # print("| char-literal")
+        expr = ast.Expression(ast.OpTypes.CHAR_LITERAL)
+        expr.type = ast.TypeTypes.CHAR
+        expr.value = p.CHAR_LITERAL
+        return expr
 
     @_('STRING_LITERAL')
     def Expression(self, p):
         """| string-literal"""
-        print("| string-literal")
+        # print("| string-literal")
+        expr = ast.Expression(ast.OpTypes.STRING_LITERAL)
+        expr.type = ast.TypeTypes.STRING
+        expr.value = p.STRING_LITERAL
+        return expr
 
     @_('TRUE')
     def Expression(self, p):
         """| true"""
-        print("| true")
+        # print("| true")
+        expr = ast.Expression(ast.OpTypes.TRUE)
+        expr.type = ast.TypeTypes.BOOL
+        expr.value = p.TRUE
+        return expr
 
     @_('FALSE')
     def Expression(self, p):
         """| false"""
-        print("| false")
+        # print("| false")
+        expr = ast.Expression(ast.OpTypes.FALSE)
+        expr.type = ast.TypeTypes.BOOL
+        expr.value = p.FALSE
+        return expr
 
     @_('NULL')
     def Expression(self, p):
         """| null"""
-        print("| null")
+        # print("| null")
+        expr = ast.Expression(ast.OpTypes.NULL)
+        expr.type = ast.TypeTypes.NULL
+        expr.value = p.NULL
+        return expr
 
     @_('IDENTIFIER')
     def Expression(self, p):
         """| identifier"""
-        print("| identifier")
+        # print("| identifier")
+        expr = ast.Expression(ast.OpTypes.IDENTIFIER)
+        expr.type = ast.TypeTypes.CLASS
+        expr.value = p.IDENTIFIER
+        return expr
 
     @_('NEW Type Arguments')
     def Expression(self, p):
         """| new Type  Arguments """
-        print("| new Type  Arguments")
+        # print("| new Type  Arguments")
+        expr = ast.Expression(ast.OpTypes.NEW)
+        expr.type = p.Type
+        expr.args = p.Arguments
+        # expr.value = p.NUM_LITERAL
+        return expr
 
     @_('NEW Type Index')
     def Expression(self, p):
         """new Type Index"""
-        print("new Type Index")
+        # print("new Type Index")
+        expr = ast.Expression(ast.OpTypes.NEW)
+        expr.type = p.Type
+        expr.index = p.Index
+        # expr.value = p.NUM_LITERAL
+        return expr
 
     @_('THIS')
     def Expression(self, p):
         """| this"""
-        print("| this")
+        # print("| this")
+        expr = ast.Expression(ast.OpTypes.THIS)
+        expr.type = ast.TypeTypes.CLASS
+        # expr.value = p.NUM_LITERAL
+        return expr
 
     @_('Expression PERIOD IDENTIFIER')
     def Expression(self, p):
         """| Expression . identifier"""
-        print("| Expression . identifier")
+        # print("| Expression . identifier")
+        expr = ast.Expression(ast.OpTypes.PERIOD)
+        # expr.type = ast.TypeTypes.INT
+        expr.left = p.Expression
+        expr.right = p.IDENTIFIER
+        # expr.value = p.NUM_LITERAL
+        return expr
 
     @_('Expression Index')
     def Expression(self, p):
         """| Expression Index"""
-        print("| Expression Index")
+        # print("| Expression Index")
+        expr = ast.Expression(ast.OpTypes.INDEX)
+        expr.left = p.Expression
+        expr.right = p.Index
+        # expr.type = ast.TypeTypes.INT
+        # expr.value = p.NUM_LITERAL
+        return expr
 
     @_('Expression Arguments')
     def Expression(self, p):
         """| Expression Arguments"""
-        print("| Expression Arguments")
+        # print("| Expression Arguments")
+        expr = ast.Expression(ast.OpTypes.ARGUMENTS)
+        expr.left = p.Expression
+        expr.right = p.Arguments
+        # expr.type = ast.TypeTypes.INT
+        # expr.value = p.NUM_LITERAL
+        return expr
 
-    @_('LPAREN OptionalArgumentList RPAREN')
+    @_('LPAREN [ ArgumentList ] RPAREN')
     def Arguments(self, p):
         """Arguments = ( OptionalArgumentList )"""
-        print("Arguments")
+        # print("Arguments")
+        return p.ArgumentList
 
-    @_('ArgumentList')
-    def OptionalArgumentList(self, p):
-        """OptionalArgumentList = ArgumentList"""
-        print("OptionalArgumentList = ArgumentList")
+    # @_('ArgumentList')
+    # def OptionalArgumentList(self, p):
+    #     """OptionalArgumentList = ArgumentList"""
+    #     print("OptionalArgumentList = ArgumentList")
 
-    @_('empty')
-    def OptionalArgumentList(self, p):
-        """OptionalArgumentList = empty"""
-        print("OptionalArgumentList = empty")
+    # @_('empty')
+    # def OptionalArgumentList(self, p):
+    #     """OptionalArgumentList = empty"""
+    #     print("OptionalArgumentList = empty")
 
-    @_('Expression RepeatCommaExpression')
+    # @_('Expression RepeatCommaExpression')
+    @_('Expression { COMMA Expression }')
     def ArgumentList(self, p):
         """ArgumentList = Expression RepeatCommaExpression"""
-        print("ArgumentList = Expression RepeatCommaExpression")
+        # print("ArgumentList = Expression RepeatCommaExpression")
+        arglist = []
+        arglist.append(p.Expression0)
+        arglist.extend(p.Expression1)
+        return arglist
 
     @_('RepeatCommaExpression COMMA Expression')
     def RepeatCommaExpression(self, p):
@@ -641,7 +911,8 @@ def main(args):
     parser = BigParser()
 
     kxi = open(args[0], 'r')
-    parser.parse(lexer.tokenize(kxi.read()))
+    compunit = parser.parse(lexer.tokenize(kxi.read()))
+
 
 
 if __name__ == '__main__':
