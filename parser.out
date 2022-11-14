@@ -95,8 +95,8 @@ Rule 91    Expression -> Expression Arguments
 Rule 92    Expression -> Expression Index
 Rule 93    Expression -> Expression PERIOD IDENTIFIER  [precedence=left, level=10]
 Rule 94    Expression -> THIS  [precedence=left, level=9]
-Rule 95    Expression -> NEW Type Index  [precedence=right, level=8]
-Rule 96    Expression -> NEW Type Arguments  [precedence=right, level=8]
+Rule 95    Expression -> NEW Type Index  [precedence=left, level=8]
+Rule 96    Expression -> NEW Type Arguments  [precedence=left, level=8]
 Rule 97    Expression -> IDENTIFIER  [precedence=left, level=10]
 Rule 98    Expression -> NULL  [precedence=left, level=10]
 Rule 99    Expression -> FALSE  [precedence=left, level=10]
@@ -106,7 +106,7 @@ Rule 102   Expression -> CHAR_LITERAL  [precedence=left, level=10]
 Rule 103   Expression -> NUM_LITERAL  [precedence=left, level=10]
 Rule 104   Expression -> MINUS Expression  [precedence=left, level=6]
 Rule 105   Expression -> PLUS Expression  [precedence=left, level=6]
-Rule 106   Expression -> EXCLAMATIONMARK Expression  [precedence=right, level=8]
+Rule 106   Expression -> EXCLAMATIONMARK Expression  [precedence=left, level=8]
 Rule 107   Expression -> Expression OR Expression  [precedence=left, level=3]
 Rule 108   Expression -> Expression AND Expression  [precedence=left, level=3]
 Rule 109   Expression -> Expression GREATEROREQUAL Expression  [precedence=left, level=5]
@@ -128,11 +128,14 @@ Rule 124   Expression -> LPAREN Expression RPAREN  [precedence=left, level=11]
 Rule 125   Arguments -> LPAREN _12_ArgumentList_optional RPAREN  [precedence=left, level=11]
 Rule 126   _12_ArgumentList_optional -> ArgumentList
 Rule 127   _12_ArgumentList_optional -> <empty>
-Rule 128   ArgumentList -> Expression RepeatCommaExpression
-Rule 129   RepeatCommaExpression -> empty
-Rule 130   RepeatCommaExpression -> RepeatCommaExpression COMMA Expression
-Rule 131   Index -> LBRACKET Expression RBRACKET
-Rule 132   empty -> <empty>
+Rule 128   ArgumentList -> Expression _13_COMMA_Expression_repeat
+Rule 129   _13_COMMA_Expression_repeat -> _13_COMMA_Expression_items
+Rule 130   _13_COMMA_Expression_repeat -> <empty>
+Rule 131   _13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item
+Rule 132   _13_COMMA_Expression_items -> _13_COMMA_Expression_item
+Rule 133   _13_COMMA_Expression_item -> COMMA Expression
+Rule 134   Index -> LBRACKET Expression RBRACKET
+Rule 135   empty -> <empty>
 
 Terminals, with rules where they appear:
 
@@ -144,7 +147,7 @@ CHAR_LITERAL         : 79 102
 CIN                  : 52
 CLASS                : 7
 COLON                : 68 79 85
-COMMA                : 44 130
+COMMA                : 44 133
 COUT                 : 53
 DEFAULT              : 68
 DIVIDE               : 115
@@ -162,7 +165,7 @@ INT                  : 17
 KEYWORDCHAR          : 16
 KXI2022              : 1
 LBRACE               : 7 33 58 68
-LBRACKET             : 27 131
+LBRACKET             : 27 134
 LEFTSHIFT            : 53
 LESSOREQUAL          : 110
 LESSTHAN             : 112
@@ -181,7 +184,7 @@ PLUSEQUALS           : 122
 PRIVATE              : 19
 PUBLIC               : 20
 RBRACE               : 7 33 58 68
-RBRACKET             : 27 131
+RBRACKET             : 27 134
 RETURN               : 54
 RIGHTSHIFT           : 52
 RPAREN               : 1 30 51 55 56 124 125
@@ -208,7 +211,7 @@ ClassMemberDefinition : 12
 CompilationUnit      : 0
 ConstructorDeclaration : 21
 DataMemberDeclaration : 22
-Expression           : 29 51 52 53 55 56 57 67 91 92 93 104 105 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 116 116 117 117 118 118 119 119 120 120 121 121 122 122 123 123 124 128 130 131
+Expression           : 29 51 52 53 55 56 57 67 91 92 93 104 105 106 107 107 108 108 109 109 110 110 111 111 112 112 113 113 114 114 115 115 116 116 117 117 118 118 119 119 120 120 121 121 122 122 123 123 124 128 133 134
 Index                : 92 95
 Initializer          : 47
 MethodBody           : 1 30
@@ -220,7 +223,6 @@ OptionalElseStatement : 56
 OptionalExpression   : 54
 Parameter            : 39 44
 ParameterList        : 31
-RepeatCommaExpression : 128 130
 Statement            : 38 55 56 63 65 78 84 90
 Type                 : 25 45 46 95 96
 VariableDeclaration  : 24 49
@@ -231,6 +233,9 @@ _11_Statement_item   : 88 89
 _11_Statement_items  : 86 88
 _11_Statement_repeat : 85
 _12_ArgumentList_optional : 125
+_13_COMMA_Expression_item : 131 132
+_13_COMMA_Expression_items : 129 131
+_13_COMMA_Expression_repeat : 128
 _1_ClassDefinition_item : 4 5
 _1_ClassDefinition_items : 2 4
 _1_ClassDefinition_repeat : 1
@@ -254,7 +259,7 @@ _8_Case_repeat       : 68
 _9_Statement_item    : 76 77
 _9_Statement_items   : 74 76
 _9_Statement_repeat  : 68
-empty                : 26 64 66 129
+empty                : 26 64 66
 
 
 state 0
@@ -579,9 +584,9 @@ state 30
     (46) VariableDeclaration -> Type . OptionalBrackets IDENTIFIER _6_Initializer_optional SEMICOLON
     (26) OptionalBrackets -> . empty
     (27) OptionalBrackets -> . LBRACKET RBRACKET
-    (132) empty -> .
+    (135) empty -> .
     LBRACKET        shift and go to state 44
-    IDENTIFIER      reduce using rule 132 (empty -> .)
+    IDENTIFIER      reduce using rule 135 (empty -> .)
 
     OptionalBrackets               shift and go to state 42
     empty                          shift and go to state 43
@@ -674,9 +679,9 @@ state 41
     (45) Parameter -> Type . OptionalBrackets IDENTIFIER
     (26) OptionalBrackets -> . empty
     (27) OptionalBrackets -> . LBRACKET RBRACKET
-    (132) empty -> .
+    (135) empty -> .
     LBRACKET        shift and go to state 44
-    IDENTIFIER      reduce using rule 132 (empty -> .)
+    IDENTIFIER      reduce using rule 135 (empty -> .)
 
     OptionalBrackets               shift and go to state 52
     empty                          shift and go to state 43
@@ -1259,7 +1264,7 @@ state 64
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       shift and go to state 101
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
@@ -1302,7 +1307,7 @@ state 67
     (54) Statement -> RETURN . OptionalExpression SEMICOLON
     (66) OptionalExpression -> . empty
     (67) OptionalExpression -> . Expression
-    (132) empty -> .
+    (135) empty -> .
     (91) Expression -> . Expression Arguments
     (92) Expression -> . Expression Index
     (93) Expression -> . Expression PERIOD IDENTIFIER
@@ -1337,7 +1342,7 @@ state 67
     (122) Expression -> . Expression PLUSEQUALS Expression
     (123) Expression -> . Expression EQUALS Expression
     (124) Expression -> . LPAREN Expression RPAREN
-    SEMICOLON       reduce using rule 132 (empty -> .)
+    SEMICOLON       reduce using rule 135 (empty -> .)
     THIS            shift and go to state 72
     NEW             shift and go to state 73
     IDENTIFIER      shift and go to state 100
@@ -1373,9 +1378,9 @@ state 70
     (46) VariableDeclaration -> Type . OptionalBrackets IDENTIFIER _6_Initializer_optional SEMICOLON
     (26) OptionalBrackets -> . empty
     (27) OptionalBrackets -> . LBRACKET RBRACKET
-    (132) empty -> .
+    (135) empty -> .
     LBRACKET        shift and go to state 44
-    IDENTIFIER      reduce using rule 132 (empty -> .)
+    IDENTIFIER      reduce using rule 135 (empty -> .)
 
     OptionalBrackets               shift and go to state 131
     empty                          shift and go to state 43
@@ -2208,7 +2213,7 @@ state 99
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     RPAREN          shift and go to state 141
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
@@ -3268,7 +3273,7 @@ state 122
     (125) Arguments -> LPAREN . _12_ArgumentList_optional RPAREN
     (126) _12_ArgumentList_optional -> . ArgumentList
     (127) _12_ArgumentList_optional -> .
-    (128) ArgumentList -> . Expression RepeatCommaExpression
+    (128) ArgumentList -> . Expression _13_COMMA_Expression_repeat
     (91) Expression -> . Expression Arguments
     (92) Expression -> . Expression Index
     (93) Expression -> . Expression PERIOD IDENTIFIER
@@ -3324,7 +3329,7 @@ state 122
 
 state 123
 
-    (131) Index -> LBRACKET . Expression RBRACKET
+    (134) Index -> LBRACKET . Expression RBRACKET
     (91) Expression -> . Expression Arguments
     (92) Expression -> . Expression Index
     (93) Expression -> . Expression PERIOD IDENTIFIER
@@ -3517,7 +3522,7 @@ state 128
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 67 (OptionalExpression -> Expression .)
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
@@ -3659,7 +3664,7 @@ state 132
 
     (95) Expression -> NEW Type . Index
     (96) Expression -> NEW Type . Arguments
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     LBRACKET        shift and go to state 123
     LPAREN          shift and go to state 122
@@ -3691,7 +3696,7 @@ state 133
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 104 (Expression -> MINUS Expression .)
     PERIOD          reduce using rule 104 (Expression -> MINUS Expression .)
     OR              reduce using rule 104 (Expression -> MINUS Expression .)
@@ -3744,7 +3749,7 @@ state 134
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 105 (Expression -> PLUS Expression .)
     PERIOD          reduce using rule 105 (Expression -> PLUS Expression .)
     OR              reduce using rule 105 (Expression -> PLUS Expression .)
@@ -3797,7 +3802,7 @@ state 135
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     PERIOD          reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     OR              reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
@@ -3887,7 +3892,7 @@ state 137
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 29 (Initializer -> EQUALS Expression .)
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
@@ -4004,7 +4009,7 @@ state 140
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     RPAREN          shift and go to state 172
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
@@ -4112,7 +4117,7 @@ state 143
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 107 (Expression -> Expression OR Expression .)
     PERIOD          reduce using rule 107 (Expression -> Expression OR Expression .)
     OR              reduce using rule 107 (Expression -> Expression OR Expression .)
@@ -4165,7 +4170,7 @@ state 144
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 108 (Expression -> Expression AND Expression .)
     PERIOD          reduce using rule 108 (Expression -> Expression AND Expression .)
     OR              reduce using rule 108 (Expression -> Expression AND Expression .)
@@ -4218,7 +4223,7 @@ state 145
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     PERIOD          reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     OR              reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
@@ -4271,7 +4276,7 @@ state 146
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     PERIOD          reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     OR              reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
@@ -4324,7 +4329,7 @@ state 147
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     PERIOD          reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     OR              reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
@@ -4377,7 +4382,7 @@ state 148
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     PERIOD          reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     OR              reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
@@ -4430,7 +4435,7 @@ state 149
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     PERIOD          reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     OR              reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
@@ -4483,7 +4488,7 @@ state 150
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     PERIOD          reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     OR              reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
@@ -4536,7 +4541,7 @@ state 151
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     PERIOD          reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     OR              reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
@@ -4589,7 +4594,7 @@ state 152
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 116 (Expression -> Expression TIMES Expression .)
     PERIOD          reduce using rule 116 (Expression -> Expression TIMES Expression .)
     OR              reduce using rule 116 (Expression -> Expression TIMES Expression .)
@@ -4642,7 +4647,7 @@ state 153
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 117 (Expression -> Expression MINUS Expression .)
     PERIOD          reduce using rule 117 (Expression -> Expression MINUS Expression .)
     OR              reduce using rule 117 (Expression -> Expression MINUS Expression .)
@@ -4695,7 +4700,7 @@ state 154
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 118 (Expression -> Expression PLUS Expression .)
     PERIOD          reduce using rule 118 (Expression -> Expression PLUS Expression .)
     OR              reduce using rule 118 (Expression -> Expression PLUS Expression .)
@@ -4748,7 +4753,7 @@ state 155
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     PERIOD          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     MINUSEQUALS     reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
@@ -4801,7 +4806,7 @@ state 156
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     PERIOD          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     MINUSEQUALS     reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
@@ -4854,7 +4859,7 @@ state 157
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     PERIOD          reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     LBRACKET        reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
@@ -4907,7 +4912,7 @@ state 158
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     PERIOD          reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     LBRACKET        reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
@@ -4960,7 +4965,7 @@ state 159
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
+    (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     PERIOD          reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     LBRACKET        reduce using rule 123 (Expression -> Expression EQUALS Expression .)
@@ -5003,7 +5008,7 @@ state 161
 
 state 162
 
-    (128) ArgumentList -> Expression . RepeatCommaExpression
+    (128) ArgumentList -> Expression . _13_COMMA_Expression_repeat
     (91) Expression -> Expression . Arguments
     (92) Expression -> Expression . Index
     (93) Expression -> Expression . PERIOD IDENTIFIER
@@ -5024,11 +5029,13 @@ state 162
     (121) Expression -> Expression . MINUSEQUALS Expression
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
-    (129) RepeatCommaExpression -> . empty
-    (130) RepeatCommaExpression -> . RepeatCommaExpression COMMA Expression
+    (129) _13_COMMA_Expression_repeat -> . _13_COMMA_Expression_items
+    (130) _13_COMMA_Expression_repeat -> .
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    (132) empty -> .
+    (134) Index -> . LBRACKET Expression RBRACKET
+    (131) _13_COMMA_Expression_items -> . _13_COMMA_Expression_items _13_COMMA_Expression_item
+    (132) _13_COMMA_Expression_items -> . _13_COMMA_Expression_item
+    (133) _13_COMMA_Expression_item -> . COMMA Expression
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5047,19 +5054,20 @@ state 162
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
+    RPAREN          reduce using rule 130 (_13_COMMA_Expression_repeat -> .)
     LPAREN          shift and go to state 122
     LBRACKET        shift and go to state 123
-    COMMA           reduce using rule 132 (empty -> .)
-    RPAREN          reduce using rule 132 (empty -> .)
+    COMMA           shift and go to state 177
 
-    RepeatCommaExpression          shift and go to state 174
+    _13_COMMA_Expression_repeat    shift and go to state 174
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
-    empty                          shift and go to state 175
+    _13_COMMA_Expression_items     shift and go to state 175
+    _13_COMMA_Expression_item      shift and go to state 176
 
 state 163
 
-    (131) Index -> LBRACKET Expression . RBRACKET
+    (134) Index -> LBRACKET Expression . RBRACKET
     (91) Expression -> Expression . Arguments
     (92) Expression -> Expression . Index
     (93) Expression -> Expression . PERIOD IDENTIFIER
@@ -5081,8 +5089,8 @@ state 163
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    RBRACKET        shift and go to state 176
+    (134) Index -> . LBRACKET Expression RBRACKET
+    RBRACKET        shift and go to state 178
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5131,8 +5139,8 @@ state 164
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    SEMICOLON       shift and go to state 177
+    (134) Index -> . LBRACKET Expression RBRACKET
+    SEMICOLON       shift and go to state 179
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5181,8 +5189,8 @@ state 165
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    SEMICOLON       shift and go to state 178
+    (134) Index -> . LBRACKET Expression RBRACKET
+    SEMICOLON       shift and go to state 180
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5266,8 +5274,8 @@ state 167
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    RPAREN          shift and go to state 179
+    (134) Index -> . LBRACKET Expression RBRACKET
+    RPAREN          shift and go to state 181
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5316,8 +5324,8 @@ state 168
     (122) Expression -> Expression . PLUSEQUALS Expression
     (123) Expression -> Expression . EQUALS Expression
     (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    RPAREN          shift and go to state 180
+    (134) Index -> . LBRACKET Expression RBRACKET
+    RPAREN          shift and go to state 182
     PERIOD          shift and go to state 104
     OR              shift and go to state 105
     AND             shift and go to state 106
@@ -5416,9 +5424,9 @@ state 172
 
     (51) Statement -> SWITCH LPAREN Expression RPAREN . CaseBlock
     (68) CaseBlock -> . LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE
-    LBRACE          shift and go to state 182
+    LBRACE          shift and go to state 184
 
-    CaseBlock                      shift and go to state 181
+    CaseBlock                      shift and go to state 183
 
 state 173
 
@@ -5451,49 +5459,110 @@ state 173
 
 state 174
 
-    (128) ArgumentList -> Expression RepeatCommaExpression .
-    (130) RepeatCommaExpression -> RepeatCommaExpression . COMMA Expression
-    RPAREN          reduce using rule 128 (ArgumentList -> Expression RepeatCommaExpression .)
-    COMMA           shift and go to state 183
+    (128) ArgumentList -> Expression _13_COMMA_Expression_repeat .
+    RPAREN          reduce using rule 128 (ArgumentList -> Expression _13_COMMA_Expression_repeat .)
 
 
 state 175
 
-    (129) RepeatCommaExpression -> empty .
-    COMMA           reduce using rule 129 (RepeatCommaExpression -> empty .)
-    RPAREN          reduce using rule 129 (RepeatCommaExpression -> empty .)
+    (129) _13_COMMA_Expression_repeat -> _13_COMMA_Expression_items .
+    (131) _13_COMMA_Expression_items -> _13_COMMA_Expression_items . _13_COMMA_Expression_item
+    (133) _13_COMMA_Expression_item -> . COMMA Expression
+    RPAREN          reduce using rule 129 (_13_COMMA_Expression_repeat -> _13_COMMA_Expression_items .)
+    COMMA           shift and go to state 177
 
+    _13_COMMA_Expression_item      shift and go to state 185
 
 state 176
 
-    (131) Index -> LBRACKET Expression RBRACKET .
-    SEMICOLON       reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    PERIOD          reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    OR              reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    AND             reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    GREATEROREQUAL  reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    LESSOREQUAL     reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    GREATERTHAN     reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    LESSTHAN        reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    NOTEQUALS       reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    DOUBLEEQUALS    reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    DIVIDE          reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    TIMES           reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    MINUS           reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    PLUS            reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    DIVIDEEQUALS    reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    TIMESEQUALS     reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    MINUSEQUALS     reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    PLUSEQUALS      reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    EQUALS          reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    LPAREN          reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    LBRACKET        reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    RPAREN          reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    COMMA           reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
-    RBRACKET        reduce using rule 131 (Index -> LBRACKET Expression RBRACKET .)
+    (132) _13_COMMA_Expression_items -> _13_COMMA_Expression_item .
+    COMMA           reduce using rule 132 (_13_COMMA_Expression_items -> _13_COMMA_Expression_item .)
+    RPAREN          reduce using rule 132 (_13_COMMA_Expression_items -> _13_COMMA_Expression_item .)
 
 
 state 177
+
+    (133) _13_COMMA_Expression_item -> COMMA . Expression
+    (91) Expression -> . Expression Arguments
+    (92) Expression -> . Expression Index
+    (93) Expression -> . Expression PERIOD IDENTIFIER
+    (94) Expression -> . THIS
+    (95) Expression -> . NEW Type Index
+    (96) Expression -> . NEW Type Arguments
+    (97) Expression -> . IDENTIFIER
+    (98) Expression -> . NULL
+    (99) Expression -> . FALSE
+    (100) Expression -> . TRUE
+    (101) Expression -> . STRING_LITERAL
+    (102) Expression -> . CHAR_LITERAL
+    (103) Expression -> . NUM_LITERAL
+    (104) Expression -> . MINUS Expression
+    (105) Expression -> . PLUS Expression
+    (106) Expression -> . EXCLAMATIONMARK Expression
+    (107) Expression -> . Expression OR Expression
+    (108) Expression -> . Expression AND Expression
+    (109) Expression -> . Expression GREATEROREQUAL Expression
+    (110) Expression -> . Expression LESSOREQUAL Expression
+    (111) Expression -> . Expression GREATERTHAN Expression
+    (112) Expression -> . Expression LESSTHAN Expression
+    (113) Expression -> . Expression NOTEQUALS Expression
+    (114) Expression -> . Expression DOUBLEEQUALS Expression
+    (115) Expression -> . Expression DIVIDE Expression
+    (116) Expression -> . Expression TIMES Expression
+    (117) Expression -> . Expression MINUS Expression
+    (118) Expression -> . Expression PLUS Expression
+    (119) Expression -> . Expression DIVIDEEQUALS Expression
+    (120) Expression -> . Expression TIMESEQUALS Expression
+    (121) Expression -> . Expression MINUSEQUALS Expression
+    (122) Expression -> . Expression PLUSEQUALS Expression
+    (123) Expression -> . Expression EQUALS Expression
+    (124) Expression -> . LPAREN Expression RPAREN
+    THIS            shift and go to state 72
+    NEW             shift and go to state 73
+    IDENTIFIER      shift and go to state 100
+    NULL            shift and go to state 74
+    FALSE           shift and go to state 75
+    TRUE            shift and go to state 76
+    STRING_LITERAL  shift and go to state 77
+    CHAR_LITERAL    shift and go to state 78
+    NUM_LITERAL     shift and go to state 79
+    MINUS           shift and go to state 80
+    PLUS            shift and go to state 81
+    EXCLAMATIONMARK shift and go to state 82
+    LPAREN          shift and go to state 63
+
+    Expression                     shift and go to state 186
+
+state 178
+
+    (134) Index -> LBRACKET Expression RBRACKET .
+    SEMICOLON       reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    PERIOD          reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    OR              reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    AND             reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    GREATEROREQUAL  reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    LESSOREQUAL     reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    GREATERTHAN     reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    LESSTHAN        reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    NOTEQUALS       reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    DOUBLEEQUALS    reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    DIVIDE          reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    TIMES           reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    MINUS           reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    PLUS            reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    DIVIDEEQUALS    reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    TIMESEQUALS     reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    MINUSEQUALS     reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    PLUSEQUALS      reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    EQUALS          reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    LPAREN          reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    LBRACKET        reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    RPAREN          reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    COMMA           reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+    RBRACKET        reduce using rule 134 (Index -> LBRACKET Expression RBRACKET .)
+
+
+state 179
 
     (52) Statement -> CIN RIGHTSHIFT Expression SEMICOLON .
     BREAK           reduce using rule 52 (Statement -> CIN RIGHTSHIFT Expression SEMICOLON .)
@@ -5528,7 +5597,7 @@ state 177
     DEFAULT         reduce using rule 52 (Statement -> CIN RIGHTSHIFT Expression SEMICOLON .)
 
 
-state 178
+state 180
 
     (53) Statement -> COUT LEFTSHIFT Expression SEMICOLON .
     BREAK           reduce using rule 53 (Statement -> COUT LEFTSHIFT Expression SEMICOLON .)
@@ -5563,7 +5632,7 @@ state 178
     DEFAULT         reduce using rule 53 (Statement -> COUT LEFTSHIFT Expression SEMICOLON .)
 
 
-state 179
+state 181
 
     (55) Statement -> WHILE LPAREN Expression RPAREN . Statement
     (49) Statement -> . VariableDeclaration
@@ -5645,11 +5714,11 @@ state 179
     VOID            shift and go to state 36
 
     Expression                     shift and go to state 64
-    Statement                      shift and go to state 184
+    Statement                      shift and go to state 187
     VariableDeclaration            shift and go to state 60
     Type                           shift and go to state 70
 
-state 180
+state 182
 
     (56) Statement -> IF LPAREN Expression RPAREN . Statement OptionalElseStatement
     (49) Statement -> . VariableDeclaration
@@ -5731,11 +5800,11 @@ state 180
     VOID            shift and go to state 36
 
     Expression                     shift and go to state 64
-    Statement                      shift and go to state 185
+    Statement                      shift and go to state 188
     VariableDeclaration            shift and go to state 60
     Type                           shift and go to state 70
 
-state 181
+state 183
 
     (51) Statement -> SWITCH LPAREN Expression RPAREN CaseBlock .
     BREAK           reduce using rule 51 (Statement -> SWITCH LPAREN Expression RPAREN CaseBlock .)
@@ -5770,7 +5839,7 @@ state 181
     DEFAULT         reduce using rule 51 (Statement -> SWITCH LPAREN Expression RPAREN CaseBlock .)
 
 
-state 182
+state 184
 
     (68) CaseBlock -> LBRACE . _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE
     (69) _8_Case_repeat -> . _8_Case_items
@@ -5781,67 +5850,72 @@ state 182
     (79) Case -> . CASE CHAR_LITERAL COLON _10_Statement_repeat
     (85) Case -> . CASE NUM_LITERAL COLON _11_Statement_repeat
     DEFAULT         reduce using rule 70 (_8_Case_repeat -> .)
-    CASE            shift and go to state 190
+    CASE            shift and go to state 193
 
-    _8_Case_repeat                 shift and go to state 186
-    _8_Case_items                  shift and go to state 187
-    _8_Case_item                   shift and go to state 188
-    Case                           shift and go to state 189
+    _8_Case_repeat                 shift and go to state 189
+    _8_Case_items                  shift and go to state 190
+    _8_Case_item                   shift and go to state 191
+    Case                           shift and go to state 192
 
-state 183
+state 185
 
-    (130) RepeatCommaExpression -> RepeatCommaExpression COMMA . Expression
-    (91) Expression -> . Expression Arguments
-    (92) Expression -> . Expression Index
-    (93) Expression -> . Expression PERIOD IDENTIFIER
-    (94) Expression -> . THIS
-    (95) Expression -> . NEW Type Index
-    (96) Expression -> . NEW Type Arguments
-    (97) Expression -> . IDENTIFIER
-    (98) Expression -> . NULL
-    (99) Expression -> . FALSE
-    (100) Expression -> . TRUE
-    (101) Expression -> . STRING_LITERAL
-    (102) Expression -> . CHAR_LITERAL
-    (103) Expression -> . NUM_LITERAL
-    (104) Expression -> . MINUS Expression
-    (105) Expression -> . PLUS Expression
-    (106) Expression -> . EXCLAMATIONMARK Expression
-    (107) Expression -> . Expression OR Expression
-    (108) Expression -> . Expression AND Expression
-    (109) Expression -> . Expression GREATEROREQUAL Expression
-    (110) Expression -> . Expression LESSOREQUAL Expression
-    (111) Expression -> . Expression GREATERTHAN Expression
-    (112) Expression -> . Expression LESSTHAN Expression
-    (113) Expression -> . Expression NOTEQUALS Expression
-    (114) Expression -> . Expression DOUBLEEQUALS Expression
-    (115) Expression -> . Expression DIVIDE Expression
-    (116) Expression -> . Expression TIMES Expression
-    (117) Expression -> . Expression MINUS Expression
-    (118) Expression -> . Expression PLUS Expression
-    (119) Expression -> . Expression DIVIDEEQUALS Expression
-    (120) Expression -> . Expression TIMESEQUALS Expression
-    (121) Expression -> . Expression MINUSEQUALS Expression
-    (122) Expression -> . Expression PLUSEQUALS Expression
-    (123) Expression -> . Expression EQUALS Expression
-    (124) Expression -> . LPAREN Expression RPAREN
-    THIS            shift and go to state 72
-    NEW             shift and go to state 73
-    IDENTIFIER      shift and go to state 100
-    NULL            shift and go to state 74
-    FALSE           shift and go to state 75
-    TRUE            shift and go to state 76
-    STRING_LITERAL  shift and go to state 77
-    CHAR_LITERAL    shift and go to state 78
-    NUM_LITERAL     shift and go to state 79
-    MINUS           shift and go to state 80
-    PLUS            shift and go to state 81
-    EXCLAMATIONMARK shift and go to state 82
-    LPAREN          shift and go to state 63
+    (131) _13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item .
+    COMMA           reduce using rule 131 (_13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item .)
+    RPAREN          reduce using rule 131 (_13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item .)
 
-    Expression                     shift and go to state 191
 
-state 184
+state 186
+
+    (133) _13_COMMA_Expression_item -> COMMA Expression .
+    (91) Expression -> Expression . Arguments
+    (92) Expression -> Expression . Index
+    (93) Expression -> Expression . PERIOD IDENTIFIER
+    (107) Expression -> Expression . OR Expression
+    (108) Expression -> Expression . AND Expression
+    (109) Expression -> Expression . GREATEROREQUAL Expression
+    (110) Expression -> Expression . LESSOREQUAL Expression
+    (111) Expression -> Expression . GREATERTHAN Expression
+    (112) Expression -> Expression . LESSTHAN Expression
+    (113) Expression -> Expression . NOTEQUALS Expression
+    (114) Expression -> Expression . DOUBLEEQUALS Expression
+    (115) Expression -> Expression . DIVIDE Expression
+    (116) Expression -> Expression . TIMES Expression
+    (117) Expression -> Expression . MINUS Expression
+    (118) Expression -> Expression . PLUS Expression
+    (119) Expression -> Expression . DIVIDEEQUALS Expression
+    (120) Expression -> Expression . TIMESEQUALS Expression
+    (121) Expression -> Expression . MINUSEQUALS Expression
+    (122) Expression -> Expression . PLUSEQUALS Expression
+    (123) Expression -> Expression . EQUALS Expression
+    (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
+    (134) Index -> . LBRACKET Expression RBRACKET
+    COMMA           reduce using rule 133 (_13_COMMA_Expression_item -> COMMA Expression .)
+    RPAREN          reduce using rule 133 (_13_COMMA_Expression_item -> COMMA Expression .)
+    PERIOD          shift and go to state 104
+    OR              shift and go to state 105
+    AND             shift and go to state 106
+    GREATEROREQUAL  shift and go to state 107
+    LESSOREQUAL     shift and go to state 108
+    GREATERTHAN     shift and go to state 109
+    LESSTHAN        shift and go to state 110
+    NOTEQUALS       shift and go to state 111
+    DOUBLEEQUALS    shift and go to state 112
+    DIVIDE          shift and go to state 113
+    TIMES           shift and go to state 114
+    MINUS           shift and go to state 115
+    PLUS            shift and go to state 116
+    DIVIDEEQUALS    shift and go to state 117
+    TIMESEQUALS     shift and go to state 118
+    MINUSEQUALS     shift and go to state 119
+    PLUSEQUALS      shift and go to state 120
+    EQUALS          shift and go to state 121
+    LPAREN          shift and go to state 122
+    LBRACKET        shift and go to state 123
+
+    Arguments                      shift and go to state 102
+    Index                          shift and go to state 103
+
+state 187
 
     (55) Statement -> WHILE LPAREN Expression RPAREN Statement .
     BREAK           reduce using rule 55 (Statement -> WHILE LPAREN Expression RPAREN Statement .)
@@ -5876,54 +5950,54 @@ state 184
     DEFAULT         reduce using rule 55 (Statement -> WHILE LPAREN Expression RPAREN Statement .)
 
 
-state 185
+state 188
 
     (56) Statement -> IF LPAREN Expression RPAREN Statement . OptionalElseStatement
     (64) OptionalElseStatement -> . empty
     (65) OptionalElseStatement -> . ELSE Statement
-    (132) empty -> .
+    (135) empty -> .
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 194
-    BREAK           reduce using rule 132 (empty -> .)
-    SWITCH          reduce using rule 132 (empty -> .)
-    CIN             reduce using rule 132 (empty -> .)
-    COUT            reduce using rule 132 (empty -> .)
-    RETURN          reduce using rule 132 (empty -> .)
-    WHILE           reduce using rule 132 (empty -> .)
-    IF              reduce using rule 132 (empty -> .)
-    LBRACE          reduce using rule 132 (empty -> .)
-    THIS            reduce using rule 132 (empty -> .)
-    NEW             reduce using rule 132 (empty -> .)
-    IDENTIFIER      reduce using rule 132 (empty -> .)
-    NULL            reduce using rule 132 (empty -> .)
-    FALSE           reduce using rule 132 (empty -> .)
-    TRUE            reduce using rule 132 (empty -> .)
-    STRING_LITERAL  reduce using rule 132 (empty -> .)
-    CHAR_LITERAL    reduce using rule 132 (empty -> .)
-    NUM_LITERAL     reduce using rule 132 (empty -> .)
-    MINUS           reduce using rule 132 (empty -> .)
-    PLUS            reduce using rule 132 (empty -> .)
-    EXCLAMATIONMARK reduce using rule 132 (empty -> .)
-    LPAREN          reduce using rule 132 (empty -> .)
-    STRING          reduce using rule 132 (empty -> .)
-    BOOL            reduce using rule 132 (empty -> .)
-    KEYWORDCHAR     reduce using rule 132 (empty -> .)
-    INT             reduce using rule 132 (empty -> .)
-    VOID            reduce using rule 132 (empty -> .)
-    RBRACE          reduce using rule 132 (empty -> .)
-    CASE            reduce using rule 132 (empty -> .)
-    DEFAULT         reduce using rule 132 (empty -> .)
+    ELSE            shift and go to state 196
+    BREAK           reduce using rule 135 (empty -> .)
+    SWITCH          reduce using rule 135 (empty -> .)
+    CIN             reduce using rule 135 (empty -> .)
+    COUT            reduce using rule 135 (empty -> .)
+    RETURN          reduce using rule 135 (empty -> .)
+    WHILE           reduce using rule 135 (empty -> .)
+    IF              reduce using rule 135 (empty -> .)
+    LBRACE          reduce using rule 135 (empty -> .)
+    THIS            reduce using rule 135 (empty -> .)
+    NEW             reduce using rule 135 (empty -> .)
+    IDENTIFIER      reduce using rule 135 (empty -> .)
+    NULL            reduce using rule 135 (empty -> .)
+    FALSE           reduce using rule 135 (empty -> .)
+    TRUE            reduce using rule 135 (empty -> .)
+    STRING_LITERAL  reduce using rule 135 (empty -> .)
+    CHAR_LITERAL    reduce using rule 135 (empty -> .)
+    NUM_LITERAL     reduce using rule 135 (empty -> .)
+    MINUS           reduce using rule 135 (empty -> .)
+    PLUS            reduce using rule 135 (empty -> .)
+    EXCLAMATIONMARK reduce using rule 135 (empty -> .)
+    LPAREN          reduce using rule 135 (empty -> .)
+    STRING          reduce using rule 135 (empty -> .)
+    BOOL            reduce using rule 135 (empty -> .)
+    KEYWORDCHAR     reduce using rule 135 (empty -> .)
+    INT             reduce using rule 135 (empty -> .)
+    VOID            reduce using rule 135 (empty -> .)
+    RBRACE          reduce using rule 135 (empty -> .)
+    CASE            reduce using rule 135 (empty -> .)
+    DEFAULT         reduce using rule 135 (empty -> .)
 
-    OptionalElseStatement          shift and go to state 192
-    empty                          shift and go to state 193
+    OptionalElseStatement          shift and go to state 194
+    empty                          shift and go to state 195
 
-state 186
+state 189
 
     (68) CaseBlock -> LBRACE _8_Case_repeat . DEFAULT COLON _9_Statement_repeat RBRACE
-    DEFAULT         shift and go to state 195
+    DEFAULT         shift and go to state 197
 
 
-state 187
+state 190
 
     (69) _8_Case_repeat -> _8_Case_items .
     (71) _8_Case_items -> _8_Case_items . _8_Case_item
@@ -5931,85 +6005,34 @@ state 187
     (79) Case -> . CASE CHAR_LITERAL COLON _10_Statement_repeat
     (85) Case -> . CASE NUM_LITERAL COLON _11_Statement_repeat
     DEFAULT         reduce using rule 69 (_8_Case_repeat -> _8_Case_items .)
-    CASE            shift and go to state 190
+    CASE            shift and go to state 193
 
-    _8_Case_item                   shift and go to state 196
-    Case                           shift and go to state 189
+    _8_Case_item                   shift and go to state 198
+    Case                           shift and go to state 192
 
-state 188
+state 191
 
     (72) _8_Case_items -> _8_Case_item .
     CASE            reduce using rule 72 (_8_Case_items -> _8_Case_item .)
     DEFAULT         reduce using rule 72 (_8_Case_items -> _8_Case_item .)
 
 
-state 189
+state 192
 
     (73) _8_Case_item -> Case .
     CASE            reduce using rule 73 (_8_Case_item -> Case .)
     DEFAULT         reduce using rule 73 (_8_Case_item -> Case .)
 
 
-state 190
+state 193
 
     (79) Case -> CASE . CHAR_LITERAL COLON _10_Statement_repeat
     (85) Case -> CASE . NUM_LITERAL COLON _11_Statement_repeat
-    CHAR_LITERAL    shift and go to state 197
-    NUM_LITERAL     shift and go to state 198
+    CHAR_LITERAL    shift and go to state 199
+    NUM_LITERAL     shift and go to state 200
 
 
-state 191
-
-    (130) RepeatCommaExpression -> RepeatCommaExpression COMMA Expression .
-    (91) Expression -> Expression . Arguments
-    (92) Expression -> Expression . Index
-    (93) Expression -> Expression . PERIOD IDENTIFIER
-    (107) Expression -> Expression . OR Expression
-    (108) Expression -> Expression . AND Expression
-    (109) Expression -> Expression . GREATEROREQUAL Expression
-    (110) Expression -> Expression . LESSOREQUAL Expression
-    (111) Expression -> Expression . GREATERTHAN Expression
-    (112) Expression -> Expression . LESSTHAN Expression
-    (113) Expression -> Expression . NOTEQUALS Expression
-    (114) Expression -> Expression . DOUBLEEQUALS Expression
-    (115) Expression -> Expression . DIVIDE Expression
-    (116) Expression -> Expression . TIMES Expression
-    (117) Expression -> Expression . MINUS Expression
-    (118) Expression -> Expression . PLUS Expression
-    (119) Expression -> Expression . DIVIDEEQUALS Expression
-    (120) Expression -> Expression . TIMESEQUALS Expression
-    (121) Expression -> Expression . MINUSEQUALS Expression
-    (122) Expression -> Expression . PLUSEQUALS Expression
-    (123) Expression -> Expression . EQUALS Expression
-    (125) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
-    (131) Index -> . LBRACKET Expression RBRACKET
-    COMMA           reduce using rule 130 (RepeatCommaExpression -> RepeatCommaExpression COMMA Expression .)
-    RPAREN          reduce using rule 130 (RepeatCommaExpression -> RepeatCommaExpression COMMA Expression .)
-    PERIOD          shift and go to state 104
-    OR              shift and go to state 105
-    AND             shift and go to state 106
-    GREATEROREQUAL  shift and go to state 107
-    LESSOREQUAL     shift and go to state 108
-    GREATERTHAN     shift and go to state 109
-    LESSTHAN        shift and go to state 110
-    NOTEQUALS       shift and go to state 111
-    DOUBLEEQUALS    shift and go to state 112
-    DIVIDE          shift and go to state 113
-    TIMES           shift and go to state 114
-    MINUS           shift and go to state 115
-    PLUS            shift and go to state 116
-    DIVIDEEQUALS    shift and go to state 117
-    TIMESEQUALS     shift and go to state 118
-    MINUSEQUALS     shift and go to state 119
-    PLUSEQUALS      shift and go to state 120
-    EQUALS          shift and go to state 121
-    LPAREN          shift and go to state 122
-    LBRACKET        shift and go to state 123
-
-    Arguments                      shift and go to state 102
-    Index                          shift and go to state 103
-
-state 192
+state 194
 
     (56) Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement .
     BREAK           reduce using rule 56 (Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement .)
@@ -6044,7 +6067,7 @@ state 192
     DEFAULT         reduce using rule 56 (Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement .)
 
 
-state 193
+state 195
 
     (64) OptionalElseStatement -> empty .
     BREAK           reduce using rule 64 (OptionalElseStatement -> empty .)
@@ -6079,7 +6102,7 @@ state 193
     DEFAULT         reduce using rule 64 (OptionalElseStatement -> empty .)
 
 
-state 194
+state 196
 
     (65) OptionalElseStatement -> ELSE . Statement
     (49) Statement -> . VariableDeclaration
@@ -6160,37 +6183,37 @@ state 194
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    Statement                      shift and go to state 199
+    Statement                      shift and go to state 201
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 195
+state 197
 
     (68) CaseBlock -> LBRACE _8_Case_repeat DEFAULT . COLON _9_Statement_repeat RBRACE
-    COLON           shift and go to state 200
+    COLON           shift and go to state 202
 
 
-state 196
+state 198
 
     (71) _8_Case_items -> _8_Case_items _8_Case_item .
     CASE            reduce using rule 71 (_8_Case_items -> _8_Case_items _8_Case_item .)
     DEFAULT         reduce using rule 71 (_8_Case_items -> _8_Case_items _8_Case_item .)
 
 
-state 197
+state 199
 
     (79) Case -> CASE CHAR_LITERAL . COLON _10_Statement_repeat
-    COLON           shift and go to state 201
+    COLON           shift and go to state 203
 
 
-state 198
+state 200
 
     (85) Case -> CASE NUM_LITERAL . COLON _11_Statement_repeat
-    COLON           shift and go to state 202
+    COLON           shift and go to state 204
 
 
-state 199
+state 201
 
     (65) OptionalElseStatement -> ELSE Statement .
     BREAK           reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
@@ -6225,7 +6248,7 @@ state 199
     DEFAULT         reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
 
 
-state 200
+state 202
 
     (68) CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON . _9_Statement_repeat RBRACE
     (74) _9_Statement_repeat -> . _9_Statement_items
@@ -6312,15 +6335,15 @@ state 200
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _9_Statement_repeat            shift and go to state 203
-    _9_Statement_items             shift and go to state 204
-    _9_Statement_item              shift and go to state 205
-    Statement                      shift and go to state 206
+    _9_Statement_repeat            shift and go to state 205
+    _9_Statement_items             shift and go to state 206
+    _9_Statement_item              shift and go to state 207
+    Statement                      shift and go to state 208
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 201
+state 203
 
     (79) Case -> CASE CHAR_LITERAL COLON . _10_Statement_repeat
     (80) _10_Statement_repeat -> . _10_Statement_items
@@ -6408,15 +6431,15 @@ state 201
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _10_Statement_repeat           shift and go to state 207
-    _10_Statement_items            shift and go to state 208
-    _10_Statement_item             shift and go to state 209
-    Statement                      shift and go to state 210
+    _10_Statement_repeat           shift and go to state 209
+    _10_Statement_items            shift and go to state 210
+    _10_Statement_item             shift and go to state 211
+    Statement                      shift and go to state 212
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 202
+state 204
 
     (85) Case -> CASE NUM_LITERAL COLON . _11_Statement_repeat
     (86) _11_Statement_repeat -> . _11_Statement_items
@@ -6504,21 +6527,21 @@ state 202
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _11_Statement_repeat           shift and go to state 211
-    _11_Statement_items            shift and go to state 212
-    _11_Statement_item             shift and go to state 213
-    Statement                      shift and go to state 214
+    _11_Statement_repeat           shift and go to state 213
+    _11_Statement_items            shift and go to state 214
+    _11_Statement_item             shift and go to state 215
+    Statement                      shift and go to state 216
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 203
+state 205
 
     (68) CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat . RBRACE
-    RBRACE          shift and go to state 215
+    RBRACE          shift and go to state 217
 
 
-state 204
+state 206
 
     (74) _9_Statement_repeat -> _9_Statement_items .
     (76) _9_Statement_items -> _9_Statement_items . _9_Statement_item
@@ -6602,13 +6625,13 @@ state 204
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _9_Statement_item              shift and go to state 216
-    Statement                      shift and go to state 206
+    _9_Statement_item              shift and go to state 218
+    Statement                      shift and go to state 208
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 205
+state 207
 
     (77) _9_Statement_items -> _9_Statement_item .
     BREAK           reduce using rule 77 (_9_Statement_items -> _9_Statement_item .)
@@ -6640,7 +6663,7 @@ state 205
     RBRACE          reduce using rule 77 (_9_Statement_items -> _9_Statement_item .)
 
 
-state 206
+state 208
 
     (78) _9_Statement_item -> Statement .
     BREAK           reduce using rule 78 (_9_Statement_item -> Statement .)
@@ -6672,14 +6695,14 @@ state 206
     RBRACE          reduce using rule 78 (_9_Statement_item -> Statement .)
 
 
-state 207
+state 209
 
     (79) Case -> CASE CHAR_LITERAL COLON _10_Statement_repeat .
     CASE            reduce using rule 79 (Case -> CASE CHAR_LITERAL COLON _10_Statement_repeat .)
     DEFAULT         reduce using rule 79 (Case -> CASE CHAR_LITERAL COLON _10_Statement_repeat .)
 
 
-state 208
+state 210
 
     (80) _10_Statement_repeat -> _10_Statement_items .
     (82) _10_Statement_items -> _10_Statement_items . _10_Statement_item
@@ -6764,13 +6787,13 @@ state 208
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _10_Statement_item             shift and go to state 217
-    Statement                      shift and go to state 210
+    _10_Statement_item             shift and go to state 219
+    Statement                      shift and go to state 212
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 209
+state 211
 
     (83) _10_Statement_items -> _10_Statement_item .
     BREAK           reduce using rule 83 (_10_Statement_items -> _10_Statement_item .)
@@ -6803,7 +6826,7 @@ state 209
     DEFAULT         reduce using rule 83 (_10_Statement_items -> _10_Statement_item .)
 
 
-state 210
+state 212
 
     (84) _10_Statement_item -> Statement .
     BREAK           reduce using rule 84 (_10_Statement_item -> Statement .)
@@ -6836,14 +6859,14 @@ state 210
     DEFAULT         reduce using rule 84 (_10_Statement_item -> Statement .)
 
 
-state 211
+state 213
 
     (85) Case -> CASE NUM_LITERAL COLON _11_Statement_repeat .
     CASE            reduce using rule 85 (Case -> CASE NUM_LITERAL COLON _11_Statement_repeat .)
     DEFAULT         reduce using rule 85 (Case -> CASE NUM_LITERAL COLON _11_Statement_repeat .)
 
 
-state 212
+state 214
 
     (86) _11_Statement_repeat -> _11_Statement_items .
     (88) _11_Statement_items -> _11_Statement_items . _11_Statement_item
@@ -6928,13 +6951,13 @@ state 212
     INT             shift and go to state 35
     VOID            shift and go to state 36
 
-    _11_Statement_item             shift and go to state 218
-    Statement                      shift and go to state 214
+    _11_Statement_item             shift and go to state 220
+    Statement                      shift and go to state 216
     VariableDeclaration            shift and go to state 60
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
-state 213
+state 215
 
     (89) _11_Statement_items -> _11_Statement_item .
     BREAK           reduce using rule 89 (_11_Statement_items -> _11_Statement_item .)
@@ -6967,7 +6990,7 @@ state 213
     DEFAULT         reduce using rule 89 (_11_Statement_items -> _11_Statement_item .)
 
 
-state 214
+state 216
 
     (90) _11_Statement_item -> Statement .
     BREAK           reduce using rule 90 (_11_Statement_item -> Statement .)
@@ -7000,7 +7023,7 @@ state 214
     DEFAULT         reduce using rule 90 (_11_Statement_item -> Statement .)
 
 
-state 215
+state 217
 
     (68) CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE .
     BREAK           reduce using rule 68 (CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE .)
@@ -7035,7 +7058,7 @@ state 215
     DEFAULT         reduce using rule 68 (CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE .)
 
 
-state 216
+state 218
 
     (76) _9_Statement_items -> _9_Statement_items _9_Statement_item .
     BREAK           reduce using rule 76 (_9_Statement_items -> _9_Statement_items _9_Statement_item .)
@@ -7067,7 +7090,7 @@ state 216
     RBRACE          reduce using rule 76 (_9_Statement_items -> _9_Statement_items _9_Statement_item .)
 
 
-state 217
+state 219
 
     (82) _10_Statement_items -> _10_Statement_items _10_Statement_item .
     BREAK           reduce using rule 82 (_10_Statement_items -> _10_Statement_items _10_Statement_item .)
@@ -7100,7 +7123,7 @@ state 217
     DEFAULT         reduce using rule 82 (_10_Statement_items -> _10_Statement_items _10_Statement_item .)
 
 
-state 218
+state 220
 
     (88) _11_Statement_items -> _11_Statement_items _11_Statement_item .
     BREAK           reduce using rule 88 (_11_Statement_items -> _11_Statement_items _11_Statement_item .)
@@ -7135,6 +7158,6 @@ state 218
 
 Conflicts:
 
-shift/reduce conflict for ELSE in state 185 resolved as shift
+shift/reduce conflict for ELSE in state 188 resolved as shift
 reduce/reduce conflict in state 71 resolved using rule Type -> IDENTIFIER  [precedence=left, level=10]
 rejected rule (Expression -> IDENTIFIER  [precedence=left, level=10]) in state 71

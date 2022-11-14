@@ -127,7 +127,7 @@ class BigParser(Parser):
         ("left", LESSTHAN, GREATERTHAN, LESSOREQUAL, GREATEROREQUAL),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
-        ("right", NEW, EXCLAMATIONMARK),
+        ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
         ("left", NUM_LITERAL, CHAR_LITERAL, STRING_LITERAL, TRUE, FALSE, NULL, IDENTIFIER),
         ("left", LPAREN, RPAREN)
@@ -267,7 +267,7 @@ class BigParser(Parser):
         constrdecl = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         constrdecl.ident = p.IDENTIFIER
         constrdecl.modifier = ast.ModifierTypes.PUBLIC
-        constrdecl.params.extend(p.MethodSuffix.params)
+        constrdecl.params = p.MethodSuffix.params
         constrdecl.body.extend(p.MethodSuffix.body)
         return constrdecl
 
@@ -323,8 +323,7 @@ class BigParser(Parser):
     def ParameterList(self, p):
         """ParameterList = Parameter RepeatCommaParameter"""
         # print("ParameterList")
-        paramlist = []
-        paramlist.append(p.Parameter0)
+        paramlist = [p.Parameter0]
         paramlist.extend(p.Parameter1)
         return paramlist
 
@@ -390,7 +389,7 @@ class BigParser(Parser):
         # print("Statement = if (Expression) Statement OptionalElseStatement")
         ifstmnt = ast.Statement(ast.StatementTypes.IF)
         ifstmnt.expr = p.Expression
-        ifstmnt.substatement.extend(Statement)
+        ifstmnt.substatement.extend(p.Statement)
         ifstmnt.else_statement = p.OptionalElseStatement
         return ifstmnt
 
@@ -478,7 +477,7 @@ class BigParser(Parser):
         """CaseBlock = { RepeatCase default : RepeatStatement }"""
         # print("CaseBlock")
         caseblock = ast.Statement(None)
-        caseblock.case_list.extend(p.Case)
+        caseblock.case_list = p.Case
         caseblock.default_stmnts = p.Statement
         return caseblock
 
@@ -524,7 +523,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.EQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type  # IDK
+        # expr.type = p.Expression0.type  # IDK
         expr.value = p.Expression1.value
         return expr
 
@@ -784,7 +783,7 @@ class BigParser(Parser):
         """| null"""
         # print("| null")
         expr = ast.Expression(ast.OpTypes.NULL)
-        expr.type = ast.TypeTypes.NULL
+        expr.type = ast.TypeTypes.VOID
         expr.value = p.NULL
         return expr
 
@@ -880,25 +879,27 @@ class BigParser(Parser):
     def ArgumentList(self, p):
         """ArgumentList = Expression RepeatCommaExpression"""
         # print("ArgumentList = Expression RepeatCommaExpression")
-        arglist = []
-        arglist.append(p.Expression0)
+        arglist = [p.Expression0]
         arglist.extend(p.Expression1)
         return arglist
 
-    @_('RepeatCommaExpression COMMA Expression')
-    def RepeatCommaExpression(self, p):
-        """RepeatCommaExpression = RepeatCommaExpression , Expression"""
-        print("RepeatCommaExpression = RepeatCommaExpression , Expression")
-
-    @_('empty')
-    def RepeatCommaExpression(self, p):
-        """RepeatCommaExpression = empty"""
-        print("RepeatCommaExpression = empty")
+    # @_('RepeatCommaExpression COMMA Expression')
+    # def RepeatCommaExpression(self, p):
+    #     """RepeatCommaExpression = RepeatCommaExpression , Expression"""
+    #     print("RepeatCommaExpression = RepeatCommaExpression , Expression")
+    #
+    # @_('empty')
+    # def RepeatCommaExpression(self, p):
+    #     """RepeatCommaExpression = empty"""
+    #     print("RepeatCommaExpression = empty")
 
     @_('LBRACKET Expression RBRACKET')
     def Index(self, p):
         """Index ::= [ Expression ]"""
-        print("Index ::= [ Expression ]")
+        # print("Index ::= [ Expression ]")
+        expr = ast.Expression(ast.OpTypes.INDEX)
+        expr.index = p.Expression
+        return expr
 
     @_('')
     def empty(self, p):
@@ -912,7 +913,6 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
-
 
 
 if __name__ == '__main__':

@@ -7,6 +7,10 @@ class Visitor:
         None
 
 
+class PrintAST(Visitor):
+
+
+
 class SymbolTableVisitor(Visitor):
     def visit(self):
         None
