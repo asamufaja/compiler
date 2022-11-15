@@ -3,6 +3,7 @@ from sly import Lexer, Parser
 import math
 import astclasses as ast
 import sys
+import visitors as v
 
 
 class BigLexer(Lexer):
@@ -372,7 +373,8 @@ class BigParser(Parser):
     def Statement(self, p):
         """Statement = { RepeatStatement }"""
         # print("Statement = { RepeatStatement }")
-        stmntlist = p.Statement  # should automatically be a list
+        stmntlist = ast.Statement(ast.StatementTypes.BRACES)
+        stmntlist.substatement = p.Statement  # should automatically be a list
         return stmntlist
 
     @_('Expression SEMICOLON')
@@ -389,7 +391,7 @@ class BigParser(Parser):
         # print("Statement = if (Expression) Statement OptionalElseStatement")
         ifstmnt = ast.Statement(ast.StatementTypes.IF)
         ifstmnt.expr = p.Expression
-        ifstmnt.substatement.extend(p.Statement)
+        ifstmnt.substatement = p.Statement
         ifstmnt.else_statement = p.OptionalElseStatement
         return ifstmnt
 
@@ -399,7 +401,7 @@ class BigParser(Parser):
         # print("Statement = while ( Expression ) Statement")
         whilestmnt = ast.Statement(ast.StatementTypes.WHILE)
         whilestmnt.expr = p.Expression
-        whilestmnt.substatement.extend(p.Statement)
+        whilestmnt.substatement = p.Statement
         return whilestmnt
 
     @_('RETURN OptionalExpression SEMICOLON')
@@ -453,12 +455,13 @@ class BigParser(Parser):
     def OptionalElseStatement(self, p):
         """OptionalElseStatement = else Statement"""
         # print("OptionalElseStatement = else Statement")
-        return p.Statement  # in a normal situation it will be a list from { statement* }
+        return p.Statement  # in a normal situation it will be a brackets stmnt { statement* }
 
     @_('empty')
     def OptionalElseStatement(self, p):
         """OptionalElseStatement = empty"""
-        print("OptionalElseStatement = empty")
+        # print("OptionalElseStatement = empty")
+        return None
 
     @_('Expression')
     def OptionalExpression(self, p):
@@ -469,7 +472,8 @@ class BigParser(Parser):
     @_('empty')
     def OptionalExpression(self, p):
         """OptionalExpression = empty"""
-        print("OptionalExpression = empty")
+        # print("OptionalExpression = empty")
+        return None
 
     # @_('LBRACE RepeatCase DEFAULT COLON RepeatStatement RBRACE')
     @_('LBRACE { Case } DEFAULT COLON { Statement } RBRACE')
@@ -842,7 +846,8 @@ class BigParser(Parser):
         # print("| Expression Index")
         expr = ast.Expression(ast.OpTypes.INDEX)
         expr.left = p.Expression
-        expr.right = p.Index
+        # expr.right = p.Index
+        expr.index = p.Index
         # expr.type = ast.TypeTypes.INT
         # expr.value = p.NUM_LITERAL
         return expr
@@ -853,7 +858,8 @@ class BigParser(Parser):
         # print("| Expression Arguments")
         expr = ast.Expression(ast.OpTypes.ARGUMENTS)
         expr.left = p.Expression
-        expr.right = p.Arguments
+        # expr.right = p.Arguments
+        expr.args = p.Arguments
         # expr.type = ast.TypeTypes.INT
         # expr.value = p.NUM_LITERAL
         return expr
@@ -913,6 +919,8 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
+    # printvisitor = v.PrintAST
+    # compunit.accept(printvisitor)
 
 
 if __name__ == '__main__':

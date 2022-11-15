@@ -81,8 +81,6 @@ class Expression(Node):
         self.index = None
 
     def accept(self, v):
-        self.left.accept(v)
-        self.right.accept(v)
         v.visitExpr(self)
 
 
@@ -96,8 +94,6 @@ class Statement(Node):
         self.default_stmnts = []
 
     def accept(self, v):
-        for substmnt in self.substatement:
-            substmnt.accept(v)
         v.visitStmnt(self)
 
 
@@ -113,7 +109,6 @@ class ClassAndMemberDeclaration(Node):
         self.child = None
 
     def accept(self, v):
-        self.child.accept(v)
         v.visitMemberDecl(self)
 
 
@@ -126,7 +121,6 @@ class VariableDeclaration(Node):
         self.child = None
 
     def accept(self, v):
-        self.child.accept(v)
         v.visitVarDecl(self)
 
 
@@ -136,8 +130,6 @@ class Case(Node):
         self.statements = []
 
     def accept(self, v):
-        for stmnt in self.statements:
-            stmnt.accept(v)
         v.visitCase(self)
 
 
