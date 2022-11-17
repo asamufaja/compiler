@@ -149,14 +149,14 @@ class BigParser(Parser):
         # print("compilation unit")
         compu = ast.ClassAndMemberDeclaration(None)
         compu.ident = "compunit"
-        compu.child = p.MethodBody
         compu.class_members.extend(p.ClassDefinition)
+        compu.child = p.MethodBody
         return compu
 
     @_('CLASS IDENTIFIER LBRACE { ClassMemberDefinition } RBRACE')
     def ClassDefinition(self, p):
         """ClassDefinition = CLASS IDENTIFIER { ClassMemberDefinition* }"""
-        print("ClassDefinition")
+        # print("ClassDefinition")
         classdef = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         classdef.ident = p.IDENTIFIER
         classdef.class_members.extend(p.ClassMemberDefinition)
@@ -287,7 +287,7 @@ class BigParser(Parser):
         # print("MethodSuffix")
         methodsuff = ast.ClassAndMemberDeclaration(None)
         methodsuff.params = p.ParameterList
-        methodsuff.body = p.MethodBody
+        methodsuff.body = p.MethodBody  # p.MethodBody should be list of statements
         return methodsuff
 
     # @_('ParameterList')
@@ -538,7 +538,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUSEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 + p.Expression1  # risky? probably
         return expr
 
@@ -549,7 +549,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUSEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 - p.Expression1
         return expr
 
@@ -560,7 +560,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.TIMESEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -571,7 +571,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DIVIDEEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -582,7 +582,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -593,7 +593,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -604,7 +604,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.TIMES)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -615,7 +615,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DIVIDE)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -626,7 +626,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -637,7 +637,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NOTEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -648,7 +648,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.LESSTHAN)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -659,7 +659,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.GREATERTHAN)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -670,7 +670,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.LESSOREQUAL)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -681,7 +681,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.GREATEROREQUAL)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -692,7 +692,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.AND)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -703,7 +703,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.OR)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        expr.type = p.Expression0.type
+        # expr.type = p.Expression0.type
         # expr.value = p.Expression0 * p.Expression1
         return expr
 
@@ -910,7 +910,7 @@ class BigParser(Parser):
     @_('')
     def empty(self, p):
         """ e m p t y """
-        print("e m p t y")
+        # print("e m p t y")
 
 
 def main(args):
@@ -919,6 +919,8 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
+    printvardecl = v.PrintVarDecl
+    compunit.accept(printvardecl)
     # printvisitor = v.PrintAST
     # compunit.accept(printvisitor)
 

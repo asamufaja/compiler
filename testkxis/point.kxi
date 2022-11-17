@@ -3,22 +3,22 @@ class Point {
     public int y;
 }
 class Quad {
-//    private Point ul;
-//    private Point lr;
-//    private int count;
-//    
-//    public Point Get_ul() {
-//        count += 1;
-//        return ul;
-//    }
+    private Point ul;
+    private Point lr;
+    private int count;
+
+    public Point Get_ul() {
+        count += 1;
+        return ul;
+    }
 
     private void param_all_day(int sus, char bus, bool cheese) {
         2 + 2;
     }
 }
 void kxi2022 main() {
-//    Quad q = new Quad();
-//    q.Get_ul().x = 5;
-//    q.Get_ul().x += 10;
+    Quad q = new Quad();
+    q.Get_ul().x = 5;
+    q.Get_ul().x += 10;
 }
 //hit
