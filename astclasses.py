@@ -81,7 +81,7 @@ class Expression(Node):
         self.index = None
 
     def accept(self, v):
-        v.visitExpr(v, self)
+        v.visitExpr(self)
 
 
 class Statement(Node):
@@ -94,7 +94,7 @@ class Statement(Node):
         self.default_stmnts = []
 
     def accept(self, v):
-        v.visitStmnt(v, self)
+        v.visitStmnt(self)
 
 
 class ClassAndMemberDeclaration(Node):
@@ -109,7 +109,7 @@ class ClassAndMemberDeclaration(Node):
         self.child = None
 
     def accept(self, v):
-        v.visitMemberDecl(v, self)
+        v.visitMemberDecl(self)
 
 
 class VariableDeclaration(Node):
@@ -121,7 +121,7 @@ class VariableDeclaration(Node):
         self.child = None
 
     def accept(self, v):
-        v.visitVarDecl(v, self)
+        v.visitVarDecl(self)
 
 
 class Case(Node):
@@ -130,7 +130,7 @@ class Case(Node):
         self.statements = []
 
     def accept(self, v):
-        v.visitCase(v, self)
+        v.visitCase(self)
 
 
 # class Variable(Node):  # what if variable is an expression actually? lol

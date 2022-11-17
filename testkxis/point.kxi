@@ -13,12 +13,15 @@ class Quad {
     }
 
     private void param_all_day(int sus, char bus, bool cheese) {
-        2 + 2;
+        count = 3;
     }
 }
 void kxi2022 main() {
     Quad q = new Quad();
     q.Get_ul().x = 5;
     q.Get_ul().x += 10;
+    while (q != 5) {
+        int x = 5;
+    }
 }
 //hit

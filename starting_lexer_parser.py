@@ -919,10 +919,9 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
-    printvardecl = v.PrintVarDecl
-    compunit.accept(printvardecl)
-    # printvisitor = v.PrintAST
-    # compunit.accept(printvisitor)
+
+    printvisitor = v.PrintAST()
+    compunit.accept(printvisitor)
 
 
 if __name__ == '__main__':

@@ -79,42 +79,35 @@ class Visitor:
                 stmnt.accept(self)
 
 
-class PrintVarDecl(Visitor):
-    def visitVarDecl(self, node):
-        print(f"{node.type}, {node.ident}")
-
-
 class PrintAST(Visitor):
     def __init__(self):
         self.indentLevel = 0
         self.tab = "  "
-
-    def visit(self, node):
-        pass
     
     def visitExpr(self, node):
-        pass
+        print(f"{self.tab*self.indentLevel}{node.op_type}")
+        super().visitExpr(node)
 
     def visitStmnt(self, node):
-        if node.statement_type == ast.StatementTypes.IF:
-            node.expr.accept(self)
-            for stmnt in node.substatement:
-                node.accept(stmnt)
-            if node.else_statement != None:
-                for stmnt in node.else_statement:
-                    node.accept(stmnt)
+        print(f"{self.tab*self.indentLevel}{node.statement_type}")
+        super().visitStmnt(node)
 
     def visitVarDecl(self, node):
-        pass
+        print(f"{self.tab*self.indentLevel}{node.type}, {node.ident}")
 
     def visitMemberDecl(self, node):
-        pass
+        print(f"{self.tab*self.indentLevel}{node.ret_type}, {node.ident}")
+        if node.ret_type == ast.TypeTypes.CLASS or node.body is not None:
+            self.indentLevel += 1
+        super().visitMemberDecl(node)
+        if node.ret_type == ast.TypeTypes.CLASS or node.body is not None:
+            self.indentLevel -= 1
 
 
 class SymbolTableVisitor(Visitor):
-    def visit(self, node):
+    def __init__(self):
         pass
-    
+
     def visitExpr(self, node):
         pass
 
