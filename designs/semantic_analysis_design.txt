@@ -51,10 +51,10 @@ I think it is easier to look at what can be on the left hand side than what can'
 for doing correct things on right hand side,
     have literals, idents, ummmmm
 
-Also maybe in one of these current visitors, like the symbol table one, check
-if isinstance(n, Stmnt):
-    if n.type == break:
-        raise Exception("break in wrong place")
+For handling break; honestly I feel like it should just be allowed. 
+since that's not the case... 
+a visitor could go through the ast and say for every statement
+if it's not in a switch or while, and it finds a break, then report that.
 
 So the main function calling these visitors will try each one and catch exceptions
 to have a moderately rough landing without exploding completely

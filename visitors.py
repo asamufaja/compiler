@@ -83,7 +83,7 @@ class PrintAST(Visitor):
         self.tab = "  "
     
     def visitExpr(self, node):
-        print(f"{self.tab*self.indentLevel}{node.op_type}, type:{node.type}")
+        print(f"{self.tab*self.indentLevel}{node.op_type}, type:{node.type}, valaue:{node.value}")
         super().visitExpr(node)
 
     def visitStmnt(self, node):
@@ -109,7 +109,48 @@ class PrintAST(Visitor):
 
 class SymbolTableVisitor(Visitor):
     def __init__(self):
-        pass
+        self.sym_table = dict()
+        self.cur_class = None
+        self.cur_method = None
+        '''
+        example of sym table?
+        {
+            class 1: {
+                data member 1: [type, size, offset]
+                data member 2: [type, size, offset]
+                member function 1: {
+                    local var 1: [type, size offset]
+                }
+                member function 2: {
+                    local var 1: [type, size offset]
+                }
+            }
+            class 2: {
+                data member 1: [type, size offset]
+                member function 1: {
+                    local var 1: [type, size offset]
+                }
+            }
+            compunit aka main(): {
+                local var 1: [type, size offset]
+                local var 2: [type, size offset]
+                local var 3: [type, size offset]
+            }
+        }
+        then can validate by saying
+        enter class 1's node, remember what class we're in
+        when entering it's functions, remember what function we're in
+        looking at when a variable is used (like the expression IDENTIFIER) 
+        and then go through the classes dict looking at the keys to match IDENTIFIER
+        if it's not in the classes, go through the function's dict (in the classes dict)
+        if it's not found then it's undeclared
+        actually, would that end up being like hoisting?
+        I would have to remember like line number? but that might not always work
+        with multiple expressions on same line
+        maybe do undeclared checks with the sym table maker
+        to say there's no var x yet, because as building sym table 
+        also checking everything for undeclared
+        '''
 
     def visitExpr(self, node):
         pass
