@@ -12,7 +12,10 @@ def main(args):
     compunit = parser.parse(lexer.tokenize(kxi.read()))
 
     printvisitor = v.PrintAST()
-    compunit.accept(printvisitor)
+    try:
+        compunit.accept(printvisitor)
+    except:
+        print(f"Got {sys.exc_info()[0]} from going through the nodes")
 
 
 if __name__ == '__main__':

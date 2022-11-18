@@ -21,7 +21,7 @@ void kxi2022 main() {
     q.Get_ul().x = 5;
     q.Get_ul().x += 10;
     while (q != 5) {
-        int x = 5;
+        int x = 5
     }
 }
 //hi

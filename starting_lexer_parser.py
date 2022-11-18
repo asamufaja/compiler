@@ -134,15 +134,6 @@ class BigParser(Parser):
         ("left", LPAREN, RPAREN)
     )
 
-    def __init__(self):
-        self.nodestack = []
-        '''
-        example: a program that declares an int variable
-        first have a compilation unit node made. put on stack
-        then have a statement node made, put on stack
-        then the variabledeclaration node
-        '''
-
     @_('{ ClassDefinition } VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     def CompilationUnit(self, p):
         """CompilationUnit = ClassDefinition* void kxi2022 main ( ) MethodBody"""

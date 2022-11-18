@@ -2037,9 +2037,9 @@ class Parser(metaclass=ParserMeta):
         if token:
             lineno = getattr(token, 'lineno', 0)
             if lineno:
-                sys.stderr.write(f'sly: Syntax error at line {lineno}, token={token.Type}\n')
+                sys.stderr.write(f'sly: Syntax error at line {lineno}, token={token.type}\n')
             else:
-                sys.stderr.write(f'sly: Syntax error, token={token.Type}')
+                sys.stderr.write(f'sly: Syntax error, token={token.type}')
         else:
             sys.stderr.write('sly: Parse error in input. EOF\n')
  
@@ -2224,7 +2224,7 @@ class Parser(metaclass=ParserMeta):
 
                 if lookahead.type != 'error':
                     sym = symstack[-1]
-                    if sym.Type == 'error':
+                    if sym.type == 'error':
                         # Hmmm. Error is on top of stack, we'll just nuke input
                         # symbol and continue
                         lookahead = None
