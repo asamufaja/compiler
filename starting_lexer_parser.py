@@ -442,17 +442,17 @@ class BigParser(Parser):
         # print("Statement = VariableDeclaration")
         return p.VariableDeclaration
 
-    @_('ELSE Statement')
-    def OptionalElseStatement(self, p):
-        """OptionalElseStatement = else Statement"""
-        # print("OptionalElseStatement = else Statement")
-        return p.Statement  # in a normal situation it will be a brackets stmnt { statement* }
-
     @_('empty')
     def OptionalElseStatement(self, p):
         """OptionalElseStatement = empty"""
         # print("OptionalElseStatement = empty")
         return None
+
+    @_('ELSE Statement')
+    def OptionalElseStatement(self, p):
+        """OptionalElseStatement = else Statement"""
+        # print("OptionalElseStatement = else Statement")
+        return p.Statement  # in a normal situation it will be a brackets stmnt { statement* }
 
     @_('Expression')
     def OptionalExpression(self, p):

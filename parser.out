@@ -64,8 +64,8 @@ Rule 60    _7_Statement_repeat -> <empty>
 Rule 61    _7_Statement_items -> _7_Statement_items _7_Statement_item
 Rule 62    _7_Statement_items -> _7_Statement_item
 Rule 63    _7_Statement_item -> Statement
-Rule 64    OptionalElseStatement -> empty
-Rule 65    OptionalElseStatement -> ELSE Statement
+Rule 64    OptionalElseStatement -> ELSE Statement
+Rule 65    OptionalElseStatement -> empty
 Rule 66    OptionalExpression -> empty
 Rule 67    OptionalExpression -> Expression
 Rule 68    CaseBlock -> LBRACE _8_Case_repeat DEFAULT COLON _9_Statement_repeat RBRACE
@@ -153,7 +153,7 @@ DEFAULT              : 68
 DIVIDE               : 115
 DIVIDEEQUALS         : 119
 DOUBLEEQUALS         : 114
-ELSE                 : 65
+ELSE                 : 64
 EQUALS               : 29 123
 EXCLAMATIONMARK      : 106
 FALSE                : 99
@@ -223,7 +223,7 @@ OptionalElseStatement : 56
 OptionalExpression   : 54
 Parameter            : 39 44
 ParameterList        : 31
-Statement            : 38 55 56 63 65 78 84 90
+Statement            : 38 55 56 63 64 78 84 90
 Type                 : 25 45 46 95 96
 VariableDeclaration  : 24 49
 _10_Statement_item   : 82 83
@@ -259,7 +259,7 @@ _8_Case_repeat       : 68
 _9_Statement_item    : 76 77
 _9_Statement_items   : 74 76
 _9_Statement_repeat  : 68
-empty                : 26 64 66
+empty                : 26 65 66
 
 
 state 0
@@ -5953,11 +5953,11 @@ state 187
 state 188
 
     (56) Statement -> IF LPAREN Expression RPAREN Statement . OptionalElseStatement
-    (64) OptionalElseStatement -> . empty
-    (65) OptionalElseStatement -> . ELSE Statement
+    (64) OptionalElseStatement -> . ELSE Statement
+    (65) OptionalElseStatement -> . empty
     (135) empty -> .
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 196
+    ELSE            shift and go to state 195
     BREAK           reduce using rule 135 (empty -> .)
     SWITCH          reduce using rule 135 (empty -> .)
     CIN             reduce using rule 135 (empty -> .)
@@ -5989,7 +5989,7 @@ state 188
     DEFAULT         reduce using rule 135 (empty -> .)
 
     OptionalElseStatement          shift and go to state 194
-    empty                          shift and go to state 195
+    empty                          shift and go to state 196
 
 state 189
 
@@ -6069,42 +6069,7 @@ state 194
 
 state 195
 
-    (64) OptionalElseStatement -> empty .
-    BREAK           reduce using rule 64 (OptionalElseStatement -> empty .)
-    SWITCH          reduce using rule 64 (OptionalElseStatement -> empty .)
-    CIN             reduce using rule 64 (OptionalElseStatement -> empty .)
-    COUT            reduce using rule 64 (OptionalElseStatement -> empty .)
-    RETURN          reduce using rule 64 (OptionalElseStatement -> empty .)
-    WHILE           reduce using rule 64 (OptionalElseStatement -> empty .)
-    IF              reduce using rule 64 (OptionalElseStatement -> empty .)
-    LBRACE          reduce using rule 64 (OptionalElseStatement -> empty .)
-    THIS            reduce using rule 64 (OptionalElseStatement -> empty .)
-    NEW             reduce using rule 64 (OptionalElseStatement -> empty .)
-    IDENTIFIER      reduce using rule 64 (OptionalElseStatement -> empty .)
-    NULL            reduce using rule 64 (OptionalElseStatement -> empty .)
-    FALSE           reduce using rule 64 (OptionalElseStatement -> empty .)
-    TRUE            reduce using rule 64 (OptionalElseStatement -> empty .)
-    STRING_LITERAL  reduce using rule 64 (OptionalElseStatement -> empty .)
-    CHAR_LITERAL    reduce using rule 64 (OptionalElseStatement -> empty .)
-    NUM_LITERAL     reduce using rule 64 (OptionalElseStatement -> empty .)
-    MINUS           reduce using rule 64 (OptionalElseStatement -> empty .)
-    PLUS            reduce using rule 64 (OptionalElseStatement -> empty .)
-    EXCLAMATIONMARK reduce using rule 64 (OptionalElseStatement -> empty .)
-    LPAREN          reduce using rule 64 (OptionalElseStatement -> empty .)
-    STRING          reduce using rule 64 (OptionalElseStatement -> empty .)
-    BOOL            reduce using rule 64 (OptionalElseStatement -> empty .)
-    KEYWORDCHAR     reduce using rule 64 (OptionalElseStatement -> empty .)
-    INT             reduce using rule 64 (OptionalElseStatement -> empty .)
-    VOID            reduce using rule 64 (OptionalElseStatement -> empty .)
-    RBRACE          reduce using rule 64 (OptionalElseStatement -> empty .)
-    ELSE            reduce using rule 64 (OptionalElseStatement -> empty .)
-    CASE            reduce using rule 64 (OptionalElseStatement -> empty .)
-    DEFAULT         reduce using rule 64 (OptionalElseStatement -> empty .)
-
-
-state 196
-
-    (65) OptionalElseStatement -> ELSE . Statement
+    (64) OptionalElseStatement -> ELSE . Statement
     (49) Statement -> . VariableDeclaration
     (50) Statement -> . BREAK SEMICOLON
     (51) Statement -> . SWITCH LPAREN Expression RPAREN CaseBlock
@@ -6188,6 +6153,41 @@ state 196
     Expression                     shift and go to state 64
     Type                           shift and go to state 70
 
+state 196
+
+    (65) OptionalElseStatement -> empty .
+    BREAK           reduce using rule 65 (OptionalElseStatement -> empty .)
+    SWITCH          reduce using rule 65 (OptionalElseStatement -> empty .)
+    CIN             reduce using rule 65 (OptionalElseStatement -> empty .)
+    COUT            reduce using rule 65 (OptionalElseStatement -> empty .)
+    RETURN          reduce using rule 65 (OptionalElseStatement -> empty .)
+    WHILE           reduce using rule 65 (OptionalElseStatement -> empty .)
+    IF              reduce using rule 65 (OptionalElseStatement -> empty .)
+    LBRACE          reduce using rule 65 (OptionalElseStatement -> empty .)
+    THIS            reduce using rule 65 (OptionalElseStatement -> empty .)
+    NEW             reduce using rule 65 (OptionalElseStatement -> empty .)
+    IDENTIFIER      reduce using rule 65 (OptionalElseStatement -> empty .)
+    NULL            reduce using rule 65 (OptionalElseStatement -> empty .)
+    FALSE           reduce using rule 65 (OptionalElseStatement -> empty .)
+    TRUE            reduce using rule 65 (OptionalElseStatement -> empty .)
+    STRING_LITERAL  reduce using rule 65 (OptionalElseStatement -> empty .)
+    CHAR_LITERAL    reduce using rule 65 (OptionalElseStatement -> empty .)
+    NUM_LITERAL     reduce using rule 65 (OptionalElseStatement -> empty .)
+    MINUS           reduce using rule 65 (OptionalElseStatement -> empty .)
+    PLUS            reduce using rule 65 (OptionalElseStatement -> empty .)
+    EXCLAMATIONMARK reduce using rule 65 (OptionalElseStatement -> empty .)
+    LPAREN          reduce using rule 65 (OptionalElseStatement -> empty .)
+    STRING          reduce using rule 65 (OptionalElseStatement -> empty .)
+    BOOL            reduce using rule 65 (OptionalElseStatement -> empty .)
+    KEYWORDCHAR     reduce using rule 65 (OptionalElseStatement -> empty .)
+    INT             reduce using rule 65 (OptionalElseStatement -> empty .)
+    VOID            reduce using rule 65 (OptionalElseStatement -> empty .)
+    RBRACE          reduce using rule 65 (OptionalElseStatement -> empty .)
+    ELSE            reduce using rule 65 (OptionalElseStatement -> empty .)
+    CASE            reduce using rule 65 (OptionalElseStatement -> empty .)
+    DEFAULT         reduce using rule 65 (OptionalElseStatement -> empty .)
+
+
 state 197
 
     (68) CaseBlock -> LBRACE _8_Case_repeat DEFAULT . COLON _9_Statement_repeat RBRACE
@@ -6215,37 +6215,37 @@ state 200
 
 state 201
 
-    (65) OptionalElseStatement -> ELSE Statement .
-    BREAK           reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    SWITCH          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    CIN             reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    COUT            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    RETURN          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    WHILE           reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    IF              reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    LBRACE          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    THIS            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    NEW             reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    IDENTIFIER      reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    NULL            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    FALSE           reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    TRUE            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    STRING_LITERAL  reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    CHAR_LITERAL    reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    NUM_LITERAL     reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    MINUS           reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    PLUS            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    EXCLAMATIONMARK reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    LPAREN          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    STRING          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    BOOL            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    KEYWORDCHAR     reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    INT             reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    VOID            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    RBRACE          reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    ELSE            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    CASE            reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
-    DEFAULT         reduce using rule 65 (OptionalElseStatement -> ELSE Statement .)
+    (64) OptionalElseStatement -> ELSE Statement .
+    BREAK           reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    SWITCH          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    CIN             reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    COUT            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    RETURN          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    WHILE           reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    IF              reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    LBRACE          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    THIS            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    NEW             reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    IDENTIFIER      reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    NULL            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    FALSE           reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    TRUE            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    STRING_LITERAL  reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    CHAR_LITERAL    reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    NUM_LITERAL     reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    MINUS           reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    PLUS            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    EXCLAMATIONMARK reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    LPAREN          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    STRING          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    BOOL            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    KEYWORDCHAR     reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    INT             reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    VOID            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    RBRACE          reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    ELSE            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    CASE            reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
+    DEFAULT         reduce using rule 64 (OptionalElseStatement -> ELSE Statement .)
 
 
 state 202
