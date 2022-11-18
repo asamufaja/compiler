@@ -76,7 +76,7 @@ class Expression(Node):
         self.left = None
         self.right = None
         self.value = None
-        self.type: TypeTypes
+        self.type: TypeTypes = None
         self.args = None
         self.index = None
 
@@ -105,7 +105,7 @@ class ClassAndMemberDeclaration(Node):
         self.ident = ""
         self.body: list[Statement] = []
         self.class_members: list[ClassAndMemberDeclaration] = []
-        self.array: bool
+        self.array: bool = False
         self.child = None
 
     def accept(self, v):
@@ -117,7 +117,7 @@ class VariableDeclaration(Node):
         self.type: TypeTypes = var_type
         self.ident = ""
         self.init = None
-        self.array: bool
+        self.array: bool = False
         self.child = None
 
     def accept(self, v):

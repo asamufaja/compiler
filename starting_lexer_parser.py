@@ -913,19 +913,8 @@ class BigParser(Parser):
         # print("e m p t y")
 
 
-def main(args):
-    lexer = BigLexer()
-    parser = BigParser()
-
-    kxi = open(args[0], 'r')
-    compunit = parser.parse(lexer.tokenize(kxi.read()))
-
-    printvisitor = v.PrintAST()
-    compunit.accept(printvisitor)
-
-
-if __name__ == '__main__':
-    main(sys.argv[1:])
+# if __name__ == '__main__':
+#     main.main(sys.argv[1:])
     # lexer = BigLexer()
     # parser = BigParser()
 

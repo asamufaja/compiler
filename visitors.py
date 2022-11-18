@@ -53,10 +53,8 @@ class Visitor:
         #     pass  # I don't currently make a Statement node that contains a VariableDeclaration
 
     def visitVarDecl(self, node):
-        pass
-        # node.accept(self)
-        # if node.child is not None:
-        #     node.child.accept(self)
+        if node.init is not None:
+            node.init.accept(self)
 
     def visitMemberDecl(self, node):
         if node.params is not None:
@@ -85,22 +83,27 @@ class PrintAST(Visitor):
         self.tab = "  "
     
     def visitExpr(self, node):
-        print(f"{self.tab*self.indentLevel}{node.op_type}")
+        print(f"{self.tab*self.indentLevel}{node.op_type}, type:{node.type}")
         super().visitExpr(node)
 
     def visitStmnt(self, node):
         print(f"{self.tab*self.indentLevel}{node.statement_type}")
+        self.indentLevel += 1
         super().visitStmnt(node)
+        self.indentLevel -= 1
 
     def visitVarDecl(self, node):
         print(f"{self.tab*self.indentLevel}{node.type}, {node.ident}")
+        super().visitVarDecl(node)
 
     def visitMemberDecl(self, node):
-        print(f"{self.tab*self.indentLevel}{node.ret_type}, {node.ident}")
-        if node.ret_type == ast.TypeTypes.CLASS or node.body is not None:
+        print(f"{self.tab*self.indentLevel}{node.modifier}, {node.ret_type}, {node.ident}")
+        if node.ret_type == ast.TypeTypes.CLASS \
+            or node.body is not None:
             self.indentLevel += 1
         super().visitMemberDecl(node)
-        if node.ret_type == ast.TypeTypes.CLASS or node.body is not None:
+        if node.ret_type == ast.TypeTypes.CLASS \
+            or node.body is not None:
             self.indentLevel -= 1
 
 
