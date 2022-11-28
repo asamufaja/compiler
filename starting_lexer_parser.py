@@ -112,8 +112,8 @@ class BigLexer(Lexer):
         self.lineno += t.value.count('\n')
 
     def error(self, t):
-        print("Illegal character '%s'" % t.value[0])
         self.index += 1
+        raise Exception(f"Illegal character {t.value[0]}")
 
 
 class BigParser(Parser):
@@ -132,6 +132,14 @@ class BigParser(Parser):
         ("left", THIS),
         ("left", LPAREN, RPAREN),
     )
+
+    def error(self, p):
+        if p:
+            raise Exception(f"Syntax error at token {p.type}")
+            # Just discard the token and tell the parser it's okay.
+            # self.errok()
+        else:
+            raise Exception("Syntax error at EOF")
 
     @_('{ ClassDefinition } VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
     def CompilationUnit(self, p):

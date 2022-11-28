@@ -23,18 +23,17 @@ def main():
         parser = lp.BigParser()
 
         file = open(fname, 'r')
-        compunit: ast.ClassAndMemberDeclaration
-        compunit = parser.parse(lexer.tokenize(file.read()))
-        # try:
-        #     compunit = parser.parse(lexer.tokenize(file.read()))
-        #     tablevisitor = v.SymbolTableVisitor()
-        #     compunit.accept(tablevisitor)
-        #     if "fail" in fname:
-        #         print(f"fail file {fname} actually passed :/")
-        # except Exception as e:
-        #     if "pass" in fname:
-        #         print(f"pass file {fname} actually failed :/")
-        #         print(e)
+        # print(f"{fname} starting:")
+        try:
+            compunit = parser.parse(lexer.tokenize(file.read()))
+            tablevisitor = v.SymbolTableVisitor()
+            compunit.accept(tablevisitor)
+            if "fail" in fname:
+                print(f"fail file {fname} actually passed :/")
+        except Exception as e:
+            if "pass" in fname:
+                print(f"pass file {fname} actually failed :/")
+                print(e)
 
 
 if __name__ == "__main__":
