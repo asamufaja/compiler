@@ -141,7 +141,11 @@ class BigParser(Parser):
         compu = ast.ClassAndMemberDeclaration(None)
         compu.ident = "compunit"
         compu.class_members.extend(p.ClassDefinition)
-        compu.child = p.MethodBody
+        mainfunc = ast.ClassAndMemberDeclaration(ast.TypeTypes.VOID)
+        mainfunc.body = p.MethodBody
+        mainfunc.ident = "main"
+        compu.child = mainfunc
+
         return compu
 
     @_('CLASS IDENTIFIER LBRACE { ClassMemberDefinition } RBRACE')
@@ -150,6 +154,7 @@ class BigParser(Parser):
         # print("ClassDefinition")
         classdef = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         classdef.ident = p.IDENTIFIER
+        classdef.member_type = ast.MemberTypes.CLASS
         classdef.class_members.extend(p.ClassMemberDefinition)
         return classdef
 
@@ -187,7 +192,8 @@ class BigParser(Parser):
     def Type(self, p):
         """Type ::= identifier"""
         # print("Type IDENTIFIER")
-        return ast.TypeTypes.CLASS
+        # return ast.TypeTypes.CLASS
+        return p.IDENTIFIER
 
     @_('PUBLIC')
     def Modifier(self, p):
@@ -225,6 +231,7 @@ class BigParser(Parser):
         # print("DataMemberDeclaration")
         memberdef = ast.ClassAndMemberDeclaration(p.VariableDeclaration.type)
         memberdef.modifier = p.Modifier
+        memberdef.member_type = ast.MemberTypes.DATAMEMBER
         memberdef.ident = p.VariableDeclaration.ident
         return memberdef
 
@@ -236,6 +243,7 @@ class BigParser(Parser):
         methoddecl.modifier = p.Modifier
         methoddecl.array = p.OptionalBrackets
         methoddecl.ident = p.IDENTIFIER
+        methoddecl.member_type = ast.MemberTypes.METHOD
         methoddecl.params = p.MethodSuffix.params
         methoddecl.body.extend(p.MethodSuffix.body)
         return methoddecl
@@ -258,6 +266,7 @@ class BigParser(Parser):
         # print("ConstructorDeclaration")
         constrdecl = ast.ClassAndMemberDeclaration(ast.TypeTypes.CLASS)
         constrdecl.ident = p.IDENTIFIER
+        constrdecl.member_type = ast.MemberTypes.CONSTRUCTOR
         constrdecl.modifier = ast.ModifierTypes.PUBLIC
         constrdecl.params = p.MethodSuffix.params
         constrdecl.body.extend(p.MethodSuffix.body)
@@ -382,7 +391,7 @@ class BigParser(Parser):
         # print("Statement = if (Expression) Statement OptionalElseStatement")
         ifstmnt = ast.Statement(ast.StatementTypes.IF)
         ifstmnt.expr = p.Expression
-        ifstmnt.substatement = p.Statement
+        ifstmnt.substatement.append(p.Statement)
         ifstmnt.else_statement = p.OptionalElseStatement
         return ifstmnt
 
@@ -392,7 +401,7 @@ class BigParser(Parser):
         # print("Statement = while ( Expression ) Statement")
         whilestmnt = ast.Statement(ast.StatementTypes.WHILE)
         whilestmnt.expr = p.Expression
-        whilestmnt.substatement = p.Statement
+        whilestmnt.substatement.append(p.Statement)
         return whilestmnt
 
     @_('RETURN OptionalExpression SEMICOLON')
@@ -518,7 +527,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.EQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type  # IDK
         expr.value = p.Expression1.value
         return expr
 
@@ -529,8 +537,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUSEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 + p.Expression1  # risky? probably
         return expr
 
     @_('Expression MINUSEQUALS Expression')
@@ -540,8 +546,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUSEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 - p.Expression1
         return expr
 
     @_('Expression TIMESEQUALS Expression')
@@ -551,8 +555,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.TIMESEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression DIVIDEEQUALS Expression')
@@ -562,8 +564,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DIVIDEEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression PLUS Expression')
@@ -573,8 +573,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression MINUS Expression')
@@ -584,8 +582,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression TIMES Expression')
@@ -595,8 +591,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.TIMES)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression DIVIDE Expression')
@@ -606,8 +600,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DIVIDE)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression DOUBLEEQUALS Expression')
@@ -617,8 +609,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression NOTEQUALS Expression')
@@ -628,8 +618,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NOTEQUALS)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression LESSTHAN Expression')
@@ -639,8 +627,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.LESSTHAN)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression GREATERTHAN Expression')
@@ -650,8 +636,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.GREATERTHAN)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression LESSOREQUAL Expression')
@@ -661,8 +645,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.LESSOREQUAL)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression GREATEROREQUAL Expression')
@@ -672,8 +654,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.GREATEROREQUAL)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression AND Expression')
@@ -683,8 +663,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.AND)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('Expression OR Expression')
@@ -694,8 +672,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.OR)
         expr.left = p.Expression0
         expr.right = p.Expression1
-        # expr.type = p.Expression0.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('EXCLAMATIONMARK Expression')
@@ -705,7 +681,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.EXCLAMATIONMARK)
         expr.right = p.Expression
         expr.type = p.Expression.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('PLUS Expression')
@@ -715,7 +690,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUS)
         expr.right = p.Expression
         expr.type = p.Expression.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('MINUS Expression')
@@ -725,7 +699,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUS)
         expr.right = p.Expression
         expr.type = p.Expression.type
-        # expr.value = p.Expression0 * p.Expression1
         return expr
 
     @_('NUM_LITERAL')
@@ -787,7 +760,6 @@ class BigParser(Parser):
         """| identifier"""
         # print("| identifier")
         expr = ast.Expression(ast.OpTypes.IDENTIFIER)
-        expr.type = ast.TypeTypes.CLASS
         expr.value = p.IDENTIFIER
         return expr
 
@@ -798,7 +770,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NEW)
         expr.type = p.Type
         expr.args = p.Arguments
-        # expr.value = p.NUM_LITERAL
         return expr
 
     @_('NEW Type Index')
@@ -808,7 +779,6 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NEW)
         expr.type = p.Type
         expr.index = p.Index
-        # expr.value = p.NUM_LITERAL
         return expr
 
     @_('THIS')
@@ -817,7 +787,6 @@ class BigParser(Parser):
         # print("| this")
         expr = ast.Expression(ast.OpTypes.THIS)
         expr.type = ast.TypeTypes.CLASS
-        # expr.value = p.NUM_LITERAL
         return expr
 
     @_('Expression PERIOD IDENTIFIER')
@@ -825,10 +794,12 @@ class BigParser(Parser):
         """| Expression . identifier"""
         # print("| Expression . identifier")
         expr = ast.Expression(ast.OpTypes.PERIOD)
-        # expr.type = ast.TypeTypes.INT
         expr.left = p.Expression
-        expr.right = p.IDENTIFIER
-        # expr.value = p.NUM_LITERAL
+        # expr.right = p.IDENTIFIER  # IDENTIFIER is a string token, gonna make it an expression for tree purposes
+        ident = ast.Expression(ast.OpTypes.IDENTIFIER)
+        ident.value = p.IDENTIFIER
+        # ident.type = ast.TypeTypes.STRING
+        expr.right = ident
         return expr
 
     @_('Expression Index')
@@ -837,10 +808,7 @@ class BigParser(Parser):
         # print("| Expression Index")
         expr = ast.Expression(ast.OpTypes.INDEX)
         expr.left = p.Expression
-        # expr.right = p.Index
         expr.index = p.Index
-        # expr.type = ast.TypeTypes.INT
-        # expr.value = p.NUM_LITERAL
         return expr
 
     @_('Expression Arguments')
@@ -849,10 +817,7 @@ class BigParser(Parser):
         # print("| Expression Arguments")
         expr = ast.Expression(ast.OpTypes.ARGUMENTS)
         expr.left = p.Expression
-        # expr.right = p.Arguments
         expr.args = p.Arguments
-        # expr.type = ast.TypeTypes.INT
-        # expr.value = p.NUM_LITERAL
         return expr
 
     @_('LPAREN [ ArgumentList ] RPAREN')

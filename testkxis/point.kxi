@@ -13,6 +13,7 @@ class Quad {
     }
 
     private void param_all_day(int sus, char bus, bool cheese) {
+        int a = 4;
         count = 3;
     }
 }

@@ -70,67 +70,89 @@ class ModifierTypes(Enum):
     NONE = "none"
 
 
+class MemberTypes(Enum):
+    CLASS = "class"
+    DATAMEMBER = "datamember"
+    METHOD = "method"
+    CONSTRUCTOR = "constructor"
+
+
 class Expression(Node):
     def __init__(self, op_type):
         self.op_type: OpTypes = op_type
-        self.left = None
-        self.right = None
-        self.value = None
+        self.left: Expression = None
+        self.right: Expression = None
+        self.value = None  # anything
         self.type: TypeTypes = None
-        self.args = None
-        self.index = None
+        self.args: list[Expression] = []
+        self.index: Expression = None
 
     def accept(self, v):
         v.visitExpr(self)
+
+    def __str__(self):
+        return f"expr:{self.op_type.value} value:{self.value} at:{self.__repr__()[-10:-1]}"
 
 
 class Statement(Node):
     def __init__(self, statement_type):
         self.statement_type: StatementTypes = statement_type
-        self.expr = None
-        self.substatement = None
-        self.else_statement = None
+        self.expr: Expression = None
+        self.substatement: list[Statement] = []
+        self.else_statement: list[Statement] = []
         self.case_list: list[Case] = []
-        self.default_stmnts = []
+        self.default_stmnts: list[Statement] = []
 
     def accept(self, v):
         v.visitStmnt(self)
+
+    def __str__(self):
+        return f"stmnt:{self.statement_type.value} at:{self.__repr__()[-10:-1]}"
 
 
 class ClassAndMemberDeclaration(Node):
     def __init__(self, ret_type):
         self.ret_type: TypeTypes = ret_type
+        self.member_type: MemberTypes = None
         self.params: list[VariableDeclaration] = []
-        self.modifier = None
-        self.ident = ""
+        self.modifier: ModifierTypes = None
+        self.ident: str = ""
         self.body: list[Statement] = []
         self.class_members: list[ClassAndMemberDeclaration] = []
-        self.array: bool = False
-        self.child = None
+        self.array: bool = None
+        self.child: ClassAndMemberDeclaration = None
 
     def accept(self, v):
         v.visitMemberDecl(self)
+
+    def __str__(self):
+        return f"class/member:{self.ident} at:{self.__repr__()[-10:-1]}"
 
 
 class VariableDeclaration(Node):
     def __init__(self, var_type):
         self.type: TypeTypes = var_type
-        self.ident = ""
-        self.init = None
-        self.array: bool = False
-        self.child = None
+        self.ident: str = ""
+        self.init: Expression = None
+        self.array: bool = None
 
     def accept(self, v):
         v.visitVarDecl(self)
 
+    def __str__(self):
+        return f"var:{self.type} {self.ident} at:{self.__repr__()[-10:-1]}"
+
 
 class Case(Node):
     def __init__(self, ident):
-        self.ident = ident
-        self.statements = []
+        self.ident: str = ident
+        self.statements: list[Statement] = []
 
     def accept(self, v):
         v.visitCase(self)
+
+    def __str__(self):
+        return f"case:{self.ident} at:{self.__repr__()[-10:-1]}"
 
 
 # class Variable(Node):  # what if variable is an expression actually? lol
@@ -154,6 +176,6 @@ if the specific visitors don't ask for it, then it goes to the do nothing
 in python can change visit methods to get intermediate results from child accepts
 and can pass forward. 
 
-DOT NOTATION we actually do (x.y).z not x.(y.z)
+DOT NOTATION is actually do (x.y).z not x.(y.z)
 
 """
