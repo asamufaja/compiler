@@ -10,13 +10,12 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
-
     printvisitor = v.PrintAST()
     # try:
     compunit.accept(printvisitor)
     # except:
     #     print(f"Got {sys.exc_info()[0]} from going through the nodes")
-    # printvisitor.makeTree()
+    printvisitor.makeTree()
 
     tablevisitor = v.SymbolTableVisitor()
     compunit.accept(tablevisitor)

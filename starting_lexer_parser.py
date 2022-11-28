@@ -36,9 +36,9 @@ class BigLexer(Lexer):
     INT = r'int'
     KXI2022 = r'kxi2022'
     NEW = r'new'
-    NULL = r'null'
-    PUBLIC = r'public'
-    PRIVATE = r'private'
+    NULL = r'null '
+    PUBLIC = r'public '
+    PRIVATE = r'private '
     RETURN = r'return'
     STRING = r'string'
     SWITCH = r'switch'
@@ -121,17 +121,16 @@ class BigParser(Parser):
     debugfile = 'parser.out'
 
     precedence = (
-        ("right", EQUALS, PLUSEQUALS, MINUSEQUALS),
-        ("right", TIMESEQUALS, DIVIDEEQUALS),
-        ("left", OR, AND),
+        ("right", EQUALS, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS),
+        ("left", OR),
+        ("left", AND),
         ("left", DOUBLEEQUALS, NOTEQUALS),
         ("left", LESSTHAN, GREATERTHAN, LESSOREQUAL, GREATEROREQUAL),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
-        ("left", NUM_LITERAL, CHAR_LITERAL, STRING_LITERAL, TRUE, FALSE, NULL, IDENTIFIER),
-        ("left", LPAREN, RPAREN)
+        ("left", LPAREN, RPAREN),
     )
 
     @_('{ ClassDefinition } VOID KXI2022 MAIN LPAREN RPAREN MethodBody')
@@ -795,7 +794,6 @@ class BigParser(Parser):
         # print("| Expression . identifier")
         expr = ast.Expression(ast.OpTypes.PERIOD)
         expr.left = p.Expression
-        # expr.right = p.IDENTIFIER  # IDENTIFIER is a string token, gonna make it an expression for tree purposes
         ident = ast.Expression(ast.OpTypes.IDENTIFIER)
         ident.value = p.IDENTIFIER
         # ident.type = ast.TypeTypes.STRING

@@ -1,7 +1,7 @@
 Grammar:
 
 Rule 0     S' -> CompilationUnit
-Rule 1     CompilationUnit -> _1_ClassDefinition_repeat VOID KXI2022 MAIN LPAREN RPAREN MethodBody  [precedence=left, level=11]
+Rule 1     CompilationUnit -> _1_ClassDefinition_repeat VOID KXI2022 MAIN LPAREN RPAREN MethodBody  [precedence=left, level=10]
 Rule 2     _1_ClassDefinition_repeat -> _1_ClassDefinition_items
 Rule 3     _1_ClassDefinition_repeat -> <empty>
 Rule 4     _1_ClassDefinition_items -> _1_ClassDefinition_items _1_ClassDefinition_item
@@ -13,7 +13,7 @@ Rule 9     _2_ClassMemberDefinition_repeat -> <empty>
 Rule 10    _2_ClassMemberDefinition_items -> _2_ClassMemberDefinition_items _2_ClassMemberDefinition_item
 Rule 11    _2_ClassMemberDefinition_items -> _2_ClassMemberDefinition_item
 Rule 12    _2_ClassMemberDefinition_item -> ClassMemberDefinition
-Rule 13    Type -> IDENTIFIER  [precedence=left, level=10]
+Rule 13    Type -> IDENTIFIER
 Rule 14    Type -> STRING
 Rule 15    Type -> BOOL
 Rule 16    Type -> KEYWORDCHAR
@@ -25,12 +25,12 @@ Rule 21    ClassMemberDefinition -> ConstructorDeclaration
 Rule 22    ClassMemberDefinition -> DataMemberDeclaration
 Rule 23    ClassMemberDefinition -> MethodDeclaration
 Rule 24    DataMemberDeclaration -> Modifier VariableDeclaration
-Rule 25    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix  [precedence=left, level=10]
+Rule 25    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix
 Rule 26    OptionalBrackets -> empty
 Rule 27    OptionalBrackets -> LBRACKET RBRACKET
-Rule 28    ConstructorDeclaration -> IDENTIFIER MethodSuffix  [precedence=left, level=10]
+Rule 28    ConstructorDeclaration -> IDENTIFIER MethodSuffix
 Rule 29    Initializer -> EQUALS Expression  [precedence=right, level=1]
-Rule 30    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody  [precedence=left, level=11]
+Rule 30    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody  [precedence=left, level=10]
 Rule 31    _3_ParameterList_optional -> ParameterList
 Rule 32    _3_ParameterList_optional -> <empty>
 Rule 33    MethodBody -> LBRACE _4_Statement_repeat RBRACE
@@ -45,18 +45,18 @@ Rule 41    _5_COMMA_Parameter_repeat -> <empty>
 Rule 42    _5_COMMA_Parameter_items -> _5_COMMA_Parameter_items _5_COMMA_Parameter_item
 Rule 43    _5_COMMA_Parameter_items -> _5_COMMA_Parameter_item
 Rule 44    _5_COMMA_Parameter_item -> COMMA Parameter
-Rule 45    Parameter -> Type OptionalBrackets IDENTIFIER  [precedence=left, level=10]
+Rule 45    Parameter -> Type OptionalBrackets IDENTIFIER
 Rule 46    VariableDeclaration -> Type OptionalBrackets IDENTIFIER _6_Initializer_optional SEMICOLON
 Rule 47    _6_Initializer_optional -> Initializer
 Rule 48    _6_Initializer_optional -> <empty>
 Rule 49    Statement -> VariableDeclaration
 Rule 50    Statement -> BREAK SEMICOLON
-Rule 51    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock  [precedence=left, level=11]
+Rule 51    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock  [precedence=left, level=10]
 Rule 52    Statement -> CIN RIGHTSHIFT Expression SEMICOLON
 Rule 53    Statement -> COUT LEFTSHIFT Expression SEMICOLON
 Rule 54    Statement -> RETURN OptionalExpression SEMICOLON
-Rule 55    Statement -> WHILE LPAREN Expression RPAREN Statement  [precedence=left, level=11]
-Rule 56    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement  [precedence=left, level=11]
+Rule 55    Statement -> WHILE LPAREN Expression RPAREN Statement  [precedence=left, level=10]
+Rule 56    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement  [precedence=left, level=10]
 Rule 57    Statement -> Expression SEMICOLON
 Rule 58    Statement -> LBRACE _7_Statement_repeat RBRACE
 Rule 59    _7_Statement_repeat -> _7_Statement_items
@@ -93,21 +93,21 @@ Rule 89    _11_Statement_items -> _11_Statement_item
 Rule 90    _11_Statement_item -> Statement
 Rule 91    Expression -> Expression Arguments
 Rule 92    Expression -> Expression Index
-Rule 93    Expression -> Expression PERIOD IDENTIFIER  [precedence=left, level=10]
+Rule 93    Expression -> Expression PERIOD IDENTIFIER
 Rule 94    Expression -> THIS  [precedence=left, level=9]
 Rule 95    Expression -> NEW Type Index  [precedence=left, level=8]
 Rule 96    Expression -> NEW Type Arguments  [precedence=left, level=8]
-Rule 97    Expression -> IDENTIFIER  [precedence=left, level=10]
-Rule 98    Expression -> NULL  [precedence=left, level=10]
-Rule 99    Expression -> FALSE  [precedence=left, level=10]
-Rule 100   Expression -> TRUE  [precedence=left, level=10]
-Rule 101   Expression -> STRING_LITERAL  [precedence=left, level=10]
-Rule 102   Expression -> CHAR_LITERAL  [precedence=left, level=10]
-Rule 103   Expression -> NUM_LITERAL  [precedence=left, level=10]
+Rule 97    Expression -> IDENTIFIER
+Rule 98    Expression -> NULL
+Rule 99    Expression -> FALSE
+Rule 100   Expression -> TRUE
+Rule 101   Expression -> STRING_LITERAL
+Rule 102   Expression -> CHAR_LITERAL
+Rule 103   Expression -> NUM_LITERAL
 Rule 104   Expression -> MINUS Expression  [precedence=left, level=6]
 Rule 105   Expression -> PLUS Expression  [precedence=left, level=6]
 Rule 106   Expression -> EXCLAMATIONMARK Expression  [precedence=left, level=8]
-Rule 107   Expression -> Expression OR Expression  [precedence=left, level=3]
+Rule 107   Expression -> Expression OR Expression  [precedence=left, level=2]
 Rule 108   Expression -> Expression AND Expression  [precedence=left, level=3]
 Rule 109   Expression -> Expression GREATEROREQUAL Expression  [precedence=left, level=5]
 Rule 110   Expression -> Expression LESSOREQUAL Expression  [precedence=left, level=5]
@@ -119,13 +119,13 @@ Rule 115   Expression -> Expression DIVIDE Expression  [precedence=left, level=7
 Rule 116   Expression -> Expression TIMES Expression  [precedence=left, level=7]
 Rule 117   Expression -> Expression MINUS Expression  [precedence=left, level=6]
 Rule 118   Expression -> Expression PLUS Expression  [precedence=left, level=6]
-Rule 119   Expression -> Expression DIVIDEEQUALS Expression  [precedence=right, level=2]
-Rule 120   Expression -> Expression TIMESEQUALS Expression  [precedence=right, level=2]
+Rule 119   Expression -> Expression DIVIDEEQUALS Expression  [precedence=right, level=1]
+Rule 120   Expression -> Expression TIMESEQUALS Expression  [precedence=right, level=1]
 Rule 121   Expression -> Expression MINUSEQUALS Expression  [precedence=right, level=1]
 Rule 122   Expression -> Expression PLUSEQUALS Expression  [precedence=right, level=1]
 Rule 123   Expression -> Expression EQUALS Expression  [precedence=right, level=1]
-Rule 124   Expression -> LPAREN Expression RPAREN  [precedence=left, level=11]
-Rule 125   Arguments -> LPAREN _12_ArgumentList_optional RPAREN  [precedence=left, level=11]
+Rule 124   Expression -> LPAREN Expression RPAREN  [precedence=left, level=10]
+Rule 125   Arguments -> LPAREN _12_ArgumentList_optional RPAREN  [precedence=left, level=10]
 Rule 126   _12_ArgumentList_optional -> ArgumentList
 Rule 127   _12_ArgumentList_optional -> <empty>
 Rule 128   ArgumentList -> Expression _13_COMMA_Expression_repeat
@@ -4121,7 +4121,6 @@ state 143
     SEMICOLON       reduce using rule 107 (Expression -> Expression OR Expression .)
     PERIOD          reduce using rule 107 (Expression -> Expression OR Expression .)
     OR              reduce using rule 107 (Expression -> Expression OR Expression .)
-    AND             reduce using rule 107 (Expression -> Expression OR Expression .)
     DIVIDEEQUALS    reduce using rule 107 (Expression -> Expression OR Expression .)
     TIMESEQUALS     reduce using rule 107 (Expression -> Expression OR Expression .)
     MINUSEQUALS     reduce using rule 107 (Expression -> Expression OR Expression .)
@@ -4131,6 +4130,7 @@ state 143
     RPAREN          reduce using rule 107 (Expression -> Expression OR Expression .)
     COMMA           reduce using rule 107 (Expression -> Expression OR Expression .)
     RBRACKET        reduce using rule 107 (Expression -> Expression OR Expression .)
+    AND             shift and go to state 106
     GREATEROREQUAL  shift and go to state 107
     LESSOREQUAL     shift and go to state 108
     GREATERTHAN     shift and go to state 109
@@ -4756,9 +4756,6 @@ state 155
     (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     PERIOD          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
-    MINUSEQUALS     reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
-    PLUSEQUALS      reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
-    EQUALS          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     LBRACKET        reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     RPAREN          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     COMMA           reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
@@ -4777,6 +4774,9 @@ state 155
     PLUS            shift and go to state 116
     DIVIDEEQUALS    shift and go to state 117
     TIMESEQUALS     shift and go to state 118
+    MINUSEQUALS     shift and go to state 119
+    PLUSEQUALS      shift and go to state 120
+    EQUALS          shift and go to state 121
     LPAREN          shift and go to state 122
 
     Arguments                      shift and go to state 102
@@ -4809,9 +4809,6 @@ state 156
     (134) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     PERIOD          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
-    MINUSEQUALS     reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
-    PLUSEQUALS      reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
-    EQUALS          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     LBRACKET        reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     RPAREN          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     COMMA           reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
@@ -4830,6 +4827,9 @@ state 156
     PLUS            shift and go to state 116
     DIVIDEEQUALS    shift and go to state 117
     TIMESEQUALS     shift and go to state 118
+    MINUSEQUALS     shift and go to state 119
+    PLUSEQUALS      shift and go to state 120
+    EQUALS          shift and go to state 121
     LPAREN          shift and go to state 122
 
     Arguments                      shift and go to state 102
@@ -7159,5 +7159,5 @@ state 220
 Conflicts:
 
 shift/reduce conflict for ELSE in state 188 resolved as shift
-reduce/reduce conflict in state 71 resolved using rule Type -> IDENTIFIER  [precedence=left, level=10]
-rejected rule (Expression -> IDENTIFIER  [precedence=left, level=10]) in state 71
+reduce/reduce conflict in state 71 resolved using rule Type -> IDENTIFIER
+rejected rule (Expression -> IDENTIFIER) in state 71

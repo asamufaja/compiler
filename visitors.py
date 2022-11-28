@@ -150,8 +150,8 @@ class PrintAST(Visitor):
 class SymbolTableVisitor(Visitor):
     def __init__(self):
         self.sym_table = dict()
-        self.cur_class = None
-        self.cur_method = None
+        self.cur_class: ast.ClassAndMemberDeclaration = None
+        self.cur_method: ast.ClassAndMemberDeclaration = None
         '''
         how about for sym table, a list of dict so instead of it all in a dict 
         so I can access different sub sym tables by index easier
@@ -205,28 +205,29 @@ class SymbolTableVisitor(Visitor):
                     node.type = node_value[0]
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
 
-            # check if variable is undeclared
-            # if self.cur_method is not None:
-            #     if node.value not in self.sym_table[self.cur_class][self.cur_method] \
-            #             and node.value not in self.sym_table[self.cur_class]:
-            #         print(self.cur_class, self.cur_method)
-            #         print("1didn't find", node, "in sym table")
-            # elif self.cur_method is None:
-            #     if node.value not in self.sym_table[self.cur_class]:
-            #         print("2didn't find", node, "in sym table")
-            #         print(node.type)
-
         super().visitExpr(node)
 
         if node.op_type == ast.OpTypes.PERIOD:
             # check if node.left is valid, and then go see if the node.right is real
+            # gotta be mindful of args, and indexes?
             is_in_sym, node_value = self.isInSym(node.left.value)
             if is_in_sym:
+                # print(node.left)
                 # if left is in sym, how do I know if right is valid?
                 # if left type is a class, then I should check if right is in that class
-                if node.right in self.sym_table[node.left.type]:
+                if node.right.value not in self.sym_table[node.left.type]:  # node.left.type probably a class
+                    # then it's bad
+                    print(f"{node.right} not found")
 
-                # gotta be mindful of args and indexes
+        if node.op_type == ast.OpTypes.IDENTIFIER:
+            # check if variable is undeclared
+            if self.cur_method is not None:
+                if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident] \
+                        and node.value not in self.sym_table[self.cur_class.ident]:
+                    print("1didn't find", node, "in sym table")
+            elif self.cur_method is None:
+                if node.value not in self.sym_table[self.cur_class.ident]:
+                    print("2didn't find", node, "in sym table")
 
     def visitStmnt(self, node: ast.Statement):
         super().visitStmnt(node)
