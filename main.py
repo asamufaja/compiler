@@ -16,7 +16,7 @@ def main(args):
     compunit.accept(printvisitor)
     # except:
     #     print(f"Got {sys.exc_info()[0]} from going through the nodes")
-    printvisitor.makeTree()
+    # printvisitor.makeTree()
 
     tablevisitor = v.SymbolTableVisitor()
     compunit.accept(tablevisitor)

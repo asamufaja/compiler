@@ -201,30 +201,32 @@ class SymbolTableVisitor(Visitor):
             is_in_sym, node_value = self.isInSym(node.value)
             if is_in_sym:
                 # get the node it's type, node_value is [type, size, offset]
-                node.type = node_value[0]
-                print(node.value, node.type)
+                if isinstance(node_value, list):
+                    node.type = node_value[0]
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
+
+            # check if variable is undeclared
+            # if self.cur_method is not None:
+            #     if node.value not in self.sym_table[self.cur_class][self.cur_method] \
+            #             and node.value not in self.sym_table[self.cur_class]:
+            #         print(self.cur_class, self.cur_method)
+            #         print("1didn't find", node, "in sym table")
+            # elif self.cur_method is None:
+            #     if node.value not in self.sym_table[self.cur_class]:
+            #         print("2didn't find", node, "in sym table")
+            #         print(node.type)
+
+        super().visitExpr(node)
+
         if node.op_type == ast.OpTypes.PERIOD:
             # check if node.left is valid, and then go see if the node.right is real
             is_in_sym, node_value = self.isInSym(node.left.value)
             if is_in_sym:
                 # if left is in sym, how do I know if right is valid?
                 # if left type is a class, then I should check if right is in that class
+                if node.right in self.sym_table[node.left.type]:
 
-                pass
-
-        if node.op_type == ast.OpTypes.IDENTIFIER:
-            # check if variable is undeclared
-            if self.cur_method is not None:
-                if node.value not in self.sym_table[self.cur_class][self.cur_method] \
-                        and node.value not in self.sym_table[self.cur_class]:
-                    print(self.cur_class, self.cur_method)
-                    print("1didn't find", node, "in sym table")
-            elif self.cur_method is None:
-                if node.value not in self.sym_table[self.cur_class]:
-                    print("2didn't find", node, "in sym table")
-                    print(node.type)
-        super().visitExpr(node)
+                # gotta be mindful of args and indexes
 
     def visitStmnt(self, node: ast.Statement):
         super().visitStmnt(node)
@@ -233,25 +235,25 @@ class SymbolTableVisitor(Visitor):
         # check duplicate variable
         if not self.isDuplicate(node):
             if self.cur_method is not None:
-                self.sym_table[self.cur_class][self.cur_method][node.ident] = [node.type, 0, 0]
+                self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] = [node.type, 0, 0]
             else:
-                self.sym_table[self.cur_class][node.ident] = [node.type, 0, 0]
+                self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0]
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
         if node.member_type == ast.MemberTypes.CLASS:
             self.cur_class = node
-            self.sym_table[self.cur_class] = {}
+            self.sym_table[self.cur_class.ident] = {}
         if node.member_type == ast.MemberTypes.METHOD \
                 or node.member_type == ast.MemberTypes.CONSTRUCTOR:
             self.cur_method = node
-            self.sym_table[self.cur_class][self.cur_method] = {}
+            self.sym_table[self.cur_class.ident][self.cur_method.ident] = {}
         if node.member_type == ast.MemberTypes.DATAMEMBER:
-            self.sym_table[self.cur_class][node.ident] = [node.ret_type, 0, 0]
+            self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0]
         if node.ident == 'main':
             self.cur_class = node
             self.cur_method = None
-            self.sym_table[self.cur_class] = {}
+            self.sym_table[self.cur_class.ident] = {}
         # if node.ident == "compunit":
         #     self.sym_table[node]
         super().visitMemberDecl(node)
@@ -261,11 +263,11 @@ class SymbolTableVisitor(Visitor):
 
     def isDuplicate(self, node):
         if self.cur_method is not None:
-            if node.ident in self.sym_table[self.cur_class][self.cur_method]:
+            if node.ident in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
                 print("duplicate decl", node)
                 return True
         else:
-            if node.ident in self.sym_table[self.cur_class]:
+            if node.ident in self.sym_table[self.cur_class.ident]:
                 print("duplicate decl", node)
                 return True
         return False
