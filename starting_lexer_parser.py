@@ -130,7 +130,7 @@ class BigParser(Parser):
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
-        ("left", LPAREN, RPAREN),
+        # ("left", LPAREN, RPAREN),
     )
 
     def error(self, p):
@@ -802,10 +802,12 @@ class BigParser(Parser):
         # print("| Expression . identifier")
         expr = ast.Expression(ast.OpTypes.PERIOD)
         expr.left = p.Expression
+        # expr.left = p.Expression0
         ident = ast.Expression(ast.OpTypes.IDENTIFIER)
         ident.value = p.IDENTIFIER
         # ident.type = ast.TypeTypes.STRING
         expr.right = ident
+        # expr.right = p.Expression1
         return expr
 
     @_('Expression Index')
