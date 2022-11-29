@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    cout << 4;
+    cout << '\n';
+    cout << 'h';
+}

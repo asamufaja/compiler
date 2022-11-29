@@ -1,0 +1,9 @@
+class Test {
+    private int function() {
+        return 0;
+    }
+}
+
+void kxi2022 main() {
+    (new Test()).function();
+}

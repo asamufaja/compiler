@@ -1,0 +1,9 @@
+class Test {
+    public int x = 1;
+
+    public void myFunction() {
+        x = 2;
+    }
+}
+
+void kxi2022 main() {}

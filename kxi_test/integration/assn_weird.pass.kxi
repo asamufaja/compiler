@@ -1,0 +1,33 @@
+
+
+void kxi2022 main() {
+    int x;
+    int y;
+
+    x = y = 5;
+    x = 5;
+    cout << x;
+    cout << ',';
+    cout << y;
+    cout << '\n';
+
+    int b;
+    int a = b = 3;
+    cout << a;
+    cout << ',';
+    cout << b;
+    cout << '\n';
+
+    int c;
+    int d = c += 1;
+    cout << c;
+    cout << ',';
+    cout << d;
+    cout << '\n';
+
+    int e = 2;
+    int f = e *= 2;
+    cout << e;
+    cout << ',';
+    cout << f;
+}

@@ -1,0 +1,23 @@
+// expected output: "2e3e"
+void kxi2022 main() {
+    int x = 1;
+    if (x == 0) {
+        cout << '1';
+    } else if (x == 1) {
+        cout << '2'; // this one
+    } else {
+        cout << '3';
+    }
+    cout << 'e';
+
+    if (x == 0) {
+        cout << '1';
+    } else if (x == 2) {
+        cout << '2';
+    } else {
+        cout << '3'; // this one
+    }
+    cout << 'e';
+    // expected output: "2e3e"
+
+}

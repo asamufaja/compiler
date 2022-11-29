@@ -1,0 +1,6 @@
+// KXI uses the operator precedence from Java 8
+// https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
+
+void kxi2022 main() {
+    bool x = -1-+2-3+5*2 || -3; // should be unaries, 5*2, add&sub from left-to-right, then bool OR. 
+}

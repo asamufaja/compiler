@@ -1,0 +1,11 @@
+class Test {
+
+    Test(int aaa) {
+    }
+
+}
+
+void kxi2022 main() {
+    Test test = new Test();
+    int Test = 1; // error? Test was already declared as a class
+}

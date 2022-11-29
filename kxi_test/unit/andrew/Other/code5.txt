@@ -1,0 +1,12 @@
+//main
+//type creation
+void kxi2022 main(){
+	int x;
+	int y = 0;
+	if(y == 0){
+		x = 1;
+	}
+	else{
+		x = 0;
+	}
+}

@@ -1,0 +1,12 @@
+void kxi2022 main() {
+    bool x = true;
+    bool y = false;
+    bool z = true;
+
+    if ( (x || y) && z ) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+}

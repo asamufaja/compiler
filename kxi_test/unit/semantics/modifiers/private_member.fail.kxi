@@ -1,0 +1,7 @@
+class TestClass {
+    private int x = 1;
+}
+
+void kxi2022 main() {
+    (new TestClass()).x = 5;
+}

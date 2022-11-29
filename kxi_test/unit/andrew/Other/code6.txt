@@ -1,0 +1,19 @@
+class myClass{
+	private int x;
+	public char y;
+	public int getX(int y){
+		if(y == 0){
+			int p;
+			return x;
+		}
+		return y;
+	}
+}
+void kxi2022 main(){
+	myClass c;
+	int x;
+	x = c.getX();
+	cout << x;
+	return;
+	return;
+}

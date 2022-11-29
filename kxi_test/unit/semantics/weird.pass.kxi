@@ -1,0 +1,11 @@
+void kxi2022 main() {
+    int y = 5;
+    (y) = 6;
+    y = (6);
+    int z = 5;
+    y = (z) + 5; // equal to z + 5
+
+    {{{{{
+        int x;
+    }}}}}
+}

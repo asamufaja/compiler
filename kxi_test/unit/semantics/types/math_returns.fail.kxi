@@ -1,0 +1,9 @@
+class Test {
+    public char zero() {
+        return 'c';
+    }
+}
+
+void kxi2022 main() {
+    3 + (new Test()).zero();
+}

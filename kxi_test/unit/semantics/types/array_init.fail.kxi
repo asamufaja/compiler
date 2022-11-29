@@ -1,0 +1,11 @@
+void kxi2022 main() {
+    int size = 2;
+    char other = 'o';
+
+    int[] x = new int[5];
+    int[] y = new int[size];
+
+    int[] a = new int[true]; // should err
+    int[] b = new int['c']; // should err
+    int[] c = new int[other]; // should err
+}

@@ -1,0 +1,10 @@
+//missing arguments for constructor will fail
+//arguemtns given to a class with no constructor so it will fail
+class myClass{
+	myClass(int i){}
+}
+class mySecondClass{}
+void kxi2022 main(){
+	myClass c = new myClass();
+	mySecondClass sc = new mySecondClass(0);
+}

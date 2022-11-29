@@ -1,0 +1,3 @@
+void kxi2022 main() {
+    true = 1; // error; keyword cannot be an ID
+}

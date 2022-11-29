@@ -1,0 +1,7 @@
+class A {
+    public void foo(C c) {
+        cout << c;
+    }
+}
+
+void kxi2022 main() {}

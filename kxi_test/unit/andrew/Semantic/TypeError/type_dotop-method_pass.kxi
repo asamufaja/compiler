@@ -1,0 +1,16 @@
+class myClass{
+	private int [] i;
+	public int [] getIntArray(){
+		return this.i;
+	}
+}
+class my2Class{
+	private myClass c;
+	public myClass getMyClass(){
+		return this.c;
+	}	
+}
+void kxi2022 main(){
+	my2Class c2;
+	int [] i = c2.getMyClass().getIntArray();
+}

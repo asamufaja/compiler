@@ -1,0 +1,7 @@
+void kxi2022 main() {
+    if (3 == 4) {
+        cout << 't';
+    } else {
+        cout << 'f';
+    }
+}

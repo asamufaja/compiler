@@ -1,0 +1,7 @@
+class Test {
+    Test() {
+        return this; // bad!
+    }
+}
+
+void kxi2022 main() {}

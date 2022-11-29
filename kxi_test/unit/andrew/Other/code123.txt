@@ -1,0 +1,26 @@
+//Here is a comment
+void kxi2022 main(){
+	int i = 50
+	if ( i == 25 ) 
+	{
+		cout << true
+	}
+	else
+	{
+		cout << false
+	}
+	//Here is a comment
+	'\n' '\t' 'a'
+}
+class hyrule {
+    private int _var1 () { x = null; }
+    public int[] intArray;
+}
+   
+void kxi2022 main() {
+    if (1 > 23a) {
+        cout << true;
+        } else {
+        cout << false;
+    }
+}

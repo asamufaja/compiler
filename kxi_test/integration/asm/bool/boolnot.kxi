@@ -1,0 +1,19 @@
+void kxi2022 main() {
+    bool t = true;
+    t = !t; // t = false
+    if (!t) { // if t == false
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    t = false;
+    if (!t) { // if t == true
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+}

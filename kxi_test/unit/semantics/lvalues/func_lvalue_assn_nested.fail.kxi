@@ -1,0 +1,8 @@
+class Test {
+    public int function() {}
+}
+
+void kxi2022 main() {
+    (((new Test()).function()));
+    (((new Test()).function())) = 5; // error
+}

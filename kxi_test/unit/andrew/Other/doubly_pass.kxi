@@ -1,0 +1,14 @@
+class myClass{
+	public int x;
+}
+void kxi2022 main(){
+	int y = 1;
+	if(y == 1){
+		int x = 0;
+		y += x;
+	}
+	else{
+		int x = 1;
+		y += x;
+	}
+}

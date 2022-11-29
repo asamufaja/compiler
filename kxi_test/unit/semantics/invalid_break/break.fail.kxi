@@ -1,0 +1,9 @@
+class Test {
+    public void func() {
+        break;
+    }
+}
+
+void kxi2022 main() {
+    break;
+}

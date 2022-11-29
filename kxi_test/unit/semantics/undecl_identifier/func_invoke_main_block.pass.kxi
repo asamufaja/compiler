@@ -1,0 +1,10 @@
+class Test {
+    public void myMethod(int y) {
+
+    }
+}
+
+void kxi2022 main() {
+    int b = 0;
+    (new Test()).myMethod(b);
+}

@@ -1,0 +1,9 @@
+class Bar {
+    private int x;
+    A() {                   //Depending on implementation this should pass the undeclared visitor. Type checker will catch this for me
+        this.x = 2;
+    }
+}
+
+void kxi2022 main() {
+}

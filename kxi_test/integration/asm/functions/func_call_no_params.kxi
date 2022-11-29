@@ -1,0 +1,12 @@
+class Bar {
+    public void myFunction() {
+        cout << 2;
+    }
+}
+
+void kxi2022 main() {
+    cout << 1;
+    Bar bar = new Bar();
+    bar.myFunction();
+    cout << 3;
+}

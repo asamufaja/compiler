@@ -1,0 +1,3 @@
+unusable_correct-func_pass.kxi
+unusable_function-assignment_fail.kxi
+unusable_new_fail.kxi

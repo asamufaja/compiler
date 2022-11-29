@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int x = 65; // ascii A
+    cout << x == 90; // 90 = ascii Z
+}

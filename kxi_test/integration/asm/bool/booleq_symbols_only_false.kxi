@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    int x = 3;
+    int y = 4;
+    cout << x == y; // gives a false positive if booleq_false fails
+}

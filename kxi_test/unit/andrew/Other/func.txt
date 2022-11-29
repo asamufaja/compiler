@@ -1,0 +1,44 @@
+class myClass{
+	private int myInt;
+	private int [] myIntArray;
+	private int index;
+	myClass(int myInt){
+		this.myInt = myInt;
+		myIntArray = new int[10];
+		index = 0;
+	}
+	public void add(int x){
+		0;
+		myIntArray[index] = x + myInt;
+	}
+	public int at(int x, int y){
+		return this.index;
+	}
+}
+class twoClass{
+	private myClass [] myArrClass;
+	public int i;
+	twoClass(){
+		myArrClass = new myClass[10];
+	}
+	public void add(myClass newClass, int index){
+		myArrClass[index] = newClass;
+	}
+	public myClass getClass(int index){
+		return myArrClass[index];
+	}
+	public myClass at(){
+		return myArrClass[0];
+	}
+	public int get(){
+		if(i == 0){
+			return 0;
+		}
+		return myArrClass[0].at(0, 1);
+	}
+}
+void kxi2022 main() {
+	twoClass b = new twoClass();
+	myClass c = new myClass();
+	c = b.at();
+}

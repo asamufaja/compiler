@@ -1,0 +1,25 @@
+void kxi2022 main() {
+    int a = 1;
+    bool b;
+    int c;
+    char d;
+    bool e;
+
+    a = a; // +4 = 8
+    b = b; // +1 = 9
+    c = c; // +4 = 13
+    d = d; // +1 = 14
+    e = e; // +1 = 15
+
+    int f = 1+5;
+    bool g = false;
+    char h = 'h';
+    int i = 13;
+    bool j = true;
+
+    f = f; // +4 = 19
+    g = g; // +1 = 20
+    h = h; // +1 = 21
+    i = i; // +4 = 25
+    j = j; // +1 = 26
+}

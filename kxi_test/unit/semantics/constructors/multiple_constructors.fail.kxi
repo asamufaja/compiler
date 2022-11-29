@@ -1,0 +1,13 @@
+class Bar {
+    private int x;
+    Bar() {
+        this.x = 2;
+    }
+
+    Bar() {
+
+    }
+}
+
+void kxi2022 main() {
+}

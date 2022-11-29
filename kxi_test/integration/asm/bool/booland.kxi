@@ -1,0 +1,53 @@
+void kxi2022 main() {
+    bool x = true;
+    bool y = true;
+
+    if (x && y) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    x = true;
+    y = false;
+
+    if (x && y) {
+        cout << '-';
+    } else {
+        cout << '+';
+    }
+    cout << '|';
+
+    x = false;
+    y = true;
+
+    if (x && y) {
+        cout << '-';
+    } else {
+        cout << '+';
+    }
+    cout << '|';
+
+    x = false;
+    y = false;
+
+    if (x && y) {
+        cout << '-';
+    } else {
+        cout << '+';
+    }
+    cout << '|';
+
+    x = true;
+    y = true;
+    bool a = true;
+    bool b = true;
+
+    if ((x && y) && (a && b)) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+}

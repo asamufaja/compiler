@@ -1,0 +1,13 @@
+// +|
+void kxi2022 main() {
+    char x = 'i';
+    bool t = true;
+    char y = 'i';
+
+    if (t) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+}

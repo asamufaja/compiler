@@ -1,0 +1,15 @@
+class Test {
+    public int x = 1;
+
+    public int func() {
+        return 0;
+    }
+}
+
+void kxi2022 main() {
+    cin >> new Test();
+
+    Test test = new Test();
+    cin >> test.x; //good!
+    cin >> test.func; //bad!
+}

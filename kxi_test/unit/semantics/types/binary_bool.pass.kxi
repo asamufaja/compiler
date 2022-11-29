@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    if (true && false) {
+        cout << 2;
+    }
+}

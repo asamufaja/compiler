@@ -1,0 +1,8 @@
+class Test {
+
+    Test(int aaa, char aaa) {
+    }
+
+}
+
+void kxi2022 main() {}

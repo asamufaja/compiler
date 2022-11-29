@@ -1,0 +1,10 @@
+class myClass{}
+void kxi2022 main(){
+	char q = '\n';
+	int x=1+2;
+	char d = 'd';
+	'c';
+	myClass c;
+	myClass b;
+	c = b;
+}

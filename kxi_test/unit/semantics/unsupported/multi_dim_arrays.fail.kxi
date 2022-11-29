@@ -1,0 +1,3 @@
+void kxi2022 main() {
+    int[][] x = new int[1][1]; // this should throw a parsing error anyway
+}

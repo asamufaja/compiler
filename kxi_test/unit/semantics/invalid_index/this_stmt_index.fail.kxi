@@ -1,0 +1,9 @@
+class Test {
+    public Test myMethod(int y) {
+        this[1];
+        this.x[1]; // good!
+        int z = this[1];
+    }
+}
+
+void kxi2022 main() {}

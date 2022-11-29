@@ -1,0 +1,7 @@
+class myClass{
+	public int get(){}
+}
+void kxi2022 main() {
+	int y = 1;
+	myClass [] x = new myClass[10];
+}

@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int[] a = new int[5];
+    a = 1; // fail!
+}

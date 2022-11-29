@@ -1,0 +1,36 @@
+class hyrule {
+	private int myballs;
+	public int eyes;
+}
+class zelda {
+	private int triforce;
+	private char hair = 'b';
+	zelda (int t, char h){
+		this.triforce = t;
+		this.hair = h;
+	}
+	public void useTriforce(int amount){
+		this.triforce -= amount;
+	}
+}
+void kxi2022 main() {
+	int power = 10;
+	char name = 'l';
+	int [] x = new int [10];
+	x[2] = 1;
+	zelda z1 = new zelda (power, name);
+    	if (1 > 2) {
+        	cout << true;
+		if(name == 'l'){
+			cout << power;
+		}
+		else{
+			cout << 0;
+		}
+        }
+	else {
+        	cout << false;
+    	}
+	z1.useTriforce(9);
+	cout << 1;
+}

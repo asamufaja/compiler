@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int a = idontexist + 1;
+    int idontexist;
+}

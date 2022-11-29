@@ -1,0 +1,63 @@
+class Test {
+    private int x = 0;
+
+    Test(int y, String aaa) {
+        this.x = 0;
+    }
+
+    public void myMethod(int aaa) {
+
+    }
+
+    public void another(char aaa) {
+
+    }
+}
+
+class String {}
+
+void kxi2022 main () {
+
+    int t = 4/1+2*3;
+    bool x1 = !true;
+    Test x = new Test(1, new String());
+    t += (-1-5);
+    char nl = '\n';
+    int y = -(1);
+    char z = 'z';
+    //new Test() = 5;
+    //x.myMethod() = 2;
+    x.myMethod(1);
+    String c = new String();
+
+    if (y == 0) {
+        char yy = 'y';
+    } else
+        int a = 0;
+    
+
+    while(z == 'z') {
+        break;
+    }
+
+    switch(y) {
+        case 0:
+            int b = 1;
+            3+3;
+        default:
+            int cc = 2;
+    }
+
+    cin >> t;
+    cout << t;
+
+    bool bb = true;
+    bool bbf = false;
+    bb = false;
+    bbf = true;
+
+    int[] arr = new int[5];
+    Test[] bbbbbbb = new Test[2];
+    arr[0] = 1;
+
+}

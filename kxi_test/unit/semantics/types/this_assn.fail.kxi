@@ -1,0 +1,8 @@
+class Test {
+    Test() {
+        this = 1;
+        this = new Test();
+    }
+}
+
+void kxi2022 main() {}

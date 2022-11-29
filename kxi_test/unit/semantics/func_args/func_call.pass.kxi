@@ -1,0 +1,9 @@
+class Test {
+    public void someMethod(int a, char b) {
+
+    }
+}
+
+void kxi2022 main() {
+    (new Test()).someMethod(1, 'b');
+}

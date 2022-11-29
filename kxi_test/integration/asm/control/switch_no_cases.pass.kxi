@@ -1,0 +1,7 @@
+void kxi2022 main() {
+    switch (0) {
+        default:
+            cout << '+';
+    }
+    cout << '|';
+}

@@ -1,0 +1,35 @@
+class Class_1{
+	private int [] myInt = new int[10];
+	Class_1(){
+		this.myInt = new int [10];
+		this.myInt[0] = 1;
+	}
+	public int [] getIntArray(){
+		return this.myInt;
+	}
+}
+class Class_2{
+	private Class_1 [] c1;
+	Class_2(){
+		this.c1 = new Class_1[10];
+		this.c1[0] = new Class_1();
+	}
+	public Class_1 [] getc1Array(){
+		return this.c1;
+	}
+}
+class Class_3{
+	private Class_2 [] c2;
+	Class_3(){
+		this.c2 = new Class_2[10];
+		this.c2[0] = new Class_2();
+	}
+	public Class_2 [] getc2Array(){
+		return this.c2;
+	}
+}
+void kxi2022 main(){
+	Class_3 [] c3;
+	c3 = new Class_3[10];
+	int myInt = c3[0].getc2Array()[0].getc1Array()[0].getIntArray()[0];
+}

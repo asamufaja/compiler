@@ -1,0 +1,7 @@
+class Test {
+    Test() {
+        this();
+    }
+}
+
+void kxi2022 main() {}

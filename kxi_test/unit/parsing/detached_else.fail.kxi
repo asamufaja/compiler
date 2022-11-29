@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    else { // error
+        int x = 1;
+    }
+}

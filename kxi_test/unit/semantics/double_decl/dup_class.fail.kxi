@@ -1,0 +1,5 @@
+class Test {}
+
+class Test {} // should error
+
+void kxi2022 main() {}

@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    int[] x = new int[1];
+    bool y = false;
+    x[y] = 1;
+}

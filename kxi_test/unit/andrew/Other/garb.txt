@@ -1,0 +1,57 @@
+VariableDeclaration = Type [] ID = Expression
+
+Lvalue
+	ID LvalueSuffix
+	Lvalue Arg LvalueSuffix
+	new Type Arguments LvalueSuffix
+	new Type Index LvalueSuffix
+	this LvalueSuffix
+	null LvalueSuffix
+LvalueSuffix
+	. ID LvalueSuffix
+	Index LvalueSuffix
+
+ID . ID . ID
+
+
+class a{
+	int [] intArr(){}
+}
+class b{
+	a [] aArr(){}
+}
+class c{
+	b [] bArr(){}
+}
+main(){
+	c [] cArr =  new c()[10];
+	int x = cArr[0].bArr()[0].aArr()[0].intArr()[0];
+}
+
+//code with errors
+this[0] LvalueSuffix?
+null[0] LvalueSuffix?
+new int() LvalueSuffix?
+myClass [] myClassArr = new myClass () [10] LvalueSuffix?
+new int[0] = new int[0]
+//what is this?
+(Lvalue)LvalueSuffix
+null LvalueSuffix
+
+//which one works
+myClass [] myClassArr = new myClass()[10]
+myClass [] myClassArr = new myClass[10]
+
+//DataMemberDeclaration
+public int [] ID = Expression
+
+//when we return any = in the type check it should be "equal"
+
+//class methods need arguments
+
+
+Unusable lvalues
+	keywords 
+	new expressions
+	function calls
+		c.method = ?; or c.method() = ?;

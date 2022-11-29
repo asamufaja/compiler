@@ -1,0 +1,12 @@
+class hyrule {
+    private int _var1 () { int x = null; }
+    public int[] intArray;
+}
+   
+void kxi2022 main() {
+    if (1 > 2) {
+        cout << true;
+        } else {
+        cout << false;
+    }
+}

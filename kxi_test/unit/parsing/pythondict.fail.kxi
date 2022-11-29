@@ -1,0 +1,7 @@
+// all tokens here are valid, but clearly violate syntax
+{
+    test: 'test',
+    {},
+    [],
+    test2: True
+}

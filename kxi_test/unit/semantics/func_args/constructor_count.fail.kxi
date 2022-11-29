@@ -1,0 +1,9 @@
+class Test {
+    Test(int a) {
+
+    }
+}
+
+void kxi2022 main() {
+    new Test(); // error
+}

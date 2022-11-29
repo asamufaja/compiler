@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    int x;
+    x = 420;
+    cout << x;
+}

@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    int[] x = new int[1];
+    int y = 0;
+    x[y] = 1;
+}

@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int x = 1;
+    x[1];
+}

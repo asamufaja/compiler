@@ -1,0 +1,36 @@
+// Tests criteria under the A tier (Everything in B, plus arrays).
+// Provision and direction courtesy of Michael Abbott, 2021.
+class orange {
+    public int[] seeds = new int[15];
+    public void makeSeeds(int startingIndex) {
+        int x = 0;
+        while (x < 15) {
+            this.seeds[x] = startingIndex + x;
+            x = x + 1;
+        }
+    }
+    public void printSeeds() {
+        int i = 0;
+        while (i < 15) {
+            cout << this.seeds[i];
+            cout << ' ';
+            i = i + 1;
+        }
+        cout << '\n';
+    }
+}
+
+void kxi2022 main() {
+    orange[] basket = new orange[5];
+    int x = 0;
+    while (x < 5) {
+        basket[x] = new orange();
+        basket[x].makeSeeds(x*10);
+        x = x + 1;
+    }
+    x = 0;
+    while (x < 5) {
+        basket[x].printSeeds();
+        x = x + 1;
+    }
+}

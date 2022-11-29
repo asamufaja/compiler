@@ -1,0 +1,9 @@
+class myClass{}
+class myClass{
+	public int y;
+	public int y;
+}
+void kxi2022 main(){
+	int x;
+	int x;
+}

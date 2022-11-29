@@ -1,0 +1,10 @@
+class TestClass {
+    private int x = 1;
+
+    TestClass() {
+        this.x = 1;
+    }
+}
+
+void kxi2022 main() {
+}

@@ -1,0 +1,32 @@
+class A {
+    public void foo() {
+        this[1];            //should be caught by lvalue visitor
+        this();             //should be caught by lvalue visitor
+    }
+}
+
+void kxi2022 main() {
+    int[] x;
+    A y = new A();
+    A[] z;
+
+    x[1][3];                //should be caught by lvalue visitor
+
+    y.foo()(2);             //should be caught by lvalue visitor
+
+    char baz = 'b';
+
+    bar(baz);               //should be caught by lvalue visitor
+
+    z[1]();                 //should be caught by lvalue visitor
+
+    //(null).x;               //should be caught by lvalue visitor
+    //(null)[2];              //should be caught by lvalue visitor
+    //null();                 //should be caught by lvalue visitor
+
+    A a = new A(2)();       //should be caught by lvalue visitor
+    B b = new B(4, 5)[1];   //should be caught by lvalue visitor
+
+    C[] c = new C[3](2);    //should be caught by lvalue visitor
+    D[] d = new D[2][1];    //should be caught by lvalue visitor
+}

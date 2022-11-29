@@ -1,0 +1,10 @@
+class Test {
+    public void myMethod(int y) {
+
+    }
+}
+
+void kxi2022 main() {
+    // b is not defined
+    (new Test()).myMethod(b);
+}

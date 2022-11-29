@@ -1,0 +1,10 @@
+class Test {
+    public char another() {
+        return this.zero();
+    }
+    public int zero() {
+        return 0;
+    }
+}
+
+void kxi2022 main() {}

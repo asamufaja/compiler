@@ -1,0 +1,13 @@
+//Here is a comment
+void kxi2022 main(){
+	int i = 50
+	if ( i == 25 ) 
+	{
+		cout << true
+	}
+	else
+	{
+		cout << false
+	}
+	//Here is a comment
+}

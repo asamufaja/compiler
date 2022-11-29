@@ -1,0 +1,6 @@
+class myClass{
+}
+void kxi2022 main(){
+	myClass();
+	new myClass() = new myClass();
+}

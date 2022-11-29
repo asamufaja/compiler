@@ -1,0 +1,22 @@
+// Tests criteria under the B tier (Everything in C, plus objects).
+// Provision and direction courtesy of Michael Abbott, 2021.
+class Test {
+    Test() {return this;}
+    public int test(int x) {
+        cout << x;
+        cout << '\n';
+        if (x == 5) {
+            cout << this.test(x + 5);
+            cout << '\n';
+        }
+        return x + 5;
+    }
+}
+
+void kxi2021 main() {
+    int[] arrTest = new int[5];
+    Test test = new Test();
+    cout << test.test(5);
+    cout << '\n';
+    arrTest[1] = 3;
+}

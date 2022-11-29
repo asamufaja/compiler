@@ -1,0 +1,36 @@
+// + means test passed, | separates tests
+// if any - is found, test failed
+// other symbols like . or , maybe used to
+// show intermediate steps
+void kxi2022 main() {
+    int a = 0;
+    switch (a) {
+        case 1:
+            cout << '-';
+            break;
+        case 0:
+            cout << '.';
+        case 3:
+            cout << ',';
+        default:
+            cout << '+';
+    }
+    cout << '|';
+    cout << '\n';
+
+
+    char b = 'b';
+    switch (b) {
+        case 'b':
+            cout << '.';
+        case 'c':
+            cout << '+';
+            break;
+        default:
+            break;
+    }
+    cout << '|';
+    cout << '\n';
+}
+
+// 

@@ -1,0 +1,3 @@
+void kxi2022 main() {
+    X bad = new X();
+}

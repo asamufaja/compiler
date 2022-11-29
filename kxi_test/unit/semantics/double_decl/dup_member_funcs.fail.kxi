@@ -1,0 +1,6 @@
+class Test{
+    public int x(int y) {}
+    public int x() {} // error
+}
+
+void kxi2022 main() {}

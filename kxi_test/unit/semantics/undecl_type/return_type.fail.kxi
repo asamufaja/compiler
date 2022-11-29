@@ -1,0 +1,14 @@
+class A {
+    public T invalidReturnType() { //undefined type
+        return new T();            //undefined type
+    }
+
+    public int invalidReturnType2() {
+        return new T();            //undefined type
+    }
+
+    public T invalidReturnType3() { // undefined type
+    }
+}
+
+void kxi2022 main() {}

@@ -1,0 +1,9 @@
+class Test {
+    public int zero() {
+        return 0;
+    }
+}
+
+void kxi2022 main() {
+    3 + (new Test()).zero();
+}

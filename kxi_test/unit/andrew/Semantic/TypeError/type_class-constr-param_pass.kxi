@@ -1,0 +1,10 @@
+//myClass has constructor with arguments, which is given
+//mySecondClass does not have constructor but no arguments so it passes
+class myClass{
+	myClass(int i){}
+}
+class mySecondClass{}
+void kxi2022 main(){
+	myClass c = new myClass(0);
+	mySecondClass sc = new mySecondClass();
+}

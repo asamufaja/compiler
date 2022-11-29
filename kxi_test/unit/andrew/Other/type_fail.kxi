@@ -1,0 +1,8 @@
+class myClass{
+}
+class secondClass{
+}
+void kxi2022 main(){
+	int x = 'a';
+	myClass c = new secondClass();	
+}

@@ -1,0 +1,25 @@
+class Test {
+    Test() {
+
+    }
+
+    public Test hello() {
+        return new Test();
+    }
+
+    public int myMethod(int c, int a) {
+        return 0;
+    }
+}
+
+void kxi2022 main () {
+    {
+        Test test = new Test();
+        int test2 = test.myMethod(1, 1);
+        Test h = test.hello();
+        test.hello().myMethod(0, 1);
+        //hi mom
+        int t = 4/1+2*3;t;
+        3+3;
+    }
+}

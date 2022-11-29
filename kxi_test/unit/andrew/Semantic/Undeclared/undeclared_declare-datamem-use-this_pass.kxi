@@ -1,0 +1,10 @@
+class myClass{
+	private int i;
+	public int getI(){
+		return this.i;
+	}
+}
+void kxi2022 main(){
+	myClass c;
+	int i = c.getI();
+}

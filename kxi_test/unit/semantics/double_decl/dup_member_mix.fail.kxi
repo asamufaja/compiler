@@ -1,0 +1,7 @@
+class Test{
+    public int x = 1;
+    
+    public int x() {} // error
+}
+
+void kxi2022 main() {}

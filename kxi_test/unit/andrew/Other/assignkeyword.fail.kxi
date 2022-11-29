@@ -1,0 +1,28 @@
+class myClass{
+	myClass(){}
+	public int geti(){}
+}
+void kxi2022 main(){
+	myClass c = c;
+	int [] p;
+	int i;
+	i;
+	p[0];
+	myClass [] y = new myClass [10];
+	if(i == 0){
+		i;
+		p[0];
+	}
+}
+
+//Unusable Type Error
+//	int i = i
+	
+//	myClass c;
+//	c.func() = 0;
+
+//	i;
+
+void kxi2022 main(){
+
+}

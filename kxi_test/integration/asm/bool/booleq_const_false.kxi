@@ -1,0 +1,3 @@
+void kxi2022 main() {
+    cout << 3 == 4; // output will be empty since ASCII 0 is nonprintable; check R3
+}

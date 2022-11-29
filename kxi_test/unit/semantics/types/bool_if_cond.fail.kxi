@@ -1,0 +1,6 @@
+void kxi2022 main() {
+    char c = 'c';
+    if (c) {
+        
+    }
+}

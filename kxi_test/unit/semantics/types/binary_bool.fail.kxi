@@ -1,0 +1,5 @@
+void kxi2022 main() {
+    if (1 && 2) { // fail
+        cout << 2;
+    }
+}

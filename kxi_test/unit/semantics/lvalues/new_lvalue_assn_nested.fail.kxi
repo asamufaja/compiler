@@ -1,0 +1,9 @@
+class Test {
+    public int x;
+}
+
+void kxi2022 main() {
+    ((new Test()).x) = 5;
+    (new Test()).x = 5;
+    ((new Test())) = 5; // error
+}

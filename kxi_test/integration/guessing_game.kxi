@@ -1,0 +1,125 @@
+// Tests criteria under the C- tier (Sequential code in the main function).
+// Provision and direction courtesy of Michael Abbott, 2021.
+void kxi2021 main() {
+    int x;
+    int guess = 0-1;
+    cout << 'G';
+    cout << 'u';
+    cout << 'e';
+    cout << 's';
+    cout << 's';
+    cout << ' ';
+    cout << 't';
+    cout << 'h';
+    cout << 'e';
+    cout << ' ';
+    cout << 'n';
+    cout << 'u';
+    cout << 'm';
+    cout << 'b';
+    cout << 'e';
+    cout << 'r';
+    cout << '\n';
+    cout << 'S';
+    cout << 'e';
+    cout << 'e';
+    cout << 'd';
+    cout << ':';
+    cin >> x;
+    x = ((x * (x + 5)) or (x * 127)) / 27;
+    // cout << x;
+
+    while (true) {
+        cout << 'I';
+        cout << 'n';
+        cout << 'p';
+        cout << 'u';
+        cout << 't';
+        cout << ' ';
+        cout << 'y';
+        cout << 'o';
+        cout << 'u';
+        cout << 'r';
+        cout << ' ';
+        cout << 'g';
+        cout << 'u';
+        cout << 'e';
+        cout << 's';
+        cout << 's';
+        cout << ':';
+        cin >> guess;
+        if (guess < x) {
+            cout << 'T';
+            cout << 'o';
+            cout << 'o';
+            cout << ' ';
+            cout << 'l';
+            cout << 'o';
+            cout << 'w';
+            cout << ',';
+            cout << ' ';
+            cout << 't';
+            cout << 'r';
+            cout << 'y';
+            cout << ' ';
+            cout << 'a';
+            cout << 'g';
+            cout << 'a';
+            cout << 'i';
+            cout << 'n';
+            cout << '.';
+            cout << '\n';
+        } else if (guess > x) {
+            cout << 'T';
+            cout << 'o';
+            cout << 'o';
+            cout << ' ';
+            cout << 'h';
+            cout << 'i';
+            cout << 'g';
+            cout << 'h';
+            cout << ',';
+            cout << ' ';
+            cout << 't';
+            cout << 'r';
+            cout << 'y';
+            cout << ' ';
+            cout << 'a';
+            cout << 'g';
+            cout << 'a';
+            cout << 'i';
+            cout << 'n';
+            cout << '.';
+            cout << '\n';
+        } else {
+            break;
+        }
+        cout << '\n';
+    }
+    cout << 'C';
+    cout << 'o';
+    cout << 'r';
+    cout << 'r';
+    cout << 'e';
+    cout << 'c';
+    cout << 't';
+    cout << ',';
+    cout << ' ';
+    cout << 'c';
+    cout << 'o';
+    cout << 'n';
+    cout << 'g';
+    cout << 'r';
+    cout << 'a';
+    cout << 't';
+    cout << 'u';
+    cout << 'l';
+    cout << 'a';
+    cout << 't';
+    cout << 'i';
+    cout << 'o';
+    cout << 'n';
+    cout << 's';
+    cout << '!';
+    cout << '\n';
+}

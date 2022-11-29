@@ -1,0 +1,3 @@
+void kxi2022 main() {
+    int null1 = 1; // pass; ID is close to a keyword, but it is not
+}

@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    void x;
+    x = main();
+}

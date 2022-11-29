@@ -1,0 +1,8 @@
+class myClass{
+	public int x;
+}
+void kxi2022 main(){
+	int y = 1;
+	myClass c = new myClass();
+	y = c.x;
+}

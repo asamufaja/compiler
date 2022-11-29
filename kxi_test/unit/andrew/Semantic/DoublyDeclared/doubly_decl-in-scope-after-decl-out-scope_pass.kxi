@@ -1,0 +1,8 @@
+void kxi2022 main(){
+	int y = 0;
+	if(y == 0){
+		int x = 1;
+	}
+	int x = 0;
+	x += 2;	
+}

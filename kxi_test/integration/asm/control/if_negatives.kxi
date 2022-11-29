@@ -1,0 +1,9 @@
+void kxi2022 main() {
+    int z = 2-100;
+    if (z == -98) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+}

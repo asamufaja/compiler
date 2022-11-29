@@ -1,0 +1,4 @@
+class myClass{}
+void kxi2022 main(){
+	cout << "NO A STRING";
+}

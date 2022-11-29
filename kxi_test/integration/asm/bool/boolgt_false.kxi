@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int x = 3;
+    cout << x > 3; // check r3
+}

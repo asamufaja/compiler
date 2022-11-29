@@ -1,0 +1,46 @@
+class Class_1{
+	private int [] myInt = new int[10];
+	Class_1(){
+		myInt = new int [10];
+		myInt[0] = 1;
+	}
+	public int [] getIntArray(){
+		return myInt;
+	}
+}
+class Class_2{
+	private Class_1 [] c1;
+	Class_2(){
+		c1 = new Class_1[10];
+		c1[0] = new Class_1();
+	}
+	public Class_1 [] getc1Array(){
+		return c1;
+	}
+}
+class Class_3{
+	public int x;
+	public Class_2 [] c2;
+	Class_3(){
+		c2 = new Class_2[10];
+		c2[0] = new Class_2();
+	}
+	public Class_2 [] getc2Array(){
+		return c2;
+	}
+}
+class Class_4{
+	public int myInt;
+	public Class_3 c3;
+	Class_4(){
+		c3 = new Class_3();
+	}
+}
+void kxi2022 main(){
+	Class_3 [] c3;
+	c3 = new Class_3[10];
+	int myInt = c3[0].getc2Array()[0].getc1Array()[0].getIntArray()[0];
+	Class_4 c4;
+	myInt = c4.c3.getc2Array()[0].getc1Array()[0].getIntArray()[0];
+	c4.c3;
+}

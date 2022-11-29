@@ -1,0 +1,6 @@
+void kxi2022 main() {
+    int x = 1;
+    if (x == 1) {
+        cout << 't';
+    }
+}

@@ -1,0 +1,7 @@
+class myClass{
+	private int myI;
+	public int myI(){}
+}
+void kxi2022 main(){
+	//a simple file
+}

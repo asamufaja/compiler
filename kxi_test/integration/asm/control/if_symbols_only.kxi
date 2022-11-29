@@ -1,0 +1,8 @@
+void kxi2022 main() {
+    int x = 69;
+    int y = 69;
+    if (x == y) {
+        cout << 't';
+    }
+    cout << 'e';
+}

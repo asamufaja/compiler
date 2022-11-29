@@ -1,0 +1,13 @@
+class A {
+    public int a = 2;
+}
+
+class Test {
+    public A function() {
+        return new A();
+    }
+}
+
+void kxi2022 main() {
+    ((new Test()).function().a()) = 3;
+}

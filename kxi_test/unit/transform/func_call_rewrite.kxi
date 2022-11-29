@@ -1,0 +1,12 @@
+class Test {
+    public Test[] testArr() {
+        return new Test[1];
+    }
+    public int[] intArr() {
+        return new int[1];
+    }
+}
+
+void kxi2022 main() {
+    (new Test()).testArr()[0].testArr()[0].intArr()[0];
+}

@@ -1,0 +1,95 @@
+//class declaration
+class myClass{
+//data member definition private
+	private int myPrivateInt;
+	private char myPrivateChar;
+	private bool myPrivateBool;
+	public char [] myCharArray;
+//constructor declaration
+	myClass(int newInt, char newChar, bool newBool) {
+		this.myPrivateInt =  newInt;
+		this.myPrivateChar = newChar;
+		this.myPrivateBool = newBool;
+		this.myCharArray = new char[10];
+	}
+//method declaration no parameter
+	private void update(){
+		
+	}
+	private int changeInt(){
+		
+	}
+	private char changeChar(){
+		
+	}
+	private bool changeBool(){
+		
+	}
+	public void run(){
+		
+	}
+	public int getInt(){
+		
+	}
+	public char getChar(){
+		
+	}
+	public bool getBool(){
+		
+	}
+//method declaration with parameter
+	private void modify(int newInt, char newChar, bool newBool){
+		return;
+	}
+	private int modifyInt(int newInt){
+		
+	}
+	private char modifyChar(char newChar){
+		
+	}
+	private bool modifyBool(bool newBool){
+		
+	}
+	public void change(int newInt, char newChar, bool newBool){
+		
+	}
+	public int changeInt(int newInt){
+		
+	}
+	public char changeChar(char newChar){
+		
+	}
+	public bool changeBool(bool newBool){
+		
+	}
+}
+void kxi2022 main() {
+	int x = 1;
+	cout << x;
+//variable declaration no initialization
+	int intNoInitial;
+	intNoInitial = 0;
+	char charNoInitial;
+	charNoInitial = 'a';
+	bool boolNoInitial;
+	boolNoInitial = true;
+	myClass myClassNoInitial;
+	myClassNoInitial = new myClass(intNoInitial, charNoInitial, boolNoInitial);
+//variable declaration with initialization
+	int intInitial = 0;
+	char charInitial = 'a';
+	bool boolInitial = true;
+	myClass myClassInitial = new myClass();//(intInitial, charInitial, boolInitial);
+//arrays
+	myClassInitial.myCharArray[0] = 'a';
+	int[] myIntArray = new int[10-9/8];
+	myIntArray[0] += 1;
+	int myValue = myIntArray[0];
+	myValue += (1 + myIntArray[0]);
+	myValue = 1;
+//if else
+//if
+//cout
+//cin
+//switch
+}

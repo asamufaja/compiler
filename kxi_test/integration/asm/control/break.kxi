@@ -1,0 +1,9 @@
+void kxi2022 main() {
+    while (true) {
+        cout << 'h';
+        cout << 'i';
+        cout << '\n';
+        break;
+    }
+    cout << 'e';
+}

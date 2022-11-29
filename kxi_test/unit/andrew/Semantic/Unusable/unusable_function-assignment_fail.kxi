@@ -1,0 +1,7 @@
+class myClass{
+	public int get(){}
+}
+void kxi2022 main(){
+	myClass c;
+	c.get() = 0;
+}

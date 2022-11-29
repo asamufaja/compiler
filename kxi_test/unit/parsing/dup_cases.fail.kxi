@@ -1,0 +1,14 @@
+void kxi2022 main() {
+    int a = 0;
+    switch (a) {
+        case 0:
+            cout << '-';
+            break;
+        case 0:
+            cout << '.';
+        default:
+            cout << '+';
+    }
+    cout << '|';
+    cout << '\n';
+}

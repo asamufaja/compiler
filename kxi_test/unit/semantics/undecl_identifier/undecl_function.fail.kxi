@@ -1,0 +1,7 @@
+class Test {
+    public int function() {}
+}
+
+void kxi2022 main() {
+    (new Test()).function2();
+}

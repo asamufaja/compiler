@@ -1,0 +1,3 @@
+class bool {} // error; keyword cannot be class name ID
+
+void kxi2022 main() {}

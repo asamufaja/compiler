@@ -1,0 +1,92 @@
+// Undeclared Variables Tests
+// The majority of these should fail
+
+class A {
+    public int x;
+    public void foo(C c) {
+        cout << c;
+    }
+}
+
+class D {
+    public A a = new A();
+
+    public A getA() {
+        return a;
+    }
+}
+
+class Bar {
+    private int x;
+    A() {                   //Depending on implementation this should pass the undeclared visitor. Type checker will catch this for me
+        this.x = 2;
+        this.r = 3; // undeclared
+    }
+
+    public T invalidReturnType() { //undeclared
+        return new T();            //undeclared
+    }
+
+    public int invalidReturnType2() {
+        return new T();            //undeclared
+    }
+
+    public T invalidReturnType3() { // undefined type
+    }
+}
+
+class Baz {
+    Bazz() {                //undeclared
+        cout << 'B'; cout << 'A'; cout << 'Z'; cout << '\n';
+    }
+}
+
+class ArrayTests {
+    public A[] getAArray(int size) {
+        return new A[size];
+    }
+
+    public void arrayParam(char[] p) {
+
+    }
+
+}
+
+void kxi2022 main() {
+    cout << x;              //undeclared
+    cout << w.y.x;          //undeclared
+    cout << p[x];           //undeclared
+
+    A a = new A();
+    A copyA = a;
+    cout << a.q;            //undeclared
+    cout << a.printX();     //undeclared
+
+    cout << a.x.y;
+
+    A aa = new AA();        //undeclared
+
+    B b;                    //undeclared
+
+    A[] aaa = new A[2];
+    aaa[0].foo(b);          //Depeding on implementation this shouldn't cause issues. Type checker should catch
+
+    D d = new D();
+    cout << d.a.x;
+    d.a.foo();
+    d.a.fakeFoo();          //undeclared
+    cout << d.a.y;          //undeclared
+    cout << d.getA().w;     //undeclared
+
+    //cout << this.d.getA().x; // "this" cannot be used outside of a class
+
+    cout << new D().foobar();
+    cout << new D().q;
+
+    ArrayTests funWithArrays = new ArrayTests();
+    funWithArrays.getAArray()[2].x;
+
+    char[] testParam = new char[16];
+    funWithArrays.arrayParam(testParam);
+
+}

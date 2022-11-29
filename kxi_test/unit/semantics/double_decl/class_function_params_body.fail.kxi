@@ -1,0 +1,10 @@
+class Test {
+    public int a = 1; // no error
+
+    public int function(int a) {
+        int a = 0; // should error
+        return 0;
+    }
+}
+
+void kxi2022 main() {}

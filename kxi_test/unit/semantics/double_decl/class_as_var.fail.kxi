@@ -1,0 +1,6 @@
+// This is may not fail due to a lack in semantic specification
+class Test {}
+
+void kxi2022 main() {
+    Test Test = new Test(); // should error
+}

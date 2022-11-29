@@ -1,0 +1,4 @@
+void kxi2022 main() {
+    int[] x = new int[2];
+    x[1] = 2;
+}
