@@ -10,7 +10,7 @@ class Visitor:
             node.right.accept(self)
         if node.index is not None:
             node.index.accept(self)
-        if node.args is not None:
+        if node.args is not None and not isinstance(node.args, str):  # funny situation adding this
             for arg in node.args:
                 arg.accept(self)
 
@@ -208,8 +208,9 @@ class SymbolTableVisitor(Visitor):
                 # get the node it's type, node_value is [type, size, offset]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
-                else:  # should be dict...
+                else:  # should be dict, identifier node is a method
                     node.type = node_value["self"][0]
+                    node.args = "method"  # maybe a dumb way to mark this identifier as a method
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
             else:
                 # print("Possibly an undeclared variable")
@@ -366,6 +367,13 @@ class AssignmentVisitor(Visitor):
                 self.isErrorState = True
 
         if node.op_type == ast.OpTypes.ARGUMENTS:
-            if node.left.
-        super().visitExpr(node)
+            # one issue is that with the dot operator, when there's args they get put above dot in ast
+            # so the args .left is the dot, and the dot's left and right are var and method (hopefully)
+            if node.left.args != "method" or node.left.right.args != "method":
+                # arguments nodes have a left, which is an expr
+                # exprs have .args, but usually only the arguments expression types use it.
+                # identifiers also set it to be == "method" if they are a method's identifier
+                self.error_messages.append(f"'{node.left.value}' is not a method")
+                self.isErrorState = True
 
+        super().visitExpr(node)

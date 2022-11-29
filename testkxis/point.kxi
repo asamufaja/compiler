@@ -30,11 +30,7 @@ class Quad {
 void kxi2022 main() {
     Quad q = new Quad();
     q.Get_ul().x = 5;
-    q.Get_ul().Sus();
-    q.Sus();
-    hi = 1;
-    int hi;
-    //int x;
+    int a = 1+2+3+4+3+2+3+2+2+3+1+654;
     q.Get_ul().x += 10;
     while (q != 5) {
         int x = 5;

@@ -1,0 +1,31 @@
+Desugaring pass visitor
+if the node I'm about to accept is an assignment type with the math (+*-/ and an =)
+some say should expand it to be = and have the math on left side, and some num_lit or something on right
+but why not just figure it out and generate the code, without making new table or modifying?
+how about the concern of handling something like
+a = 1+2+3+4+3+2+3+2+2+3+1+654   (having a really long branch in the tree, takes too many registers!)
+ADD R1, R2   R1 is first operand and dest which gets overwritten, R2 is other operand.
+if we need two registers for each add, there's a problem. the dest gets overwritten though
+if we go to the bottom of tree, (right associative for assignment) it's 1+654
+MOVI R1, #1
+MOVI R2, #654
+ADD R1, R2    do we need R2 anymore? no, just sum in R1
+now we need the R1 (655) and the next node up to be in R2, which is 3
+MOVI R2, #3
+ADD R1, R2
+now how do I do this in a visitor?
+if it's a variable declaration (int a = bunchofmath) then there's no expr.EQUALS node in there
+just the var decl node and from it all of the math expr nodes and num_lits
+
+Symbol table
+time to start adding size and offset, that’s gonna be the stack pointer or rather frame pointer’s
+offset to get
+When visitor gets to an =  gonna generate some code, getting the literal value,
+or whatever is the right hand side,
+get the frame pointer copy and offset it, and store the literal value there.
+Doing a similar thing if there’s a little math expression, but loading the value to do the math
+Whether an ident node is gonna be read or written to, we could go when we are validating types
+for assignments and say heyo this ident is gonna be read/written to and set a flag there.
+Then in code gen we check that flag, so we generate the load or store
+get_label() => int, maybe
+For generating jump labels that are unique, we use this to be like making our if01, if02 etc
