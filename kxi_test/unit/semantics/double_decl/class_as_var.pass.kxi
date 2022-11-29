@@ -3,4 +3,5 @@ class Test {}
 
 void kxi2022 main() {
     Test Test = new Test(); // should error
+    //it works in java, so... I'd say should pass
 }

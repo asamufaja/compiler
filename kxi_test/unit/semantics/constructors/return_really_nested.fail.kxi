@@ -1,9 +1,8 @@
 class Test {
-    Test(int a) {
-
+    Test() {
+        return return;
     }
 }
 
 void kxi2022 main() {
-    new Test(1);
 }

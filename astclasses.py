@@ -181,3 +181,7 @@ class Keywords(Enum):  # copied from the lexer
     WHILE = r'while'
     MAIN = r'main'
     THIS = r'this'
+    # adding these for fun
+    NUM_LITERAL = "num_literal"
+    CHAR_LITERAL = "char_literal"
+    STRING_LITERAL = "string_literal"

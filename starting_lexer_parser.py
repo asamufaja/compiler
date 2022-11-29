@@ -777,6 +777,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NEW)
         expr.type = p.Type
         expr.args = p.Arguments
+        expr.value = "new"
         return expr
 
     @_('NEW Type Index')
@@ -786,6 +787,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.NEW)
         expr.type = p.Type
         expr.index = p.Index
+        expr.value = "new"
         return expr
 
     @_('THIS')
