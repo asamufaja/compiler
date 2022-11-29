@@ -152,6 +152,7 @@ class SymbolTableVisitor(Visitor):
         self.sym_table = dict()
         self.cur_class: ast.ClassAndMemberDeclaration = None
         self.cur_method: ast.ClassAndMemberDeclaration = None
+        self.isErrorState = False
         '''
         how about for sym table, a list of dict so instead of it all in a dict 
         so I can access different sub sym tables by index easier
@@ -161,22 +162,25 @@ class SymbolTableVisitor(Visitor):
                 data member 1: [type, size, offset]
                 data member 2: [type, size, offset]
                 member function 1: {
-                    local var 1: [type, size offset]
+                    self: [ret_type, size, offset]
+                    local var 1: [type, size, offset]
                 }
                 member function 2: {
-                    local var 1: [type, size offset]
+                    self: [ret_type, size, offset]
+                    local var 1: [type, size, offset]
                 }
             }
             class 2: {
-                data member 1: [type, size offset]
+                data member 1: [type, size, offset]
                 member function 1: {
-                    local var 1: [type, size offset]
+                    self: [ret_type, size, offset]
+                    local var 1: [type, size, offset]
                 }
             }
             compunit aka main(): {
-                local var 1: [type, size offset]
-                local var 2: [type, size offset]
-                local var 3: [type, size offset]
+                local var 1: [type, size, offset]
+                local var 2: [type, size, offset]
+                local var 3: [type, size, offset]
             }
         }
         then can validate by saying
@@ -203,37 +207,59 @@ class SymbolTableVisitor(Visitor):
                 # get the node it's type, node_value is [type, size, offset]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
+                else:  # should be dict...
+                    node.type = node_value["self"][0]
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
-
-        super().visitExpr(node)
-
-        if node.op_type == ast.OpTypes.PERIOD:
-            # check if node.left is valid, and then go see if the node.right is real
-            # gotta be mindful of args, and indexes?
-            is_in_sym, node_value = self.isInSym(node.left.value)
-            if is_in_sym:
-                # print(node.left)
-                # if left is in sym, how do I know if right is valid?
-                # if left type is a class, then I should check if right is in that class
-                if node.right.value not in self.sym_table[node.left.type]:  # node.left.type probably a class
-                    # then it's bad
-                    print(f"{node.right} not found")
+            else:
+                print("Possibly an undeclared variable")
 
         if node.op_type == ast.OpTypes.IDENTIFIER:
             # check if variable is undeclared
             if self.cur_method is not None:
                 if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident] \
                         and node.value not in self.sym_table[self.cur_class.ident]:
-                    print("1didn't find", node, "in sym table")
+                    print(f"Couldn't find '{node.value}' in sym table")
+                    self.isErrorState = True
             elif self.cur_method is None:
-                if node.value not in self.sym_table[self.cur_class.ident]:
-                    print("2didn't find", node, "in sym table")
+                # if node.value not in self.sym_table[self.cur_class.ident]:
+                if node.type is None:  # this works right if the code above worked properly
+                    # the code above should be what gives all expr identifier nodes a type
+                    # based on what was found in the sym table as it was being built
+                    print(f"Couldn't find '{node.value}' in main()'s sym table")
+                    self.isErrorState = True
+
+        super().visitExpr(node)
+
+        if node.op_type == ast.OpTypes.PERIOD:
+            # check if node.left is valid, and then go see if the node.right is real
+            # gotta be mindful of args, and indexes?
+            if node.left.op_type == ast.OpTypes.ARGUMENTS:  # TODO this is weird situation
+                # this probably only works for the situation q.Get_ul().x
+                # where Get_ul() returns an object with an x
+                is_in_sym, node_value = self.isInSym(node.left.left.right.value)
+                if is_in_sym:
+                    if node.right.value not in self.sym_table[node.left.left.right.type]:
+                        # node.left.type probably a class
+                        # then it's bad
+                        print(f"'{node.right.value}' not found within '{node.left.value}'s scope")
+                        self.isErrorState = True
+            else:
+                is_in_sym, node_value = self.isInSym(node.left.value)
+                if is_in_sym:
+                    # print(node.left)
+                    # if left is in sym, how do I know if right is valid?
+                    # if left type is a class, then I should check if right is in that class
+                    if node.right.value not in self.sym_table[node.left.type]:  # node.left.type probably a class
+                        # then it's bad
+                        print(f"'{node.right.value}' not found within '{node.left.value}'s scope")
+                        self.isErrorState = True
 
     def visitStmnt(self, node: ast.Statement):
         super().visitStmnt(node)
 
     def visitVarDecl(self, node: ast.VariableDeclaration):
         # check duplicate variable
+        # print(node)
         if not self.isDuplicate(node):
             if self.cur_method is not None:
                 self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] = [node.type, 0, 0]
@@ -242,34 +268,45 @@ class SymbolTableVisitor(Visitor):
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
-        if node.member_type == ast.MemberTypes.CLASS:
-            self.cur_class = node
-            self.sym_table[self.cur_class.ident] = {}
-        if node.member_type == ast.MemberTypes.METHOD \
-                or node.member_type == ast.MemberTypes.CONSTRUCTOR:
-            self.cur_method = node
-            self.sym_table[self.cur_class.ident][self.cur_method.ident] = {}
-        if node.member_type == ast.MemberTypes.DATAMEMBER:
-            self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0]
-        if node.ident == 'main':
-            self.cur_class = node
-            self.cur_method = None
-            self.sym_table[self.cur_class.ident] = {}
-        # if node.ident == "compunit":
-        #     self.sym_table[node]
+        if not self.isDuplicate(node):
+            if node.member_type == ast.MemberTypes.CLASS:
+                self.cur_class = node
+                self.sym_table[self.cur_class.ident] = {}
+                self.cur_method = None
+            if node.member_type == ast.MemberTypes.METHOD \
+                    or node.member_type == ast.MemberTypes.CONSTRUCTOR:
+                self.cur_method = node
+                self.sym_table[self.cur_class.ident][self.cur_method.ident] = {"self": [node.ret_type, 0, 0]}
+            if node.member_type == ast.MemberTypes.DATAMEMBER:
+                self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0]
+                self.cur_method = None
+            if node.ident == 'main':
+                self.cur_class = node
+                self.cur_method = None
+                self.sym_table[self.cur_class.ident] = {}
+
         super().visitMemberDecl(node)
 
     def visitCase(self, node: ast.Case):
         super().visitCase(node)
 
     def isDuplicate(self, node):
+        if self.cur_class is None:
+            return False
         if self.cur_method is not None:
             if node.ident in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
-                print("duplicate decl", node)
+                print("duplicate declaration:", node)
+                self.isErrorState = True
                 return True
+            if isinstance(node, ast.ClassAndMemberDeclaration):
+                if node.ident in self.sym_table[self.cur_class.ident]:
+                    print("duplicate declaration:", node)
+                    self.isErrorState = True
+                    return True
         else:
             if node.ident in self.sym_table[self.cur_class.ident]:
-                print("duplicate decl", node)
+                print("duplicate declaration:", node)
+                self.isErrorState = True
                 return True
         return False
 
