@@ -5,6 +5,10 @@ class Point {
         int a;
     }
     public void x() {
+        //int a;
+        int cheese;
+    }
+    public void legal() {
         int a;
     }
 }
