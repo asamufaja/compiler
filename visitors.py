@@ -218,7 +218,7 @@ class SymbolTableVisitor(Visitor):
             if self.cur_method is not None:
                 if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident] \
                         and node.value not in self.sym_table[self.cur_class.ident]:
-                    print(f"Couldn't find '{node.value}' in sym table")
+                    print(f"Couldn't find '{node.value}' in {self.cur_class} sym table")
                     self.isErrorState = True
             elif self.cur_method is None:
                 # if node.value not in self.sym_table[self.cur_class.ident]:
@@ -295,17 +295,17 @@ class SymbolTableVisitor(Visitor):
             return False
         if self.cur_method is not None:
             if node.ident in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
-                print("duplicate declaration:", node)
+                print("duplicate declaration:", node, "in", self.cur_class)
                 self.isErrorState = True
                 return True
             if isinstance(node, ast.ClassAndMemberDeclaration):
                 if node.ident in self.sym_table[self.cur_class.ident]:
-                    print("duplicate declaration:", node)
+                    print("duplicate declaration:", node, "in", self.cur_class)
                     self.isErrorState = True
                     return True
         else:
             if node.ident in self.sym_table[self.cur_class.ident]:
-                print("duplicate declaration:", node)
+                print("duplicate declaration:", node, "in", self.cur_class)
                 self.isErrorState = True
                 return True
         return False
@@ -322,3 +322,20 @@ class SymbolTableVisitor(Visitor):
                         if x in v1:
                             return True, v1[x]
         return False, None
+
+
+class AssignmentVisitor(Visitor):
+    def __init__(self):
+        self.keywords = set(k.value for k in ast.Keywords)
+        self.assignment_operators = [
+            ast.OpTypes.EQUALS,
+            ast.OpTypes.PLUSEQUALS,
+            ast.OpTypes.MINUSEQUALS,
+            ast.OpTypes.TIMESEQUALS,
+            ast.OpTypes.DIVIDEEQUALS,
+        ]
+
+    def visitExpr(self, node: ast.Expression):
+        if node.op_type in self.assignment_operators:
+            if node.left.value
+        super().visitExpr(node)

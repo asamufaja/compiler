@@ -15,7 +15,11 @@ def main():
         "kxi_test/unit/parsing/keyword_decl.pass.kxi",
         "kxi_test/unit/parsing/operator_precedence.pass.kxi",
         "kxi_test/unit/parsing/pythondict.fail.kxi",
-        "kxi_test/unit/parsing/weird_array.pass.kxi",
+        "kxi_test/unit/semantics/constructors/constructor_naming.fail.kxi",
+        "kxi_test/unit/semantics/constructors/multiple_constructors.fail.kxi",
+        "kxi_test/unit/semantics/constructors/return.fail.kxi",
+        "kxi_test/unit/semantics/constructors/return_nested.fail.kxi",
+
     ]
 
     for fname in list_of_files:
@@ -28,6 +32,8 @@ def main():
             compunit = parser.parse(lexer.tokenize(file.read()))
             tablevisitor = v.SymbolTableVisitor()
             compunit.accept(tablevisitor)
+            if tablevisitor.isErrorState:
+                raise Exception()
             if "fail" in fname:
                 print(f"fail file {fname} actually passed :/")
         except Exception as e:

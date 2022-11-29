@@ -155,27 +155,29 @@ class Case(Node):
         return f"case:{self.ident} at:{self.__repr__()[-10:-1]}"
 
 
-# class Variable(Node):  # what if variable is an expression actually? lol
-#     def __init__(self, type_types):
-#         self.type_type: TypeTypes = type_types
-#         self.name = ""
-#         self.array: bool
-#         self.subtype = ""
-#         self.param_list: list[Declaration] = []
-#         self.child = None
-
-
-"""
-alduous says node does traverse, because it knows its children
-typically post order, children accept visitor first.
-the visitor then is maybe just existing and it gets called sometimes.
-if we say child.accept(), we want to have it go to right visitor use virtual dispatch because it's taht type
-visitor is gonna have like visit_if() and such, simulate overloading
-have abstract visitor that do nothing,
-if the specific visitors don't ask for it, then it goes to the do nothing
-in python can change visit methods to get intermediate results from child accepts
-and can pass forward. 
-
-DOT NOTATION is actually do (x.y).z not x.(y.z)
-
-"""
+class Keywords(Enum):  # copied from the lexer
+    BOOL = r'bool'
+    BREAK = r'break'
+    CASE = r'case'
+    CLASS = r'class'
+    KEYWORDCHAR = r'char'
+    CIN = r'cin'
+    COUT = r'cout'
+    DEFAULT = r'default'
+    ELSE = r'else'
+    FALSE = r'false'
+    IF = r'if'
+    INT = r'int'
+    KXI2022 = r'kxi2022'
+    NEW = r'new'
+    NULL = r'null '
+    PUBLIC = r'public '
+    PRIVATE = r'private '
+    RETURN = r'return'
+    STRING = r'string'
+    SWITCH = r'switch'
+    TRUE = r'true'
+    VOID = r'void'
+    WHILE = r'while'
+    MAIN = r'main'
+    THIS = r'this'
