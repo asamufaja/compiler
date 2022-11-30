@@ -19,9 +19,13 @@ def main(args):
 
     tablevisitor = v.SymbolTableVisitor()
     compunit.accept(tablevisitor)
+    print("table errors", tablevisitor.error_messages)
     assignmentvisitor = v.AssignmentVisitor(tablevisitor.sym_table)
     compunit.accept(assignmentvisitor)
-    print(assignmentvisitor.error_messages)
+    print("assignment errors", assignmentvisitor.error_messages)
+    breakvisitor = v.BreakVisitor()
+    compunit.accept(breakvisitor)
+    print("break error", breakvisitor.error_messages)
 
     # print(tablevisitor.sym_table)
     # for key, val in tablevisitor.sym_table.items():

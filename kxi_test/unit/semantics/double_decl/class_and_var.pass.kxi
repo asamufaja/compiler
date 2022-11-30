@@ -6,6 +6,6 @@ class Test {
 }
 
 void kxi2022 main() {
-    Test test = new Test();
+    Test test = new Test(1);
     int Test = 1; // error? Test was already declared as a class
 }

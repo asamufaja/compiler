@@ -130,12 +130,13 @@ class BigParser(Parser):
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
+        ("right", LBRACKET, RBRACKET),
         # ("left", LPAREN, RPAREN),
     )
 
     def error(self, p):
         if p:
-            raise Exception(f"Syntax error at token {p.type}")
+            raise Exception(f"Syntax error at token {p.type}, {p}")
             # Just discard the token and tell the parser it's okay.
             # self.errok()
         else:
@@ -195,12 +196,12 @@ class BigParser(Parser):
         # print("Type STRING")
         return ast.TypeTypes.STRING
 
-    @_('IDENTIFIER')
-    def Type(self, p):
-        """Type ::= identifier"""
-        # print("Type IDENTIFIER")
-        # return ast.TypeTypes.CLASS
-        return p.IDENTIFIER
+    # @_('IDENTIFIER')
+    # def Type(self, p):
+    #     """Type ::= identifier"""
+    #     # print("Type IDENTIFIER")
+    #     # return ast.TypeTypes.CLASS
+    #     return p.IDENTIFIER
 
     @_('PUBLIC')
     def Modifier(self, p):
@@ -771,6 +772,13 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.IDENTIFIER)
         expr.value = p.IDENTIFIER
         return expr
+    # there's a reduce/reduce conflict between these two, for now it works better to have idents be expr
+    @_('IDENTIFIER')
+    def Type(self, p):
+        """Type ::= identifier"""
+        # print("Type IDENTIFIER")
+        # return ast.TypeTypes.CLASS
+        return p.IDENTIFIER
 
     @_('NEW Type Arguments')
     def Expression(self, p):

@@ -381,11 +381,84 @@ class AssignmentVisitor(Visitor):
                 self.isErrorState = True
             else:
                 funcnode = node.left.right  # the expr ident node for the method being called
+                reqdparams = []  # a list of all reqd params ident and values
                 # print(node.args)  # args used to call the method
                 # print(node.left.right.args)  # should be "method"
                 # print(self.sym_table[node.left.right.classtype])  # the class sym table entry
                 # print(self.sym_table[funcnode.classtype][funcnode.value])  # the function's sym table entry
                 for k, v in self.sym_table[funcnode.classtype][funcnode.value].items():
-                    print(k, v)
+                    if v[3] == True:  # this could be True, False, or a class ident
+                        # if true then it's a parameter variable
+                        reqdparams.append((k, v))
+                # print("reqd", reqdparams)
+                # if node.args is not None:
+                #     print("given", [n.value for n in node.args])
+                # else:
+                #     print("none given")
+                self.checkFuncParams(reqdparams, node, funcnode)
+
+        if node.op_type == ast.OpTypes.NEW and node.index is None:
+            # print([n.value for n in node.args])  # the args given to new
+            # new could have index instead of args though, just not here
+            # get the node.type (should be class name) then check the classes constructor, if it has one
+            reqdparams = []
+            if node.type in self.sym_table[node.type]:  # has a constructor
+                for k, v in self.sym_table[node.type][node.type].items():
+                    if v[3] == True:
+                        reqdparams.append((k, v))
+            funcnode = ast.Expression(None)
+            funcnode.value = node.type
+            self.checkFuncParams(reqdparams, node, funcnode)
+
+        if node.op_type == ast.OpTypes.NEW and node.args is not None \
+                and len(node.args) > 0 and node.index is not None:
+            self.error_messages.append(f"new operator had args and indecies")
+            self.isErrorState = True
 
         super().visitExpr(node)
+
+    def checkFuncParams(self, reqdparams, node, funcnode):
+        try:
+            for i in range(len(reqdparams)):
+                if reqdparams[i][1][0] != node.args[i].type:
+                    # print(reqdparams[i][0], node.args[i].value)
+                    # print(reqdparams[i][1][0], node.args[i].type)
+                    self.error_messages.append(f"invalid parameters for {funcnode.value}, {node.args[i].value}")
+                    self.isErrorState = True
+                    if node.args[i].type is None:
+                        self.error_messages.append(f"argument {node.args[i].value} probably doesn't exist")
+            if node.args is not None and len(node.args) > len(reqdparams):
+                self.error_messages.append(f"too many arguments given for {funcnode.value}")
+                self.isErrorState = True
+
+        except Exception as e:
+            self.error_messages.append(f"error {e}: not enough args")
+            self.isErrorState = True
+
+class BreakVisitor(Visitor):
+    def __init__(self):
+        self.in_while: bool = False
+        self.in_case: bool = False
+        self.in_switch: bool = False
+        self.isErrorState = False
+        self.error_messages: list[str] = []
+
+    def visitStmnt(self, node: ast.Statement):
+        if node.statement_type == ast.StatementTypes.WHILE:
+            self.in_while = True
+        if node.statement_type == ast.StatementTypes.SWITCH:
+            self.in_switch = True
+        if node.statement_type == ast.StatementTypes.BREAK:
+            if not self.in_case and not self.in_while and not self.in_switch:
+                self.error_messages.append(f"break statement in an invalid place")
+                self.isErrorState = True
+        super().visitStmnt(node)
+        if node.statement_type == ast.StatementTypes.WHILE:
+            self.in_while = False
+        if node.statement_type == ast.StatementTypes.SWITCH:
+            self.in_switch = False
+
+    def visitCase(self, node: ast.Case):
+        self.in_case = True
+        super().visitCase(node)
+        self.in_case = False
