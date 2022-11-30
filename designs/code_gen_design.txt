@@ -1,20 +1,37 @@
 Desugaring pass visitor
+statements
+most statements use the expr field and substatement field.
+if's also use the else statement field if they have an else
+switch statements have a list of case objects, and a list of statements for their default case
+basically the expression should be evaluated and maybe be a bool or a literal for switches
+that ends up looking like an if statement for the most part
+first go to the expression and evaluate it, like for if (a == 3) cout << "hi";
+LDR R1, a
+CMPI R1, #3
+BRZ if01true
+BNZ if01false
+if01true MOVI R3, 'h'
+TRP #3
+MOVI R3, 'i'
+TRP #3
+if01false ;next statement in program
+I'd actually want to put the string in the directives and then generate a loop to print the whole string
+that would be for any situation there's a string literal, to be printed or stored in a variable or something
+
+
 if the node I'm about to accept is an assignment type with the math (+*-/ and an =)
-some say should expand it to be = and have the math on left side, and some num_lit or something on right
-but why not just figure it out and generate the code, without making new table or modifying?
 how about the concern of handling something like
 a = 1+2+3+4+3+2+3+2+2+3+1+654   (having a really long branch in the tree, takes too many registers!)
 ADD R1, R2   R1 is first operand and dest which gets overwritten, R2 is other operand.
-if we need two registers for each add, there's a problem. the dest gets overwritten though
-if we go to the bottom of tree, (right associative for assignment) it's 1+654
+go to bottom of = tree, to the left, there's a + expr with a 1 and 2
 MOVI R1, #1
-MOVI R2, #654
+MOVI R2, #2
 ADD R1, R2    do we need R2 anymore? no, just sum in R1
-now we need the R1 (655) and the next node up to be in R2, which is 3
+now we need the R1 (3) and the next node up to be in R2, which is 3
 MOVI R2, #3
 ADD R1, R2
-now how do I do this in a visitor?
-if it's a variable declaration (int a = bunchofmath) then there's no expr.EQUALS node in there
+if it's a variable declaration (int a = bunchofmath) then there's no expr.EQUALS node in there,
+the expr = is replaced with a var decl and it's initializer points to the last math expr
 just the var decl node and from it all of the math expr nodes and num_lits
 
 Symbol table

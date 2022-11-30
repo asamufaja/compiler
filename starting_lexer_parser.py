@@ -352,6 +352,7 @@ class BigParser(Parser):
         param = ast.VariableDeclaration(p.Type)
         param.array = p.OptionalBrackets
         param.ident = p.IDENTIFIER
+        param.is_param = True
         return param
 
     # @_('Type OptionalBrackets IDENTIFIER OptionalInitializer SEMICOLON')
@@ -363,6 +364,7 @@ class BigParser(Parser):
         vardecl.array = p.OptionalBrackets
         vardecl.ident = p.IDENTIFIER
         vardecl.init = p.Initializer
+        vardecl.is_param = False
         return vardecl
 
     # @_('Initializer')

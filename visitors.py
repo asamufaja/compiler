@@ -211,6 +211,7 @@ class SymbolTableVisitor(Visitor):
                 else:  # should be dict, identifier node is a method
                     node.type = node_value["self"][0]
                     node.args = "method"  # maybe a dumb way to mark this identifier as a method
+                    node.classtype = node_value["self"][3]
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
             else:
                 # print("Possibly an undeclared variable")
@@ -272,7 +273,7 @@ class SymbolTableVisitor(Visitor):
         # check duplicate variable
         if not self.isDuplicate(node):
             if self.cur_method is not None:
-                self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] = [node.type, 0, 0]
+                self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] = [node.type, 0, 0, node.is_param]
             else:
                 self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0]
         super().visitVarDecl(node)
@@ -286,7 +287,7 @@ class SymbolTableVisitor(Visitor):
             if node.member_type == ast.MemberTypes.METHOD \
                     or node.member_type == ast.MemberTypes.CONSTRUCTOR:
                 self.cur_method = node
-                self.sym_table[self.cur_class.ident][self.cur_method.ident] = {"self": [node.ret_type, 0, 0]}
+                self.sym_table[self.cur_class.ident][self.cur_method.ident] = {"self": [node.ret_type, 0, 0, self.cur_class.ident]}
             if node.member_type == ast.MemberTypes.DATAMEMBER:
                 self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0]
                 self.cur_method = None
@@ -347,7 +348,8 @@ class SymbolTableVisitor(Visitor):
 
 
 class AssignmentVisitor(Visitor):
-    def __init__(self):
+    def __init__(self, sym_table):
+        self.sym_table = sym_table
         self.isErrorState = False
         self.error_messages: list[str] = []
         self.keywords = set(k.value for k in ast.Keywords)
@@ -360,20 +362,30 @@ class AssignmentVisitor(Visitor):
         ]
 
     def visitExpr(self, node: ast.Expression):
+        # basic check for assigning things to keywords
         if node.op_type in self.assignment_operators:
             if node.left.value in self.keywords:
                 # print(f"keyword '{node.left.value}' was assigned to")
                 self.error_messages.append(f"keyword '{node.left.value}' was assigned to")
                 self.isErrorState = True
-
+        # check for argument expression attached to not a function
+        # and if it is a function, make sure arguments are right
         if node.op_type == ast.OpTypes.ARGUMENTS:
             # one issue is that with the dot operator, when there's args they get put above dot in ast
             # so the args .left is the dot, and the dot's left and right are var and method (hopefully)
-            if node.left.args != "method" or node.left.right.args != "method":
+            if node.left.args != "method" and node.left.right.args != "method":
                 # arguments nodes have a left, which is an expr
                 # exprs have .args, but usually only the arguments expression types use it.
                 # identifiers also set it to be == "method" if they are a method's identifier
-                self.error_messages.append(f"'{node.left.value}' is not a method")
+                self.error_messages.append(f"'{node.left.right.value}' is not a method")
                 self.isErrorState = True
+            else:
+                funcnode = node.left.right  # the expr ident node for the method being called
+                # print(node.args)  # args used to call the method
+                # print(node.left.right.args)  # should be "method"
+                # print(self.sym_table[node.left.right.classtype])  # the class sym table entry
+                # print(self.sym_table[funcnode.classtype][funcnode.value])  # the function's sym table entry
+                for k, v in self.sym_table[funcnode.classtype][funcnode.value].items():
+                    print(k, v)
 
         super().visitExpr(node)

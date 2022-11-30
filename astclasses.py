@@ -86,6 +86,7 @@ class Expression(Node):
         self.type: TypeTypes = None
         self.args: list[Expression] = []
         self.index: Expression = None
+        self.classtype: ClassAndMemberDeclaration = None  # for method expr identifiers
 
     def accept(self, v):
         v.visitExpr(self)
@@ -135,6 +136,7 @@ class VariableDeclaration(Node):
         self.ident: str = ""
         self.init: Expression = None
         self.array: bool = None
+        self.is_param: bool = None
 
     def accept(self, v):
         v.visitVarDecl(self)

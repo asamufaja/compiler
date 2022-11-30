@@ -216,7 +216,7 @@ def main():
             compunit.accept(tablevisitor)
             if tablevisitor.isErrorState:
                 raise Exception()
-            assignmentvisitor = v.AssignmentVisitor()
+            assignmentvisitor = v.AssignmentVisitor(tablevisitor.sym_table)
             compunit.accept(assignmentvisitor)
             if assignmentvisitor.isErrorState:
                 raise Exception()
