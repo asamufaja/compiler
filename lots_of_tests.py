@@ -61,6 +61,12 @@ def main():
         "kxi_test/unit/semantics/lvalues/new_lvalue_assn.fail.kxi",
         "kxi_test/unit/semantics/lvalues/new_lvalue_assn_nested.fail.kxi",
         "kxi_test/unit/semantics/lvalues/unusableLVals.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/basic_lvalue.pass.kxi",
+        "kxi_test/unit/semantics/modifiers/private_func.fail.kxi",
+        "kxi_test/unit/semantics/modifiers/private_func_inside.pass.kxi",
+        "kxi_test/unit/semantics/modifiers/private_member.fail.kxi",
+        "kxi_test/unit/semantics/modifiers/private_member.pass.kxi",
+        "kxi_test/unit/semantics/modifiers/public_member.pass.kxi",
         # ...,
         # "kxi_test/unit/semantics/undecl_identifier/func_invoke_main_block.fail.kxi",
         # "kxi_test/unit/semantics/undecl_identifier/func_invoke_main_block.pass.kxi",
@@ -146,21 +152,8 @@ def main():
     
     
     
-    "kxi_test/unit/semantics/lvalues/cin.invalid.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/cin.parse.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/cin.pass.kxi",
-    "kxi_test/unit/semantics/lvalues/func_lvalue_assn.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/func_lvalue_assn_chain.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/func_lvalue_assn_chain.pass.kxi",
-    "kxi_test/unit/semantics/lvalues/func_lvalue_assn_nested.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/new_lvalue_assn.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/new_lvalue_assn_nested.fail.kxi",
-    "kxi_test/unit/semantics/lvalues/unusableLVals.fail.kxi",
-    "kxi_test/unit/semantics/modifiers/private_func.fail.kxi",
-    "kxi_test/unit/semantics/modifiers/private_func_inside.pass.kxi",
-    "kxi_test/unit/semantics/modifiers/private_member.fail.kxi",
-    "kxi_test/unit/semantics/modifiers/private_member.pass.kxi",
-    "kxi_test/unit/semantics/modifiers/public_member.pass.kxi",
+    
+    
     "kxi_test/unit/semantics/types/array_idx.fail.kxi",
     "kxi_test/unit/semantics/types/array_idx.pass.kxi",
     "kxi_test/unit/semantics/types/array_init.fail.kxi",

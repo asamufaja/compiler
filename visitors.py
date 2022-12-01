@@ -305,7 +305,8 @@ class SymbolTableVisitor(Visitor):
             if node.member_type == ast.MemberTypes.METHOD \
                     or node.member_type == ast.MemberTypes.CONSTRUCTOR:
                 self.cur_method = node
-                self.sym_table[self.cur_class.ident][self.cur_method.ident] = {"self": [node.ret_type, 0, 0, self.cur_class.ident]}
+                self.sym_table[self.cur_class.ident][self.cur_method.ident] \
+                    = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
             if node.member_type == ast.MemberTypes.DATAMEMBER:
                 self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0, None, node.array]
                 self.cur_method = None
@@ -386,11 +387,22 @@ class AssignmentVisitor(Visitor):
                 # print(f"keyword '{node.left.value}' was assigned to")
                 self.error_messages.append(f"keyword '{node.left.value}' was assigned to")
                 self.isErrorState = True
+            if node.left.op_type == ast.OpTypes.NEW or node.left.op_type == ast.OpTypes.ARGUMENTS:
+                self.error_messages.append(f"tried to assign to arguments or new operator illegally")
+                self.isErrorState = True
         # check for argument expression attached to not a function
         # and if it is a function, make sure arguments are right
         if node.op_type == ast.OpTypes.ARGUMENTS:
             # one issue is that with the dot operator, when there's args they get put above dot in ast
             # so the args .left is the dot, and the dot's left and right are var and method (hopefully)
+            if self.isInSym(node.left.right.value):
+                funcnode = node.left.right
+                _, nodeinfo = self.isInSym(funcnode.value)
+                print(funcnode, nodeinfo)
+                
+                # if nodeinfo[4] == ast.ModifierTypes.PRIVATE:
+                #     self.error_messages.append(f"tried to call private function {funcnode.value}")
+                #     self.isErrorState = True
             if node.left.args != "method" and node.left.right.args != "method":
                 # arguments nodes have a left, which is an expr
                 # exprs have .args, but usually only the arguments expression types use it.
@@ -486,6 +498,7 @@ class BreakVisitor(Visitor):
         super().visitCase(node)
         self.in_case = False
 
+
 class CinVisitor(Visitor):
     def __init__(self, sym_table):
         self.isErrorState = False
@@ -497,5 +510,13 @@ class CinVisitor(Visitor):
             # I need to check cin's expr, it has to either be type int or char,
             # or be a dot where dot.right needs to be an int or char
             cinexpr = node.expr
-            if cinexpr.op_type == ast.OpTypes.PERIOD:
-                pass
+            # if cinexpr.op_type == ast.OpTypes.PERIOD:
+            #     if cinexpr.right.type is not ast.TypeTypes.INT \
+            #             and cinexpr.right.type is not ast.TypeTypes.CHAR \
+            #             or cinexpr.right.args == "method":
+            #         self.error_messages.append(f"error using cin on invalid var {cinexpr}")
+            #         self.isErrorState = True
+            if cinexpr.op_type != ast.OpTypes.IDENTIFIER:
+                self.error_messages.append(f"error using cin on invalid var {cinexpr}")
+                self.isErrorState = True
+        super().visitStmnt(node)

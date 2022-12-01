@@ -1,0 +1,10 @@
+class Test {
+    public int x;
+    public int function() {}
+}
+
+void kxi2022 main() {
+    (new Test()).x = 5;
+    Test test = new Test();
+    test.x = 5;
+}
