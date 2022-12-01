@@ -130,7 +130,7 @@ class BigParser(Parser):
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
-        ("right", LBRACKET, RBRACKET),
+        ("left", LBRACKET, RBRACKET),
         # ("left", LPAREN, RPAREN),
     )
 
@@ -879,9 +879,9 @@ class BigParser(Parser):
     def Index(self, p):
         """Index ::= [ Expression ]"""
         # print("Index ::= [ Expression ]")
-        expr = ast.Expression(ast.OpTypes.INDEX)
-        expr.index = p.Expression
-        return expr
+        # expr = ast.Expression(ast.OpTypes.INDEX)
+        # expr.index = p.Expression
+        return p.Expression
 
     @_('')
     def empty(self, p):

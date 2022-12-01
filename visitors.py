@@ -3,6 +3,9 @@ import pydot
 
 
 class Visitor:
+    def __init__(self):
+        self.sym_table = None
+
     def visitExpr(self, node: ast.Expression):
         if node.left is not None:
             node.left.accept(self)
@@ -67,6 +70,19 @@ class Visitor:
         if node.statements is not None:
             for stmnt in node.statements:
                 stmnt.accept(self)
+
+    def isInSym(self, x):
+        if x in self.sym_table:
+            return True, self.sym_table[x]
+        for k, v in self.sym_table.items():
+            if isinstance(v, dict):
+                if x in v:
+                    return True, v[x]
+                for k1, v1 in v.items():
+                    if isinstance(v1, dict):
+                        if x in v1:
+                            return True, v1[x]
+        return False, None
 
 
 class PrintAST(Visitor):
@@ -205,9 +221,10 @@ class SymbolTableVisitor(Visitor):
         if node.op_type == ast.OpTypes.IDENTIFIER:
             is_in_sym, node_value = self.isInSym(node.value)
             if is_in_sym:
-                # get the node it's type, node_value is [type, size, offset]
+                # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
+                    node.array = node_value[4]
                 else:  # should be dict, identifier node is a method
                     node.type = node_value["self"][0]
                     node.args = "method"  # maybe a dumb way to mark this identifier as a method
@@ -273,9 +290,10 @@ class SymbolTableVisitor(Visitor):
         # check duplicate variable
         if not self.isDuplicate(node):
             if self.cur_method is not None:
-                self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] = [node.type, 0, 0, node.is_param]
+                self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] \
+                    = [node.type, 0, 0, node.is_param, node.array]
             else:
-                self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0]
+                self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, node.array]
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
@@ -289,7 +307,7 @@ class SymbolTableVisitor(Visitor):
                 self.cur_method = node
                 self.sym_table[self.cur_class.ident][self.cur_method.ident] = {"self": [node.ret_type, 0, 0, self.cur_class.ident]}
             if node.member_type == ast.MemberTypes.DATAMEMBER:
-                self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0]
+                self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0, None, node.array]
                 self.cur_method = None
             if node.ident == 'main':
                 self.cur_class = node
@@ -333,18 +351,18 @@ class SymbolTableVisitor(Visitor):
                 return True
         return False
 
-    def isInSym(self, x):
-        if x in self.sym_table:
-            return True, self.sym_table[x]
-        for k, v in self.sym_table.items():
-            if isinstance(v, dict):
-                if x in v:
-                    return True, v[x]
-                for k1, v1 in v.items():
-                    if isinstance(v1, dict):
-                        if x in v1:
-                            return True, v1[x]
-        return False, None
+    # def isInSym(self, x):
+    #     if x in self.sym_table:
+    #         return True, self.sym_table[x]
+    #     for k, v in self.sym_table.items():
+    #         if isinstance(v, dict):
+    #             if x in v:
+    #                 return True, v[x]
+    #             for k1, v1 in v.items():
+    #                 if isinstance(v1, dict):
+    #                     if x in v1:
+    #                         return True, v1[x]
+    #     return False, None
 
 
 class AssignmentVisitor(Visitor):
@@ -409,12 +427,17 @@ class AssignmentVisitor(Visitor):
             funcnode = ast.Expression(None)
             funcnode.value = node.type
             self.checkFuncParams(reqdparams, node, funcnode)
-
-        if node.op_type == ast.OpTypes.NEW and node.args is not None \
-                and len(node.args) > 0 and node.index is not None:
-            self.error_messages.append(f"new operator had args and indecies")
-            self.isErrorState = True
-
+        # don't let index be used on vars that aren't arrays
+        if node.op_type == ast.OpTypes.INDEX:
+            if not node.left.array:
+                self.error_messages.append(f"var {node.left.value} was indexed but is not an array")
+                self.isErrorState = True
+            # is_in_sym, node_val = self.isInSym(node.left.value)
+            # if is_in_sym:
+            #     print(node_val)
+            # self.sym_table[node.left]
+            # self.error_messages.append(f"new operator had args and indecies")
+            # self.isErrorState = True
         super().visitExpr(node)
 
     def checkFuncParams(self, reqdparams, node, funcnode):
@@ -462,3 +485,17 @@ class BreakVisitor(Visitor):
         self.in_case = True
         super().visitCase(node)
         self.in_case = False
+
+class CinVisitor(Visitor):
+    def __init__(self, sym_table):
+        self.isErrorState = False
+        self.error_messages = []
+        self.sym_table = sym_table
+
+    def visitStmnt(self, node: ast.Statement):
+        if node.statement_type == ast.StatementTypes.CIN:
+            # I need to check cin's expr, it has to either be type int or char,
+            # or be a dot where dot.right needs to be an int or char
+            cinexpr = node.expr
+            if cinexpr.op_type == ast.OpTypes.PERIOD:
+                pass

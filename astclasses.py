@@ -87,6 +87,7 @@ class Expression(Node):
         self.args: list[Expression] = []
         self.index: Expression = None
         self.classtype: ClassAndMemberDeclaration = None  # for method expr identifiers
+        self.array: bool = None
 
     def accept(self, v):
         v.visitExpr(self)

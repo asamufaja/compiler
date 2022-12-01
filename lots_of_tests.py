@@ -47,10 +47,20 @@ def main():
         "kxi_test/unit/semantics/func_args/no_constructor.pass.kxi",
         "kxi_test/unit/semantics/invalid_break/break.fail.kxi",
         "kxi_test/unit/semantics/invalid_break/break.pass.kxi",
-        "kxi_test/unit/semantics/invalid_index/new_stmt_index.fail.kxi",
         "kxi_test/unit/semantics/invalid_index/normal_array.pass.kxi",
         "kxi_test/unit/semantics/invalid_index/not_an_array.fail.kxi",
         "kxi_test/unit/semantics/invalid_index/this_stmt_index.fail.kxi",
+        "kxi_test/unit/semantics/invalid_this/this_as_func.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/cin.invalid.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/cin.parse.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/cin.pass.kxi",
+        "kxi_test/unit/semantics/lvalues/func_lvalue_assn.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/func_lvalue_assn_chain.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/func_lvalue_assn_chain.pass.kxi",
+        "kxi_test/unit/semantics/lvalues/func_lvalue_assn_nested.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/new_lvalue_assn.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/new_lvalue_assn_nested.fail.kxi",
+        "kxi_test/unit/semantics/lvalues/unusableLVals.fail.kxi",
         # ...,
         # "kxi_test/unit/semantics/undecl_identifier/func_invoke_main_block.fail.kxi",
         # "kxi_test/unit/semantics/undecl_identifier/func_invoke_main_block.pass.kxi",
@@ -136,7 +146,6 @@ def main():
     
     
     
-    "kxi_test/unit/semantics/invalid_this/this_as_func.fail.kxi",
     "kxi_test/unit/semantics/lvalues/cin.invalid.fail.kxi",
     "kxi_test/unit/semantics/lvalues/cin.parse.fail.kxi",
     "kxi_test/unit/semantics/lvalues/cin.pass.kxi",
@@ -222,6 +231,10 @@ def main():
             breakvisitor = v.BreakVisitor()
             compunit.accept(breakvisitor)
             if breakvisitor.isErrorState:
+                raise Exception()
+            cinvisitor = v.CinVisitor(tablevisitor.sym_table)
+            compunit.accept(cinvisitor)
+            if cinvisitor.isErrorState:
                 raise Exception()
 
             if "fail" in fname:

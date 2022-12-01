@@ -26,6 +26,9 @@ def main(args):
     breakvisitor = v.BreakVisitor()
     compunit.accept(breakvisitor)
     print("break error", breakvisitor.error_messages)
+    cinvisitor = v.CinVisitor(tablevisitor.sym_table)
+    compunit.accept(cinvisitor)
+    print("cin error", cinvisitor.error_messages)
 
     # print(tablevisitor.sym_table)
     # for key, val in tablevisitor.sym_table.items():

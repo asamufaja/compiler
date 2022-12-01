@@ -1,8 +1,0 @@
-class Test {
-    public Test myMethod(int y) {
-        Test test = new Test()[1]; // bad!!
-        return test;
-    }
-}
-
-void kxi2022 main() {}

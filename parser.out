@@ -27,7 +27,7 @@ Rule 23    ClassMemberDefinition -> MethodDeclaration
 Rule 24    DataMemberDeclaration -> Modifier VariableDeclaration
 Rule 25    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix
 Rule 26    OptionalBrackets -> empty
-Rule 27    OptionalBrackets -> LBRACKET RBRACKET  [precedence=right, level=10]
+Rule 27    OptionalBrackets -> LBRACKET RBRACKET  [precedence=left, level=10]
 Rule 28    ConstructorDeclaration -> IDENTIFIER MethodSuffix
 Rule 29    Initializer -> EQUALS Expression  [precedence=right, level=1]
 Rule 30    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody
@@ -134,7 +134,7 @@ Rule 130   _13_COMMA_Expression_repeat -> <empty>
 Rule 131   _13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item
 Rule 132   _13_COMMA_Expression_items -> _13_COMMA_Expression_item
 Rule 133   _13_COMMA_Expression_item -> COMMA Expression
-Rule 134   Index -> LBRACKET Expression RBRACKET  [precedence=right, level=10]
+Rule 134   Index -> LBRACKET Expression RBRACKET  [precedence=left, level=10]
 Rule 135   empty -> <empty>
 
 Terminals, with rules where they appear:
