@@ -1,5 +1,5 @@
 import astclasses as ast
-import visitors as v
+import semanticvisitors as v
 import starting_lexer_parser as lp
 
 def main():
@@ -216,26 +216,29 @@ def main():
             tablevisitor = v.SymbolTableVisitor()
             compunit.accept(tablevisitor)
             if tablevisitor.isErrorState:
+                # print(tablevisitor.error_messages)
                 raise Exception()
             assignmentvisitor = v.AssignmentVisitor(tablevisitor.sym_table)
             compunit.accept(assignmentvisitor)
             if assignmentvisitor.isErrorState:
+                # print(assignmentvisitor.error_messages)
                 raise Exception()
             breakvisitor = v.BreakVisitor()
             compunit.accept(breakvisitor)
             if breakvisitor.isErrorState:
+                # print(breakvisitor.error_messages)
                 raise Exception()
             cinvisitor = v.CinVisitor(tablevisitor.sym_table)
             compunit.accept(cinvisitor)
             if cinvisitor.isErrorState:
+                # print(cinvisitor.error_messages)
                 raise Exception()
 
             if "fail" in fname:
                 print(f"fail file {fname} actually passed :/")
         except Exception as e:
             if "pass" in fname:
-                print(f"pass file {fname} actually failed :/")
-                print(e)
+                print(f"pass file {fname} actually failed :/", e)
 
 
 if __name__ == "__main__":

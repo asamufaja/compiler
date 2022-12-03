@@ -1,3 +1,21 @@
+class Classy {
+    public int x;
+    public char a;
+    private string y;
+
+    public void yeet(int x) {
+        cout << x;
+    }
+
+    public int giveGive(int y) {
+        y = y + 1;
+        return y;
+    }
+}
+
 void kxi2022 main() {
-    int x;
+    //int[] x = new int[3];
+    string x = "sussy";
+    x = x + 1;
+    cout << x;
 }

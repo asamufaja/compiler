@@ -4,4 +4,6 @@ class TestClass {
 
 void kxi2022 main() {
     (new TestClass()).x = 5;
+    TestClass cheeseknife = new TestClass();
+    cheeseknife.x = 4;
 }

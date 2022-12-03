@@ -138,6 +138,7 @@ class VariableDeclaration(Node):
         self.init: Expression = None
         self.array: bool = None
         self.is_param: bool = None
+        self.is_obj: bool = None
 
     def accept(self, v):
         v.visitVarDecl(self)

@@ -224,6 +224,7 @@ class SymbolTableVisitor(Visitor):
                 # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
+                    node.classtype = node_value[3]
                     node.array = node_value[4]
                 else:  # should be dict, identifier node is a method
                     node.type = node_value["self"][0]
@@ -234,7 +235,7 @@ class SymbolTableVisitor(Visitor):
                 # print("Possibly an undeclared variable")
                 self.error_messages.append("Possibly an undeclared variable")
 
-        if node.op_type == ast.OpTypes.IDENTIFIER:
+        # if node.op_type == ast.OpTypes.IDENTIFIER:
             # check if variable is undeclared
             if self.cur_method is not None:
                 if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident] \
@@ -250,6 +251,13 @@ class SymbolTableVisitor(Visitor):
                     # print(f"Couldn't find '{node.value}' in main()'s sym table")
                     self.error_messages.append(f"Couldn't find '{node.value}' in main()'s sym table")
                     self.isErrorState = True
+        # check for accessing private datamember
+        if node.op_type == ast.OpTypes.PERIOD:
+            _, node_value = self.isInSym(node.right.value)
+            if len(node_value) > 4 and node_value[5] == ast.ModifierTypes.PRIVATE \
+                    and self.cur_class.ident != node_value[3]:
+                self.error_messages.append(f"tried to access private data member {node.right.value}")
+                self.isErrorState = True
 
         super().visitExpr(node)
 
@@ -269,6 +277,7 @@ class SymbolTableVisitor(Visitor):
                         self.isErrorState = True
             else:
                 is_in_sym, node_value = self.isInSym(node.left.value)
+
                 if is_in_sym:
                     # if left is in sym, how do I know if right is valid?
                     # if left type is a class, then I should check if right is in that class
@@ -290,10 +299,16 @@ class SymbolTableVisitor(Visitor):
         # check duplicate variable
         if not self.isDuplicate(node):
             if self.cur_method is not None:
+                # vars not in main
                 self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] \
                     = [node.type, 0, 0, node.is_param, node.array]
             else:
+                # vars in main
                 self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, node.array]
+                normaltypes = [x for x in ast.TypeTypes]
+                if node.type not in normaltypes:
+                    # probably an object var
+                    node.is_obj = True
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
@@ -308,7 +323,8 @@ class SymbolTableVisitor(Visitor):
                 self.sym_table[self.cur_class.ident][self.cur_method.ident] \
                     = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
             if node.member_type == ast.MemberTypes.DATAMEMBER:
-                self.sym_table[self.cur_class.ident][node.ident] = [node.ret_type, 0, 0, None, node.array]
+                self.sym_table[self.cur_class.ident][node.ident] \
+                    = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
                 self.cur_method = None
             if node.ident == 'main':
                 self.cur_class = node
@@ -390,19 +406,19 @@ class AssignmentVisitor(Visitor):
             if node.left.op_type == ast.OpTypes.NEW or node.left.op_type == ast.OpTypes.ARGUMENTS:
                 self.error_messages.append(f"tried to assign to arguments or new operator illegally")
                 self.isErrorState = True
+
         # check for argument expression attached to not a function
         # and if it is a function, make sure arguments are right
         if node.op_type == ast.OpTypes.ARGUMENTS:
             # one issue is that with the dot operator, when there's args they get put above dot in ast
             # so the args .left is the dot, and the dot's left and right are var and method (hopefully)
+            # check for accessing private function
             if self.isInSym(node.left.right.value):
                 funcnode = node.left.right
                 _, nodeinfo = self.isInSym(funcnode.value)
-                print(funcnode, nodeinfo)
-                
-                # if nodeinfo[4] == ast.ModifierTypes.PRIVATE:
-                #     self.error_messages.append(f"tried to call private function {funcnode.value}")
-                #     self.isErrorState = True
+                if nodeinfo["self"][4] == ast.ModifierTypes.PRIVATE:
+                    self.error_messages.append(f"tried to call private function {funcnode.value}")
+                    self.isErrorState = True
             if node.left.args != "method" and node.left.right.args != "method":
                 # arguments nodes have a left, which is an expr
                 # exprs have .args, but usually only the arguments expression types use it.
@@ -520,3 +536,26 @@ class CinVisitor(Visitor):
                 self.error_messages.append(f"error using cin on invalid var {cinexpr}")
                 self.isErrorState = True
         super().visitStmnt(node)
+
+"""
+wanna make a new visitor? just copy and update the name
+class classname(Visitor):
+    def __init__(self):
+        self.isErrorState = False
+        self.error_messages = []
+
+    def visitExpr(self, node: ast.Expression):
+        super().visitExpr(node)
+
+    def visitStmnt(self, node: ast.Statement):
+        super().visitStmnt(node)
+
+    def visitVarDecl(self, node: ast.VariableDeclaration):
+        super().visitVarDecl(node)
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        super().visitMemberDecl(node)
+
+    def visitCase(self, node: ast.Case):
+        super().visitCase(node)
+"""

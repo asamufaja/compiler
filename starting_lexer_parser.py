@@ -3,7 +3,7 @@ from sly import Lexer, Parser
 import math
 import astclasses as ast
 import sys
-import visitors as v
+import semanticvisitors as v
 
 
 class BigLexer(Lexer):
@@ -118,7 +118,7 @@ class BigLexer(Lexer):
 
 class BigParser(Parser):
     tokens = BigLexer.tokens
-    debugfile = 'parser.out'
+    # debugfile = 'parser.out'
 
     precedence = (
         ("right", EQUALS, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS),
