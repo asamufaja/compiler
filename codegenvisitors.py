@@ -4,9 +4,17 @@ import semanticvisitors as sv
 
 class RegManager:
     def __init__(self):
-        self.regs = ["R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11",
+        # not R3 in regs, that's for TRP
+        self.regs = ["R0", "R1", "R2", "R4", "R5", "R6", "R7", "R8", "R9", "R10", "R11",
                      "R12", "R13", "R14", "R15", ]
         self.given_regs = []
+
+        """
+        using stack heavy instead of registers could work well, 
+        pushing things onto stack and working off of it, use less registers
+        desugaring things means less assembly and codegen visitors 
+        tons of stuff can be desugared and that would be great
+        """
 
     def getReg(self):
         try:
@@ -22,6 +30,90 @@ class RegManager:
             self.regs.append(reg)
         except:
             print("tried to free an already free reg")
+
+
+class StartDesugar(sv.Visitor):
+    def __init__(self, sym_table):
+        self.sym_table = sym_table
+        self.new_tree = None
+        self.prev_node = None
+        self.cur_class = None
+        self.cur_method = None
+
+    def visitExpr(self, node: ast.Expression):
+        """nodes to desugar
+        PLUS
+        MINUS
+        TIMES
+        DIVIDE
+        # these math should be one function that takes the op type and works the same
+        PLUSEQUALS
+        MINUSEQUALS
+        TIMESEQUALS
+        DIVIDEEQUALS
+        # these math assign should be the equals and then the math type above
+        EQUALS
+        DOUBLEEQUALS
+        # these are not really changed
+        NOTEQUALS
+        # this will be not and then equals
+        LESSTHAN
+        GREATERTHAN
+        # these are not really changed
+        LESSOREQUAL
+        GREATEROREQUAL
+        # these are going to be their < or > and then the double equals
+        AND
+        OR
+        EXCLAMATIONMARK
+        # these are not really changed
+        NUM_LITERAL
+        CHAR_LITERAL
+        STRING_LITERAL
+        TRUE
+        FALSE
+        NULL
+        IDENTIFIER
+        # these are pretty much without sugar already
+        NEW
+        # this is just gonna be itself, have to make a thing like a literal but
+        # much more complicated to make and gotta slap on heap
+        THIS
+        # has to be on members to know if it's a member or not
+        PERIOD
+        # if it's an attribute gotta just load it I guess, if it's a method gotta call it
+        INDEX
+        # need to offset the variable to get to different things
+        ARGUMENTS
+        # this is just a list of params to be given to the function call to call
+        """
+        super().visitExpr(node)
+
+    def visitStmnt(self, node: ast.Statement):
+        """nodes to desugar
+        BRACES
+        # this means a list of statements like a body
+        EXPRESSION
+        this is a parent to most expressions (not initializers in var decls though)
+        IF
+        WHILE
+        RETURN
+        COUT
+        CIN
+        SWITCH
+        BREAK
+        VAR_DECL
+        """
+        super().visitStmnt(node)
+
+    def visitVarDecl(self, node: ast.VariableDeclaration):
+        super().visitVarDecl(node)
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        super().visitMemberDecl(node)
+
+    def visitCase(self, node: ast.Case):
+        super().visitCase(node)
 
 
 class SetupDirectives(sv.Visitor):
@@ -111,6 +203,7 @@ class ExpressionGen(sv.Visitor):
 
     def visitExpr(self, node: ast.Expression):
         if node.op_type == ast.OpTypes.PLUS:
+            # TODO PUT ALL THIS CODE IN A FUNCTION pass in the op type
             line = ""
             reg1 = self.regs.getReg()
             reg2 = self.regs.getReg()

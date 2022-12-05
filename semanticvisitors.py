@@ -164,9 +164,73 @@ class PrintAST(Visitor):
         self.graph.write("output.png", format="png")
 
 
+class PreSymbolTableVisitor(Visitor):
+    def __init__(self, sym_table):
+        # visitor to put classes and methods in the sym table to be semi-hoisted
+        self.sym_table = sym_table
+        self.isErrorState = False
+        self.error_messages = []
+        self.cur_method: ast.ClassAndMemberDeclaration = None
+        self.cur_class: ast.ClassAndMemberDeclaration = None
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        if not self.isDuplicate(node):
+            if node.member_type == ast.MemberTypes.CLASS:
+                self.cur_class = node
+                self.sym_table[self.cur_class.ident] = {}
+                self.cur_method = None
+            if node.member_type == ast.MemberTypes.METHOD \
+                    or node.member_type == ast.MemberTypes.CONSTRUCTOR:
+                self.cur_method = node
+                self.sym_table[self.cur_class.ident][self.cur_method.ident] \
+                    = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
+            if node.member_type == ast.MemberTypes.DATAMEMBER:
+                self.sym_table[self.cur_class.ident][node.ident] \
+                    = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
+                self.cur_method = None
+            if node.ident == 'main':
+                self.cur_class = node
+                self.cur_method = None
+                self.sym_table[self.cur_class.ident] = {}
+        if node.member_type == ast.MemberTypes.CONSTRUCTOR:
+            if node.ident != self.cur_class.ident:
+                # print(f"wrong constructor name {node.ident} for class {self.cur_class.ident}")
+                self.error_messages.append(f"wrong constructor name {node.ident} for class {self.cur_class.ident}")
+                self.isErrorState = True
+        super().visitMemberDecl(node)
+
+    def isDuplicate(self, node):
+        if self.cur_class is None:
+            return False
+        if self.cur_method is not None:
+            if node.ident in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
+                # print("duplicate declaration:", node, "in", self.cur_class)
+                self.error_messages.append(f"duplicate declaration: {node} in {self.cur_class}")
+                self.isErrorState = True
+                return True
+            if isinstance(node, ast.ClassAndMemberDeclaration):
+                if node.ident in self.sym_table[self.cur_class.ident]:
+                    # print("duplicate declaration:", node, "in", self.cur_class)
+                    self.error_messages.append(f"duplicate declaration: {node} in {self.cur_class}")
+                    self.isErrorState = True
+                    return True
+        else:
+            if node.ident in self.sym_table[self.cur_class.ident]:
+                # print("duplicate declaration:", node, "in", self.cur_class)
+                self.error_messages.append(f"duplicate declaration: {node} in {self.cur_class}")
+                self.isErrorState = True
+                return True
+        if isinstance(node, ast.ClassAndMemberDeclaration) and node.member_type == ast.MemberTypes.CLASS:
+            if node.ident in self.sym_table:
+                self.error_messages.append(f"duplicate class declaration: {node}")
+                self.isErrorState = True
+                return True
+        return False
+
+
 class SymbolTableVisitor(Visitor):
-    def __init__(self):
-        self.sym_table = dict()
+    def __init__(self, sym_table):
+        self.sym_table = sym_table
         self.cur_class: ast.ClassAndMemberDeclaration = None
         self.cur_method: ast.ClassAndMemberDeclaration = None
         self.isErrorState = False
@@ -240,8 +304,8 @@ class SymbolTableVisitor(Visitor):
             # check if variable is undeclared
             if self.cur_method is not None:
                 if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident] \
-                        and node.value not in self.sym_table[self.cur_class.ident]:
-                    # print(f"Couldn't find '{node.value}' in {self.cur_class} sym table")
+                        and node.value not in self.sym_table[self.cur_class.ident] \
+                        and not self.isInSym(node.value):
                     self.error_messages.append(f"Couldn't find '{node.value}' in {self.cur_class} sym table")
                     self.isErrorState = True
             elif self.cur_method is None:
@@ -249,7 +313,6 @@ class SymbolTableVisitor(Visitor):
                 if node.type is None:  # this works right if the code above worked properly
                     # the code above should be what gives all expr identifier nodes a type
                     # based on what was found in the sym table as it was being built
-                    # print(f"Couldn't find '{node.value}' in main()'s sym table")
                     self.error_messages.append(f"Couldn't find '{node.value}' in main()'s sym table")
                     self.isErrorState = True
         # check for accessing private datamember
@@ -318,24 +381,24 @@ class SymbolTableVisitor(Visitor):
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
-        if not self.isDuplicate(node):
-            if node.member_type == ast.MemberTypes.CLASS:
-                self.cur_class = node
-                self.sym_table[self.cur_class.ident] = {}
-                self.cur_method = None
-            if node.member_type == ast.MemberTypes.METHOD \
-                    or node.member_type == ast.MemberTypes.CONSTRUCTOR:
-                self.cur_method = node
-                self.sym_table[self.cur_class.ident][self.cur_method.ident] \
-                    = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
-            if node.member_type == ast.MemberTypes.DATAMEMBER:
-                self.sym_table[self.cur_class.ident][node.ident] \
-                    = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
-                self.cur_method = None
-            if node.ident == 'main':
-                self.cur_class = node
-                self.cur_method = None
-                self.sym_table[self.cur_class.ident] = {}
+        # if not self.isDuplicate(node):
+        if node.member_type == ast.MemberTypes.CLASS:
+            self.cur_class = node
+            # self.sym_table[self.cur_class.ident] = {}
+            self.cur_method = None
+        if node.member_type == ast.MemberTypes.METHOD \
+                or node.member_type == ast.MemberTypes.CONSTRUCTOR:
+            self.cur_method = node
+            # self.sym_table[self.cur_class.ident][self.cur_method.ident] \
+            #     = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
+        if node.member_type == ast.MemberTypes.DATAMEMBER:
+            # self.sym_table[self.cur_class.ident][node.ident] \
+            #     = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
+            self.cur_method = None
+        if node.ident == 'main':
+            self.cur_class = node
+            self.cur_method = None
+            # self.sym_table[self.cur_class.ident] = {}
         if node.member_type == ast.MemberTypes.CONSTRUCTOR:
             if node.ident != self.cur_class.ident:
                 # print(f"wrong constructor name {node.ident} for class {self.cur_class.ident}")
@@ -453,6 +516,8 @@ class AssignmentVisitor(Visitor):
             # print([n.value for n in node.args])  # the args given to new
             # new could have index instead of args though, just not here
             # get the node.type (should be class name) then check the classes constructor, if it has one
+            # if you try something like int[] x = new int();
+            # it will have a KeyError here because the primitive type isn't in the sym table
             reqdparams = []
             if node.type in self.sym_table[node.type]:  # has a constructor
                 for k, v in self.sym_table[node.type][node.type].items():
@@ -585,6 +650,9 @@ class ExpressionTypeVisitor(Visitor):
                 self.isErrorState = True
             else:
                 node.type = ast.TypeTypes.BOOL
+        # if node.op_type == ast.OpTypes.ARGUMENTS:
+        #     if node.left.right.args == "method":
+        #         print("swaws")
 
     def visitStmnt(self, node: ast.Statement):
         if self.cur_method is not None and node.statement_type == ast.StatementTypes.RETURN:
@@ -692,7 +760,7 @@ class TypesVisitor(Visitor):
 
     def visitVarDecl(self, node: ast.VariableDeclaration):
         if node.init is not None and node.init.type is not None:
-            if node.type != node.init.type:
+            if node.type != node.init.type and node.init.value != "null":
                 self.error_messages.append(f"did invalid assignment in initializer for {node}")
                 self.isErrorState = True
         if node.type not in self.reg_types and node.type not in self.sym_table:

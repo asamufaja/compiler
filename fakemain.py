@@ -17,7 +17,10 @@ def main(args):
     #     print(f"Got {sys.exc_info()[0]} from going through the nodes")
     printvisitor.makeTree()
 
-    tablevisitor = v.SymbolTableVisitor()
+    pretablevisitor = v.PreSymbolTableVisitor({})
+    compunit.accept(pretablevisitor)
+    print("pre-table errors", pretablevisitor.error_messages)
+    tablevisitor = v.SymbolTableVisitor(pretablevisitor.sym_table)
     compunit.accept(tablevisitor)
     print("table errors", tablevisitor.error_messages)
     assignmentvisitor = v.AssignmentVisitor(tablevisitor.sym_table)
@@ -36,8 +39,13 @@ def main(args):
     compunit.accept(typesvisitor)
     print("types error", typesvisitor.error_messages)
 
+    startdesugar = cv.StartDesugar(tablevisitor.sym_table)
+    compunit.accept(startdesugar)
+    newtree = startdesugar.new_tree
 
-    # exprgen = cv.ExpressionGen()
+    # directivesgen = cv.SetupDirectives()
+    # compunit.accept(directivesgen)
+    # exprgen = cv.ExpressionGen(directivesgen.asmfile)
     # compunit.accept(exprgen)
 
     # print(tablevisitor.sym_table)

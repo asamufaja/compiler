@@ -862,6 +862,7 @@ class BigParser(Parser):
         # print("| Expression Arguments")
         expr = ast.Expression(ast.OpTypes.ARGUMENTS)
         expr.left = p.Expression
+        p.Expression.parent = expr
         expr.args = p.Arguments
         return expr
 

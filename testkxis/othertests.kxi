@@ -14,7 +14,7 @@ class Classy {
 }
 
 void kxi2022 main() {
-    //int[] x = new int[3];
+    int[] x = new int[3];
     string x = "sussy";
     x = x + 1;
     cout << x;

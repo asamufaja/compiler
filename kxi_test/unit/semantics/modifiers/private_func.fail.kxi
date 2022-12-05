@@ -1,9 +1,17 @@
 class Test {
+    public After a = new After();
     private int function() {
+        a.sus();
         return 0;
     }
 }
 
+class After {
+    public void sus() {
+    }
+}
+
 void kxi2022 main() {
+    int[] x = new int[6];
     (new Test()).function();
 }

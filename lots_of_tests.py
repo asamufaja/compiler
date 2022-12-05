@@ -93,7 +93,6 @@ def main():
         "kxi_test/unit/semantics/types/main_return.fail.kxi",
         "kxi_test/unit/semantics/types/main_return.pass.kxi",
         "kxi_test/unit/semantics/types/maths.fail.kxi",
-        # "kxi_test/unit/semantics/types/math_returns.fail.kxi",  # I gotta ignore this one for now
         "kxi_test/unit/semantics/types/math_returns.pass.kxi",
         "kxi_test/unit/semantics/types/null_assn.pass.kxi",  # trouble parsing arrays
         "kxi_test/unit/semantics/types/shadowing_class.pass.kxi",
@@ -127,6 +126,9 @@ def main():
     }
     
     with a little bit of fancy text editing...
+    
+    
+    # "kxi_test/unit/semantics/types/math_returns.fail.kxi",  # I gotta ignore this one for now
     
     "kxi_test/unit/andrew/Lexical/lexical_basicwithstring_fail.kxi",
     "kxi_test/unit/andrew/Lexical/lexical_basic_pass.kxi",
@@ -208,7 +210,12 @@ def main():
         # print(f"{fname} starting:")
         try:
             compunit = parser.parse(lexer.tokenize(file.read()))
-            tablevisitor = v.SymbolTableVisitor()
+
+            pretablevisitor = v.PreSymbolTableVisitor({})
+            compunit.accept(pretablevisitor)
+            if pretablevisitor.isErrorState:
+                raise Exception()
+            tablevisitor = v.SymbolTableVisitor(pretablevisitor.sym_table)
             compunit.accept(tablevisitor)
             if tablevisitor.isErrorState:
                 # print(tablevisitor.error_messages)
