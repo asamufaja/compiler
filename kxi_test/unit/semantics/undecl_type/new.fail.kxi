@@ -1,3 +1,4 @@
 void kxi2022 main() {
     X bad = new X();
 }
+//how was this file labeled a pass?

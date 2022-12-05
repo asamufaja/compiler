@@ -13,7 +13,7 @@ class BigLexer(Lexer):
               GREATEROREQUAL, LESSOREQUAL, GREATERTHAN, LESSTHAN, AND, OR, PLUSEQUALS,
               MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS, LEFTSHIFT, RIGHTSHIFT, PERIOD, COMMA,
               IDENTIFIER, CHAR_LITERAL, STRING_LITERAL, NUM_LITERAL, MAIN,
-              EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, THIS
+              EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, THIS, LRBRACKET
               # ALPHA,  UNESCAPED_CHAR, ESCAPED_CHAR, LINE_ENDING, CHAR, DIGIT, COMMENT,
               }
     ignore = ' \t'
@@ -59,6 +59,7 @@ class BigLexer(Lexer):
     COMMA = r","
     LBRACE = r"{"
     RBRACE = r"}"
+    LRBRACKET = r"\[\]"
     LBRACKET = r"\["
     RBRACKET = r"\]"
     LPAREN = r"\("
@@ -118,7 +119,7 @@ class BigLexer(Lexer):
 
 class BigParser(Parser):
     tokens = BigLexer.tokens
-    # debugfile = 'parser.out'
+    debugfile = 'parser.out'
 
     precedence = (
         ("right", EQUALS, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS),
@@ -130,7 +131,7 @@ class BigParser(Parser):
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", THIS),
-        ("left", LBRACKET, RBRACKET),
+        # ("left", LBRACKET, RBRACKET),
         # ("left", LPAREN, RPAREN),
     )
 

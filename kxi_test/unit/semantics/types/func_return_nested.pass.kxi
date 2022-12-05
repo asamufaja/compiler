@@ -1,9 +1,9 @@
 class Test {
-    public int another() {
-        return this.zero();
-    }
     public int zero() {
         return 0;
+    }
+    public int another() {
+        return this.zero();
     }
 }
 

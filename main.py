@@ -39,6 +39,16 @@ def dashS(kxi, lexer, parser):
     if cinvisitor.isErrorState:
         print("error at other visitor", cinvisitor.error_messages)
         return
+    pretypes = v.ExpressionTypeVisitor(tablevisitor.sym_table)
+    compunit.accept(pretypes)
+    if pretypes.isErrorState:
+        print("pre_types error", pretypes.error_messages)
+        return
+    typesvisitor = v.TypesVisitor(tablevisitor.sym_table)
+    compunit.accept(typesvisitor)
+    if typesvisitor.isErrorState:
+        print("types error", typesvisitor.error_messages)
+        return
     return compunit
 
 

@@ -115,8 +115,9 @@ class PrintAST(Visitor):
             self.graph.add_edge(pydot.Edge(f"{node}", f"{node.expr}"))
         for n in node.substatement:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
-        for n in node.else_statement:
-            self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
+        if node.else_statement is not None:
+            for n in node.else_statement:
+                self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
         for n in node.case_list:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
         for n in node.default_stmnts:
@@ -253,8 +254,8 @@ class SymbolTableVisitor(Visitor):
                     self.isErrorState = True
         # check for accessing private datamember
         if node.op_type == ast.OpTypes.PERIOD:
-            _, node_value = self.isInSym(node.right.value)
-            if len(node_value) > 4 and node_value[5] == ast.ModifierTypes.PRIVATE \
+            is_in_sym, node_value = self.isInSym(node.right.value)
+            if is_in_sym and len(node_value) > 4 and node_value[5] == ast.ModifierTypes.PRIVATE \
                     and self.cur_class.ident != node_value[3]:
                 self.error_messages.append(f"tried to access private data member {node.right.value}")
                 self.isErrorState = True
@@ -288,11 +289,16 @@ class SymbolTableVisitor(Visitor):
                         self.isErrorState = True
 
     def visitStmnt(self, node: ast.Statement):
-        """no returning 'this' apparently"""
-        if node.statement_type == ast.StatementTypes.RETURN:
+        # no returning 'this' apparently
+        # and checking the ret type for function
+        if node.statement_type == ast.StatementTypes.RETURN and node.expr is not None:
             if node.expr.op_type == ast.OpTypes.THIS:
                 self.error_messages.append(f"returned 'this' in {self.cur_class.ident}")
                 self.isErrorState = True
+            # if self.cur_method is not None and \
+            #         node.expr.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0]:
+            #     self.error_messages.append(f"wrong ret type for func {self.cur_method.ident}")
+            #     self.isErrorState = True
         super().visitStmnt(node)
 
     def visitVarDecl(self, node: ast.VariableDeclaration):
@@ -536,6 +542,170 @@ class CinVisitor(Visitor):
                 self.error_messages.append(f"error using cin on invalid var {cinexpr}")
                 self.isErrorState = True
         super().visitStmnt(node)
+
+
+class ExpressionTypeVisitor(Visitor):
+    def __init__(self, sym_table):
+        self.cur_class = None
+        self.cur_method = None
+        self.isErrorState = False
+        self.error_messages = []
+        self.sym_table = sym_table
+        self.returns_bool = [
+            ast.OpTypes.DOUBLEEQUALS,
+            ast.OpTypes.NOTEQUALS,
+            ast.OpTypes.LESSTHAN,
+            ast.OpTypes.GREATERTHAN,
+            ast.OpTypes.LESSOREQUAL,
+            ast.OpTypes.GREATEROREQUAL,
+            ast.OpTypes.AND,
+            ast.OpTypes.OR,
+        ]
+        self.returns_int = [
+            ast.OpTypes.PLUS,
+            ast.OpTypes.MINUS,
+            ast.OpTypes.TIMES,
+            ast.OpTypes.DIVIDE,
+        ]
+
+    def visitExpr(self, node: ast.Expression):
+        super().visitExpr(node)
+        if node.op_type in self.returns_int:
+            # if node.left is not None and node.left.type != node.right.type:
+            #     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+            #                                f"{node.left.value} {node.right.value}, ")
+            #     self.isErrorState = True
+            # else:
+            node.type = ast.TypeTypes.INT
+        if node.op_type in self.returns_bool:
+            if node.left.type != node.right.type:
+                self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                           f"{node.left.value} {node.right.value}, "
+                                           f"they must be the same type")
+                self.isErrorState = True
+            else:
+                node.type = ast.TypeTypes.BOOL
+
+    def visitStmnt(self, node: ast.Statement):
+        if self.cur_method is not None and node.statement_type == ast.StatementTypes.RETURN:
+            realnode = ast.Expression(None)
+            if node.expr.op_type == ast.OpTypes.ARGUMENTS:
+                realnode = node.expr.left.right
+            if node.expr.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0] \
+                    and realnode.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0]:
+                self.error_messages.append(f"wrong ret type for func {self.cur_method.ident}")
+                self.isErrorState = True
+        if self.cur_class.ident == "main" and node.statement_type == ast.StatementTypes.RETURN:
+            if node.expr is not None:
+                self.error_messages.append(f"wrong ret type for func {self.cur_class.ident}")
+                self.isErrorState = True
+        super().visitStmnt(node)
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        if node.member_type == ast.MemberTypes.METHOD:
+            self.cur_method = node
+        if node.member_type == ast.MemberTypes.CLASS:
+            self.cur_class = node
+        if node.ident == 'main':
+            self.cur_class = node
+            self.cur_method = None
+        super().visitMemberDecl(node)
+
+
+class TypesVisitor(Visitor):
+    def __init__(self, sym_table):
+        self.isErrorState = False
+        self.error_messages = []
+        self.sym_table = sym_table
+        self.reg_types = [x for x in ast.TypeTypes]
+        self.bool_ops = [
+            ast.OpTypes.AND,
+            ast.OpTypes.OR,
+        ]
+        self.math_ops = [
+            ast.OpTypes.PLUS,
+            ast.OpTypes.MINUS,
+            ast.OpTypes.TIMES,
+            ast.OpTypes.DIVIDE,
+        ]
+        self.assn_ops = [
+            ast.OpTypes.PLUSEQUALS,
+            ast.OpTypes.MINUSEQUALS,
+            ast.OpTypes.TIMESEQUALS,
+            ast.OpTypes.DIVIDEEQUALS,
+            ast.OpTypes.EQUALS,
+        ]
+
+    def visitExpr(self, node: ast.Expression):
+        # if node.op_type in self.assn_ops:
+        #     if node.left.type != node.right.type:
+        #         self.error_messages.append("sussy")
+        if node.op_type in self.math_ops:
+            if node.right.op_type == ast.OpTypes.NEW:
+                pass  # TODO might want to figure out something like x = 3 + (new Test()).one()
+                # where one() would return the number one or something
+            # TODO this is pretty wack
+            elif node.left is not None and node.right is not None and \
+                    node.left.type is not None and node.right.type is not None and \
+                    (node.left.type != ast.TypeTypes.INT or node.right.type != ast.TypeTypes.INT):
+                self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
+                                           f"{node.left.value} {node.right.value}")
+                self.isErrorState = True
+            elif node.right is not None and node.right.type != ast.TypeTypes.INT:
+                self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
+                                           f"{node.left} {node.right}")
+                self.isErrorState = True
+        if node.op_type in self.bool_ops:
+            if node.left.type != ast.TypeTypes.BOOL and node.right.type != ast.TypeTypes.BOOL:
+                self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
+                                           f"{node.left.type.value} {node.right.type.value}")
+                self.isErrorState = True
+        if node.op_type == ast.OpTypes.NEW:
+            if node.index is not None and node.index.type != ast.TypeTypes.INT:
+                self.error_messages.append(f"can only index with int {node}")
+                self.isErrorState = True
+        if node.op_type == ast.OpTypes.INDEX:
+            if node.index is not None and node.index.type != ast.TypeTypes.INT:
+                self.error_messages.append(f"can only index into array {node.left.value} with int")
+                self.isErrorState = True
+        if node.op_type == ast.OpTypes.EQUALS:
+            if node.left.type is not None and node.right.type is not None:  # probably an ident
+                if node.left.type != node.right.type:  # probably wrong?
+                    self.error_messages.append(f"invalid types in assignment {node.left.value} = {node.right.value}")
+                    self.isErrorState = True
+            if node.left.array and node.right.op_type != ast.OpTypes.NEW:
+                self.error_messages.append(f"can only assign array {node.left} with a new array")
+                self.isErrorState = True
+            if node.left.op_type == ast.OpTypes.INDEX and node.left.index is not None:
+                ind = node.left
+                if ind.left.array and ind.left.type != node.right.type:
+                    self.error_messages.append(f"invalid assignment {ind.left.value}[{ind.index.value}] = {node.right.type}")
+                    self.isErrorState = True
+        super().visitExpr(node)
+
+    def visitStmnt(self, node: ast.Statement):
+        if node.statement_type == ast.StatementTypes.IF:
+            if node.expr.type != ast.TypeTypes.BOOL:
+                self.error_messages.append(f"if statement requires bool, got {node.expr.type}")
+                self.isErrorState = True
+        super().visitStmnt(node)
+
+    def visitVarDecl(self, node: ast.VariableDeclaration):
+        if node.init is not None and node.init.type is not None:
+            if node.type != node.init.type:
+                self.error_messages.append(f"did invalid assignment in initializer")
+                self.isErrorState = True
+        if node.type not in self.reg_types and node.type not in self.sym_table:
+            self.error_messages.append(f"did invalid type in var {node}")
+            self.isErrorState = True
+        super().visitVarDecl(node)
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        super().visitMemberDecl(node)
+
+    def visitCase(self, node: ast.Case):
+        super().visitCase(node)
+
 
 """
 wanna make a new visitor? just copy and update the name

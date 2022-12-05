@@ -3,4 +3,6 @@ void kxi2022 main() {
     if (c) {
         
     }
+    if (1 == 1) {
+    }
 }

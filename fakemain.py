@@ -29,6 +29,13 @@ def main(args):
     cinvisitor = v.CinVisitor(tablevisitor.sym_table)
     compunit.accept(cinvisitor)
     print("cin error", cinvisitor.error_messages)
+    pretypes = v.ExpressionTypeVisitor(tablevisitor.sym_table)
+    compunit.accept(pretypes)
+    print("pre_types error", pretypes.error_messages)
+    typesvisitor = v.TypesVisitor(tablevisitor.sym_table)
+    compunit.accept(typesvisitor)
+    print("types error", typesvisitor.error_messages)
+
 
     # exprgen = cv.ExpressionGen()
     # compunit.accept(exprgen)

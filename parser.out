@@ -27,7 +27,7 @@ Rule 23    ClassMemberDefinition -> MethodDeclaration
 Rule 24    DataMemberDeclaration -> Modifier VariableDeclaration
 Rule 25    MethodDeclaration -> Modifier Type OptionalBrackets IDENTIFIER MethodSuffix
 Rule 26    OptionalBrackets -> empty
-Rule 27    OptionalBrackets -> LBRACKET RBRACKET  [precedence=left, level=10]
+Rule 27    OptionalBrackets -> LBRACKET RBRACKET
 Rule 28    ConstructorDeclaration -> IDENTIFIER MethodSuffix
 Rule 29    Initializer -> EQUALS Expression  [precedence=right, level=1]
 Rule 30    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody
@@ -134,7 +134,7 @@ Rule 130   _13_COMMA_Expression_repeat -> <empty>
 Rule 131   _13_COMMA_Expression_items -> _13_COMMA_Expression_items _13_COMMA_Expression_item
 Rule 132   _13_COMMA_Expression_items -> _13_COMMA_Expression_item
 Rule 133   _13_COMMA_Expression_item -> COMMA Expression
-Rule 134   Index -> LBRACKET Expression RBRACKET  [precedence=left, level=10]
+Rule 134   Index -> LBRACKET Expression RBRACKET
 Rule 135   empty -> <empty>
 
 Terminals, with rules where they appear:
@@ -3715,12 +3715,12 @@ state 133
     PLUSEQUALS      reduce using rule 104 (Expression -> MINUS Expression .)
     EQUALS          reduce using rule 104 (Expression -> MINUS Expression .)
     LPAREN          reduce using rule 104 (Expression -> MINUS Expression .)
+    LBRACKET        reduce using rule 104 (Expression -> MINUS Expression .)
     RPAREN          reduce using rule 104 (Expression -> MINUS Expression .)
     COMMA           reduce using rule 104 (Expression -> MINUS Expression .)
     RBRACKET        reduce using rule 104 (Expression -> MINUS Expression .)
     DIVIDE          shift and go to state 113
     TIMES           shift and go to state 114
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -3768,12 +3768,12 @@ state 134
     PLUSEQUALS      reduce using rule 105 (Expression -> PLUS Expression .)
     EQUALS          reduce using rule 105 (Expression -> PLUS Expression .)
     LPAREN          reduce using rule 105 (Expression -> PLUS Expression .)
+    LBRACKET        reduce using rule 105 (Expression -> PLUS Expression .)
     RPAREN          reduce using rule 105 (Expression -> PLUS Expression .)
     COMMA           reduce using rule 105 (Expression -> PLUS Expression .)
     RBRACKET        reduce using rule 105 (Expression -> PLUS Expression .)
     DIVIDE          shift and go to state 113
     TIMES           shift and go to state 114
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -3823,10 +3823,10 @@ state 135
     PLUSEQUALS      reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     EQUALS          reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     LPAREN          reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
+    LBRACKET        reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     RPAREN          reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     COMMA           reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
     RBRACKET        reduce using rule 106 (Expression -> EXCLAMATIONMARK Expression .)
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4127,6 +4127,7 @@ state 143
     PLUSEQUALS      reduce using rule 107 (Expression -> Expression OR Expression .)
     EQUALS          reduce using rule 107 (Expression -> Expression OR Expression .)
     LPAREN          reduce using rule 107 (Expression -> Expression OR Expression .)
+    LBRACKET        reduce using rule 107 (Expression -> Expression OR Expression .)
     RPAREN          reduce using rule 107 (Expression -> Expression OR Expression .)
     COMMA           reduce using rule 107 (Expression -> Expression OR Expression .)
     RBRACKET        reduce using rule 107 (Expression -> Expression OR Expression .)
@@ -4141,7 +4142,6 @@ state 143
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4181,6 +4181,7 @@ state 144
     PLUSEQUALS      reduce using rule 108 (Expression -> Expression AND Expression .)
     EQUALS          reduce using rule 108 (Expression -> Expression AND Expression .)
     LPAREN          reduce using rule 108 (Expression -> Expression AND Expression .)
+    LBRACKET        reduce using rule 108 (Expression -> Expression AND Expression .)
     RPAREN          reduce using rule 108 (Expression -> Expression AND Expression .)
     COMMA           reduce using rule 108 (Expression -> Expression AND Expression .)
     RBRACKET        reduce using rule 108 (Expression -> Expression AND Expression .)
@@ -4194,7 +4195,6 @@ state 144
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4240,6 +4240,7 @@ state 145
     PLUSEQUALS      reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     EQUALS          reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     LPAREN          reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
+    LBRACKET        reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     RPAREN          reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     COMMA           reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
     RBRACKET        reduce using rule 109 (Expression -> Expression GREATEROREQUAL Expression .)
@@ -4247,7 +4248,6 @@ state 145
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4293,6 +4293,7 @@ state 146
     PLUSEQUALS      reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     EQUALS          reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     LPAREN          reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
+    LBRACKET        reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     RPAREN          reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     COMMA           reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
     RBRACKET        reduce using rule 110 (Expression -> Expression LESSOREQUAL Expression .)
@@ -4300,7 +4301,6 @@ state 146
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4346,6 +4346,7 @@ state 147
     PLUSEQUALS      reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     EQUALS          reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     LPAREN          reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
+    LBRACKET        reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     RPAREN          reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     COMMA           reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
     RBRACKET        reduce using rule 111 (Expression -> Expression GREATERTHAN Expression .)
@@ -4353,7 +4354,6 @@ state 147
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4399,6 +4399,7 @@ state 148
     PLUSEQUALS      reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     EQUALS          reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     LPAREN          reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
+    LBRACKET        reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     RPAREN          reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     COMMA           reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
     RBRACKET        reduce using rule 112 (Expression -> Expression LESSTHAN Expression .)
@@ -4406,7 +4407,6 @@ state 148
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4448,6 +4448,7 @@ state 149
     PLUSEQUALS      reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     EQUALS          reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     LPAREN          reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
+    LBRACKET        reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     RPAREN          reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     COMMA           reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
     RBRACKET        reduce using rule 113 (Expression -> Expression NOTEQUALS Expression .)
@@ -4459,7 +4460,6 @@ state 149
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4501,6 +4501,7 @@ state 150
     PLUSEQUALS      reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     EQUALS          reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     LPAREN          reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
+    LBRACKET        reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     RPAREN          reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     COMMA           reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
     RBRACKET        reduce using rule 114 (Expression -> Expression DOUBLEEQUALS Expression .)
@@ -4512,7 +4513,6 @@ state 150
     TIMES           shift and go to state 114
     MINUS           shift and go to state 115
     PLUS            shift and go to state 116
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4562,10 +4562,10 @@ state 151
     PLUSEQUALS      reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     EQUALS          reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     LPAREN          reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
+    LBRACKET        reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     RPAREN          reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     COMMA           reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
     RBRACKET        reduce using rule 115 (Expression -> Expression DIVIDE Expression .)
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4615,10 +4615,10 @@ state 152
     PLUSEQUALS      reduce using rule 116 (Expression -> Expression TIMES Expression .)
     EQUALS          reduce using rule 116 (Expression -> Expression TIMES Expression .)
     LPAREN          reduce using rule 116 (Expression -> Expression TIMES Expression .)
+    LBRACKET        reduce using rule 116 (Expression -> Expression TIMES Expression .)
     RPAREN          reduce using rule 116 (Expression -> Expression TIMES Expression .)
     COMMA           reduce using rule 116 (Expression -> Expression TIMES Expression .)
     RBRACKET        reduce using rule 116 (Expression -> Expression TIMES Expression .)
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4666,12 +4666,12 @@ state 153
     PLUSEQUALS      reduce using rule 117 (Expression -> Expression MINUS Expression .)
     EQUALS          reduce using rule 117 (Expression -> Expression MINUS Expression .)
     LPAREN          reduce using rule 117 (Expression -> Expression MINUS Expression .)
+    LBRACKET        reduce using rule 117 (Expression -> Expression MINUS Expression .)
     RPAREN          reduce using rule 117 (Expression -> Expression MINUS Expression .)
     COMMA           reduce using rule 117 (Expression -> Expression MINUS Expression .)
     RBRACKET        reduce using rule 117 (Expression -> Expression MINUS Expression .)
     DIVIDE          shift and go to state 113
     TIMES           shift and go to state 114
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4719,12 +4719,12 @@ state 154
     PLUSEQUALS      reduce using rule 118 (Expression -> Expression PLUS Expression .)
     EQUALS          reduce using rule 118 (Expression -> Expression PLUS Expression .)
     LPAREN          reduce using rule 118 (Expression -> Expression PLUS Expression .)
+    LBRACKET        reduce using rule 118 (Expression -> Expression PLUS Expression .)
     RPAREN          reduce using rule 118 (Expression -> Expression PLUS Expression .)
     COMMA           reduce using rule 118 (Expression -> Expression PLUS Expression .)
     RBRACKET        reduce using rule 118 (Expression -> Expression PLUS Expression .)
     DIVIDE          shift and go to state 113
     TIMES           shift and go to state 114
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4757,6 +4757,7 @@ state 155
     SEMICOLON       reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     PERIOD          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     LPAREN          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
+    LBRACKET        reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     RPAREN          reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     COMMA           reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
     RBRACKET        reduce using rule 119 (Expression -> Expression DIVIDEEQUALS Expression .)
@@ -4777,7 +4778,6 @@ state 155
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4810,6 +4810,7 @@ state 156
     SEMICOLON       reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     PERIOD          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     LPAREN          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
+    LBRACKET        reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     RPAREN          reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     COMMA           reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
     RBRACKET        reduce using rule 120 (Expression -> Expression TIMESEQUALS Expression .)
@@ -4830,7 +4831,6 @@ state 156
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4863,6 +4863,7 @@ state 157
     SEMICOLON       reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     PERIOD          reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     LPAREN          reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
+    LBRACKET        reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     RPAREN          reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     COMMA           reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
     RBRACKET        reduce using rule 121 (Expression -> Expression MINUSEQUALS Expression .)
@@ -4883,7 +4884,6 @@ state 157
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4916,6 +4916,7 @@ state 158
     SEMICOLON       reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     PERIOD          reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     LPAREN          reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
+    LBRACKET        reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     RPAREN          reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     COMMA           reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
     RBRACKET        reduce using rule 122 (Expression -> Expression PLUSEQUALS Expression .)
@@ -4936,7 +4937,6 @@ state 158
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
@@ -4969,6 +4969,7 @@ state 159
     SEMICOLON       reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     PERIOD          reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     LPAREN          reduce using rule 123 (Expression -> Expression EQUALS Expression .)
+    LBRACKET        reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     RPAREN          reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     COMMA           reduce using rule 123 (Expression -> Expression EQUALS Expression .)
     RBRACKET        reduce using rule 123 (Expression -> Expression EQUALS Expression .)
@@ -4989,7 +4990,6 @@ state 159
     MINUSEQUALS     shift and go to state 119
     PLUSEQUALS      shift and go to state 120
     EQUALS          shift and go to state 121
-    LBRACKET        shift and go to state 123
 
     Arguments                      shift and go to state 102
     Index                          shift and go to state 103
