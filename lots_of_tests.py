@@ -86,7 +86,7 @@ def main():
         "kxi_test/unit/semantics/types/func_assn.fail.kxi",
         "kxi_test/unit/semantics/types/func_return.fail.kxi",
         "kxi_test/unit/semantics/types/func_return.pass.kxi",
-        # "kxi_test/unit/semantics/types/func_return_array.pass.kxi",  # trouble parsing arrays
+        "kxi_test/unit/semantics/types/func_return_array.pass.kxi",  # trouble parsing arrays
         "kxi_test/unit/semantics/types/func_return_nested.fail.kxi",
         "kxi_test/unit/semantics/types/func_return_nested.pass.kxi",
         "kxi_test/unit/semantics/types/int_assn_char.fail.kxi",
@@ -95,7 +95,7 @@ def main():
         "kxi_test/unit/semantics/types/maths.fail.kxi",
         # "kxi_test/unit/semantics/types/math_returns.fail.kxi",  # I gotta ignore this one for now
         "kxi_test/unit/semantics/types/math_returns.pass.kxi",
-        # "kxi_test/unit/semantics/types/null_assn.pass.kxi",  # trouble parsing arrays
+        "kxi_test/unit/semantics/types/null_assn.pass.kxi",  # trouble parsing arrays
         "kxi_test/unit/semantics/types/shadowing_class.pass.kxi",
         "kxi_test/unit/semantics/types/this_assn.fail.kxi",
         "kxi_test/unit/semantics/types/too_many_indices.fail.kxi",

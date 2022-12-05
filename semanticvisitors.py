@@ -693,7 +693,7 @@ class TypesVisitor(Visitor):
     def visitVarDecl(self, node: ast.VariableDeclaration):
         if node.init is not None and node.init.type is not None:
             if node.type != node.init.type:
-                self.error_messages.append(f"did invalid assignment in initializer")
+                self.error_messages.append(f"did invalid assignment in initializer for {node}")
                 self.isErrorState = True
         if node.type not in self.reg_types and node.type not in self.sym_table:
             self.error_messages.append(f"did invalid type in var {node}")

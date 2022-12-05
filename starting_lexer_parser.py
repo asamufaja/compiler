@@ -16,38 +16,52 @@ class BigLexer(Lexer):
               EXCLAMATIONMARK, PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, THIS, LRBRACKET
               # ALPHA,  UNESCAPED_CHAR, ESCAPED_CHAR, LINE_ENDING, CHAR, DIGIT, COMMENT,
               }
+    # Tokens
+    # ALPHA = r"[A-Za-z]"
+    # DIGIT = r"[0-9]"
+    IDENTIFIER = r"(?:[A-Za-z]|_)(?:[A-Za-z]|_|[0-9])*"
+    # LINE_ENDING = r"(?:\r|\n|\r\n)"
+
+    # UNESCAPED_CHAR = r"[^\"'\\\n\t\r]"  # should not automatically match whitespace
+    # Any ASCII character from SPACE (32) to ~ (126)
+    # except " (34), ' (39), or \ (92)
+    # ESCAPED_CHAR = r"(\r|\n|\t|\\)"
+    # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
+    CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
+    STRING_LITERAL = r'"(?:(?:[^\"\'\\\n\t\r]|(\r|\n|\t|\\))|\'|\\")*"'
+    NUM_LITERAL = r"(?:0|[1-9])[0-9]*"
+
     ignore = ' \t'
     # Ignored pattern
     ignore_newline = r'\n+'
     ignore_comment = r'//[^\n]*'
 
     # keywords
-    BOOL = r'bool'
-    BREAK = r'break'
-    CASE = r'case'
-    CLASS = r'class'
-    KEYWORDCHAR = r'char'
-    CIN = r'cin'
-    COUT = r'cout'
-    DEFAULT = r'default'
-    ELSE = r'else'
-    FALSE = r'false'
-    IF = r'if'
-    INT = r'int'
-    KXI2022 = r'kxi2022'
-    NEW = r'new'
-    NULL = r'null '
-    PUBLIC = r'public '
-    PRIVATE = r'private '
-    RETURN = r'return'
-    STRING = r'string'
-    SWITCH = r'switch'
-    TRUE = r'true'
-    VOID = r'void'
-    WHILE = r'while'
-
-    MAIN = r'main'
-    THIS = r'this'
+    IDENTIFIER['bool'] = BOOL
+    IDENTIFIER['break'] = BREAK
+    IDENTIFIER['case'] = CASE
+    IDENTIFIER['class'] = CLASS
+    IDENTIFIER['char'] = KEYWORDCHAR
+    IDENTIFIER['cin'] = CIN
+    IDENTIFIER['cout'] = COUT
+    IDENTIFIER['default'] = DEFAULT
+    IDENTIFIER['else'] = ELSE
+    IDENTIFIER['false'] = FALSE
+    IDENTIFIER['if'] = IF
+    IDENTIFIER['int'] = INT
+    IDENTIFIER['kxi2022'] = KXI2022
+    IDENTIFIER['new'] = NEW
+    IDENTIFIER['null'] = NULL
+    IDENTIFIER['public'] = PUBLIC
+    IDENTIFIER['private'] = PRIVATE
+    IDENTIFIER['return'] = RETURN
+    IDENTIFIER['string'] = STRING
+    IDENTIFIER['switch'] = SWITCH
+    IDENTIFIER['true'] = TRUE
+    IDENTIFIER['void'] = VOID
+    IDENTIFIER['while'] = WHILE
+    IDENTIFIER['main'] = MAIN
+    IDENTIFIER['this'] = THIS
 
     # COMMENT = r"//[^\n]*"
 
@@ -59,7 +73,7 @@ class BigLexer(Lexer):
     COMMA = r","
     LBRACE = r"{"
     RBRACE = r"}"
-    LRBRACKET = r"\[\]"
+    LRBRACKET = r"\[]"
     LBRACKET = r"\["
     RBRACKET = r"\]"
     LPAREN = r"\("
@@ -85,20 +99,7 @@ class BigLexer(Lexer):
     TIMES = r"\*"
     DIVIDE = r"/"
 
-    # Tokens
-    # ALPHA = r"[A-Za-z]"
-    # DIGIT = r"[0-9]"
-    IDENTIFIER = r"(?:[A-Za-z]|_)(?:[A-Za-z]|_|[0-9])*"
-    # LINE_ENDING = r"(?:\r|\n|\r\n)"
 
-    # UNESCAPED_CHAR = r"[^\"'\\\n\t\r]"  # should not automatically match whitespace
-    # Any ASCII character from SPACE (32) to ~ (126)
-    # except " (34), ' (39), or \ (92)
-    # ESCAPED_CHAR = r"(\r|\n|\t|\\)"
-    # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
-    CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
-    STRING_LITERAL = r'"(?:(?:[^\"\'\\\n\t\r]|(\r|\n|\t|\\))|\'|\\")*"'
-    NUM_LITERAL = r"(?:0|[1-9])[0-9]*"
 
     # def DIGIT(self, t):
     #     t.value = int(t.value)
@@ -130,6 +131,9 @@ class BigParser(Parser):
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
         ("left", NEW, EXCLAMATIONMARK),
+        ("left", IDENTIFIER),  #
+        ("left", LRBRACKET),  #
+        ("left", LBRACKET, RBRACKET),  #
         ("left", THIS),
         # ("left", LBRACKET, RBRACKET),
         # ("left", LPAREN, RPAREN),
@@ -197,6 +201,16 @@ class BigParser(Parser):
         # print("Type STRING")
         return ast.TypeTypes.STRING
 
+    @_('IDENTIFIER Index')
+    def Expression(self, p):
+        # print('sussy expr index')
+        expr = ast.Expression(ast.OpTypes.INDEX)
+        identexpr = ast.Expression(ast.OpTypes.IDENTIFIER)
+        identexpr.value = p.IDENTIFIER
+        expr.left = identexpr
+        expr.index = p.Index
+        return expr
+
     # @_('IDENTIFIER')
     # def Type(self, p):
     #     """Type ::= identifier"""
@@ -257,7 +271,8 @@ class BigParser(Parser):
         methoddecl.body.extend(p.MethodSuffix.body)
         return methoddecl
 
-    @_('LBRACKET RBRACKET')
+    # @_('LBRACKET RBRACKET')
+    @_('LRBRACKET')
     def OptionalBrackets(self, p):
         """OptionalBrackets = [ ]"""
         # print("OptionalBrackets = [ ]")
@@ -780,6 +795,15 @@ class BigParser(Parser):
         # print("Type IDENTIFIER")
         # return ast.TypeTypes.CLASS
         return p.IDENTIFIER
+    @_('Expression Index')
+    def Expression(self, p):
+        """| Expression Index"""
+        # print("| Expression Index")
+        expr = ast.Expression(ast.OpTypes.INDEX)
+        expr.left = p.Expression
+        expr.index = p.Index
+        return expr
+
 
     @_('NEW Type Arguments')
     def Expression(self, p):
@@ -823,14 +847,14 @@ class BigParser(Parser):
         # expr.right = p.Expression1
         return expr
 
-    @_('Expression Index')
-    def Expression(self, p):
-        """| Expression Index"""
-        # print("| Expression Index")
-        expr = ast.Expression(ast.OpTypes.INDEX)
-        expr.left = p.Expression
-        expr.index = p.Index
-        return expr
+    # @_('Expression Index')
+    # def Expression(self, p):
+    #     """| Expression Index"""
+    #     # print("| Expression Index")
+    #     expr = ast.Expression(ast.OpTypes.INDEX)
+    #     expr.left = p.Expression
+    #     expr.index = p.Index
+    #     return expr
 
     @_('Expression Arguments')
     def Expression(self, p):
