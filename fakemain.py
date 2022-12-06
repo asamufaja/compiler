@@ -10,12 +10,10 @@ def main(args):
 
     kxi = open(args[0], 'r')
     compunit = parser.parse(lexer.tokenize(kxi.read()))
+
     printvisitor = v.PrintAST()
-    # try:
-    compunit.accept(printvisitor)
-    # except:
-    #     print(f"Got {sys.exc_info()[0]} from going through the nodes")
-    printvisitor.makeTree()
+    # compunit.accept(printvisitor)
+    # printvisitor.makeTree()
 
     pretablevisitor = v.PreSymbolTableVisitor({})
     compunit.accept(pretablevisitor)
@@ -39,14 +37,22 @@ def main(args):
     compunit.accept(typesvisitor)
     print("types error", typesvisitor.error_messages)
 
-    startdesugar = cv.StartDesugar(tablevisitor.sym_table)
-    compunit.accept(startdesugar)
-    newtree = startdesugar.new_tree
+    mathassndesugar = cv.MathAssignDesugar()
+    compunit.accept(mathassndesugar)
+    notequals = cv.NotEqualsVisitor()
+    compunit.accept(notequals)
+    lessorgreater = cv.LessOrGreater()
+    compunit.accept(lessorgreater)
+    whiletoif = cv.WhileToIf()
+    compunit.accept(whiletoif)
 
-    # directivesgen = cv.SetupDirectives()
-    # compunit.accept(directivesgen)
-    # exprgen = cv.ExpressionGen(directivesgen.asmfile)
-    # compunit.accept(exprgen)
+    compunit.accept(printvisitor)
+    printvisitor.makeTree()
+
+    directivesgen = cv.SetupDirectives()
+    compunit.accept(directivesgen)
+    exprgen = cv.ExpressionGen(directivesgen.asmfile)
+    compunit.accept(exprgen)
 
     # print(tablevisitor.sym_table)
     # for key, val in tablevisitor.sym_table.items():

@@ -1,0 +1,29 @@
+void kxi2022 main() {
+//    int x = 1;
+//    x += 2;
+//    x != 2;
+//    1 >= 2;
+//    bool x = false;
+//    while(x) {
+//        break;
+//    }
+//    if(true) {
+//    }
+//    if(true) {
+//    }
+//    else {
+//    }
+//    if(false) {
+//    }
+//    else 1;
+    switch (2) {
+        case 1: {
+        "hi";
+        }
+        case 2: 2;
+        case 3: {
+        2 + 2;
+        }
+        default: 1;
+    }
+}

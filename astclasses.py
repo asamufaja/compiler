@@ -102,7 +102,7 @@ class Statement(Node):
         self.statement_type: StatementTypes = statement_type
         self.expr: Expression = None
         self.substatement: list[Statement] = []
-        self.else_statement: list[Statement] = []
+        self.else_statement: Statement = None
         self.case_list: list[Case] = []
         self.default_stmnts: list[Statement] = []
 

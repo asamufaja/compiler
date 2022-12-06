@@ -32,37 +32,26 @@ class RegManager:
             print("tried to free an already free reg")
 
 
-class StartDesugar(sv.Visitor):
-    def __init__(self, sym_table):
-        self.sym_table = sym_table
-        self.new_tree = None
-        self.prev_node = None
-        self.cur_class = None
-        self.cur_method = None
-
-    def visitExpr(self, node: ast.Expression):
-        """nodes to desugar
-        PLUS
-        MINUS
-        TIMES
-        DIVIDE
-        # these math should be one function that takes the op type and works the same
+"""nodes to desugar
         PLUSEQUALS
         MINUSEQUALS
         TIMESEQUALS
         DIVIDEEQUALS
         # these math assign should be the equals and then the math type above
+        # MakeMathVisitor
         EQUALS
         DOUBLEEQUALS
         # these are not really changed
         NOTEQUALS
         # this will be not and then equals
+        # NotEqualsVisitor
         LESSTHAN
         GREATERTHAN
         # these are not really changed
         LESSOREQUAL
         GREATEROREQUAL
         # these are going to be their < or > and then the double equals
+        # LessOrGreater
         AND
         OR
         EXCLAMATIONMARK
@@ -87,32 +76,113 @@ class StartDesugar(sv.Visitor):
         ARGUMENTS
         # this is just a list of params to be given to the function call to call
         """
-        super().visitExpr(node)
 
-    def visitStmnt(self, node: ast.Statement):
-        """nodes to desugar
+"""nodes to desugar
         BRACES
         # this means a list of statements like a body
         EXPRESSION
-        this is a parent to most expressions (not initializers in var decls though)
+        # this is a parent to most expressions (not initializers in var decls though) I'll keep it
         IF
+        # "everything is an if" has expr, true statements, false statements (or just end)
         WHILE
+        # turn into if
+        # WhileToIf
         RETURN
+        # opposite of the dot op, maybe can make them do something similar
         COUT
         CIN
+        # these are TRP 1-4 and use R3 for the data to go to/from
         SWITCH
+        # make it an if
+        # SwitchToIf
         BREAK
+        # like a jump used in what are now ifs
         VAR_DECL
+        # if these are in main, they should be put on the directives, maybe just put em all there though
+        # could prefix ones in methods with the method name
         """
+
+"""a case has it's ident which is the thing to match, and a true body to execute
+        with switch these become if"""
+
+
+class MathAssignDesugar(sv.Visitor):
+    def visitExpr(self, node: ast.Expression):
+        if node.op_type == ast.OpTypes.PLUSEQUALS:
+            self.makeMath(ast.OpTypes.PLUS, node)
+        if node.op_type == ast.OpTypes.MINUSEQUALS:
+            self.makeMath(ast.OpTypes.MINUS, node)
+        if node.op_type == ast.OpTypes.TIMESEQUALS:
+            self.makeMath(ast.OpTypes.TIMES, node)
+        if node.op_type == ast.OpTypes.DIVIDEEQUALS:
+            self.makeMath(ast.OpTypes.DIVIDE, node)
+        super().visitExpr(node)
+
+    def makeMath(self, op, node):
+        # node.left  # should be unchanged
+        oldright = node.right
+        if oldright is not None:
+            node.right = ast.Expression(op)
+            node.right.left = node.left
+            node.right.right = oldright
+            node.right.type = oldright.type
+        node.op_type = ast.OpTypes.EQUALS
+
+
+class NotEqualsVisitor(sv.Visitor):
+    def visitExpr(self, node: ast.Expression):
+        if node.op_type == ast.OpTypes.NOTEQUALS:
+            self.makeNotEquals(node)
+        super().visitExpr(node)
+
+    def makeNotEquals(self, node):
+        # node.left  # should be unchanged
+        oldright = node.right
+        if oldright is not None:
+            node.right = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
+            node.right.left = node.left
+            node.right.right = oldright
+            node.right.type = oldright.type
+        node.op_type = ast.OpTypes.EXCLAMATIONMARK
+        node.left = None
+
+
+class LessOrGreater(sv.Visitor):  # shockingly similar to the others, but small differences, figured it's fine
+    def visitExpr(self, node: ast.Expression):
+        if node.op_type == ast.OpTypes.LESSOREQUAL:
+            self.makeLessGreater(ast.OpTypes.LESSTHAN, node)
+        if node.op_type == ast.OpTypes.GREATEROREQUAL:
+            self.makeLessGreater(ast.OpTypes.GREATERTHAN, node)
+        super().visitExpr(node)
+
+    def makeLessGreater(self, op, node):
+        # node.left  # should be unchanged
+        oldright = node.right
+        if oldright is not None:
+            node.right = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
+            node.right.left = node.left
+            node.right.right = oldright
+            node.right.type = oldright.type
+        node.op_type = op
+
+
+class WhileToIf(sv.Visitor):
+    def visitStmnt(self, node: ast.Statement):
+        if node.statement_type == ast.StatementTypes.WHILE:
+            node.statement_type = ast.StatementTypes.IF  # did I make a whole class just to do this?
         super().visitStmnt(node)
 
-    def visitVarDecl(self, node: ast.VariableDeclaration):
-        super().visitVarDecl(node)
 
-    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
-        super().visitMemberDecl(node)
+class SwitchToIf(sv.Visitor):
+    def visitStmnt(self, node: ast.Statement):
+        if node.statement_type == ast.StatementTypes.SWITCH:
+            node.statement_type = ast.StatementTypes.IF
+            # maybe not do that, and instead
+            # probably have to go and make an if statement for each case, to check each one.
+        super().visitStmnt(node)
 
     def visitCase(self, node: ast.Case):
+
         super().visitCase(node)
 
 
@@ -135,6 +205,7 @@ class SetupDirectives(sv.Visitor):
             else:
                 line = f"{node.ident} .INT 0\n"
                 if node.init:  # should be a new
+                    print(node, node.init)
                     numlines = node.init.index.value - 1  # - 1 for the first line already made
                     for x in range(numlines):
                         line += f" .INT 0\n"
@@ -200,39 +271,22 @@ class ExpressionGen(sv.Visitor):
     def __init__(self, asmfile):
         self.asmfile = asmfile
         self.regs = RegManager()
+        self.expr_reg_result = None
 
     def visitExpr(self, node: ast.Expression):
+        """PLUS
+        MINUS
+        TIMES
+        DIVIDE
+        # these math should be one function that takes the op type and they basically work the same"""
         if node.op_type == ast.OpTypes.PLUS:
-            # TODO PUT ALL THIS CODE IN A FUNCTION pass in the op type
-            line = ""
-            reg1 = self.regs.getReg()
-            reg2 = self.regs.getReg()
-            if node.left.op_type == ast.OpTypes.IDENTIFIER:
-                line += f"LDR {reg1}, {node.left.value}\n"
-            elif node.left.op_type == ast.OpTypes.NUM_LITERAL:
-                line += f"MOVI {reg1}, {node.left.value}"
-            if node.right.op_type == ast.OpTypes.IDENTIFIER:
-                line += f"LDR {reg2}, {node.right.value}\n"
-            elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
-                line += f"MOVI {reg2}, {node.right.value}\n"
-            line += f"ADD {reg1}, {reg2}\n"
-            # keep reg 1 for giving to the assign or whatever?
-            self.regs.freeReg(reg2)
-            self.asmfile.write(line)
+            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.PLUS)
         if node.op_type == ast.OpTypes.MINUS:
-            pass
+            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.MINUS)
         if node.op_type == ast.OpTypes.TIMES:
-            pass
+            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.TIMES)
         if node.op_type == ast.OpTypes.DIVIDE:
-            pass
-        if node.op_type == ast.OpTypes.PLUSEQUALS:
-            pass
-        if node.op_type == ast.OpTypes.MINUSEQUALS:
-            pass
-        if node.op_type == ast.OpTypes.TIMESEQUALS:
-            pass
-        if node.op_type == ast.OpTypes.DIVIDEEQUALS:
-            pass
+            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.DIVIDE)
         if node.op_type == ast.OpTypes.EQUALS:
             pass
         if node.op_type == ast.OpTypes.DOUBLEEQUALS:
@@ -270,6 +324,24 @@ class ExpressionGen(sv.Visitor):
         if node.op_type == ast.OpTypes.ARGUMENTS:
             pass
         super().visitExpr(node)
+
+    def mathExpr(self, node, op):
+        line = ""
+        reg1 = self.regs.getReg()
+        reg2 = self.regs.getReg()
+        if node.left.op_type == ast.OpTypes.IDENTIFIER:
+            line += f"LDR {reg1}, {node.left.value}\n"
+        elif node.left.op_type == ast.OpTypes.NUM_LITERAL:
+            line += f"MOVI {reg1}, {node.left.value}\n"
+        if node.right.op_type == ast.OpTypes.IDENTIFIER:
+            line += f"LDR {reg2}, {node.right.value}\n"
+        elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
+            line += f"MOVI {reg2}, {node.right.value}\n"
+        line += f"{op} {reg1}, {reg2}\n"
+        # keep reg 1 for giving to the assign or whatever?
+        self.regs.freeReg(reg2)
+        self.asmfile.write(line)
+        return reg1
 
 
 class StatementGen(sv.Visitor):

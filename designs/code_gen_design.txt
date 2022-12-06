@@ -18,6 +18,75 @@ if01false ;next statement in program
 I'd actually want to put the string in the directives and then generate a loop to print the whole string
 that would be for any situation there's a string literal, to be printed or stored in a variable or something
 
+"""expr nodes to desugar
+    PLUS
+    MINUS
+    TIMES
+    DIVIDE
+    # these math should be one function that takes the op type and works the same
+    PLUSEQUALS
+    MINUSEQUALS
+    TIMESEQUALS
+    DIVIDEEQUALS
+    # these math assign should be the equals and then the math type above
+    EQUALS
+    DOUBLEEQUALS
+    # these are not really changed
+    NOTEQUALS
+    # this will be not and then equals
+    LESSTHAN
+    GREATERTHAN
+    # these are not really changed
+    LESSOREQUAL
+    GREATEROREQUAL
+    # these are going to be their < or > and then the double equals
+    AND
+    OR
+    EXCLAMATIONMARK
+    # these are not really changed
+    NUM_LITERAL
+    CHAR_LITERAL
+    STRING_LITERAL
+    TRUE
+    FALSE
+    NULL
+    IDENTIFIER
+    # these are pretty much without sugar already
+    NEW
+    # this is just gonna be itself, have to make a thing like a literal but
+    # much more complicated to make and gotta slap on heap
+    THIS
+    # has to be on members to know if it's a member or not
+    PERIOD
+    # if it's an attribute gotta just load it I guess, if it's a method gotta call it
+    INDEX
+    # need to offset the variable to get to different things
+    ARGUMENTS
+    # this is just a list of params to be given to the function call to call
+    """
+
+"""stmnt nodes to desugar
+    BRACES
+    # this means a list of statements like a body
+    EXPRESSION
+    # this is a parent to most expressions (not initializers in var decls though) I'll keep it
+    IF
+    # "everything is an if" has expr, true statements, false statements (or just end)
+    WHILE
+    # turn into if
+    RETURN
+    # opposite of the dot op, maybe can make them do something similar
+    COUT
+    CIN
+    # these are TRP 1-4 and use R3 for the data to go to/from
+    SWITCH
+    # make it an if
+    BREAK
+    # like a jump used in what are now ifs
+    VAR_DECL
+    # if these are in main, they should be put on the directives, maybe just put em all there though
+    # could prefix ones in methods with the method name
+    """
 
 if the node I'm about to accept is an assignment type with the math (+*-/ and an =)
 how about the concern of handling something like

@@ -25,9 +25,12 @@ class Visitor:
             node.expr.accept(self)
             for stmnt in node.substatement:
                 stmnt.accept(self)
-            if node.else_statement is not None:
-                for stmnt in node.else_statement:
+            if node.else_statement is not None \
+                    and node.else_statement.statement_type == ast.StatementTypes.BRACES:
+                for stmnt in node.else_statement.substatement:
                     stmnt.accept(self)
+            elif node.else_statement is not None:
+                node.else_statement.accept(self)
         if node.statement_type == ast.StatementTypes.WHILE:
             node.expr.accept(self)
             for stmnt in node.substatement:
@@ -115,9 +118,15 @@ class PrintAST(Visitor):
             self.graph.add_edge(pydot.Edge(f"{node}", f"{node.expr}"))
         for n in node.substatement:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
-        if node.else_statement is not None:
-            for n in node.else_statement:
-                self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
+
+        if node.else_statement is not None \
+                and node.else_statement.statement_type == ast.StatementTypes.BRACES:
+            self.graph.add_edge(pydot.Edge(f"{node}", f"{node.else_statement}"))
+            for stmnt in node.else_statement.substatement:
+                self.graph.add_edge(pydot.Edge(f"{node.else_statement}", f"{stmnt}"))
+        elif node.else_statement is not None:
+            self.graph.add_edge(pydot.Edge(f"{node}", f"{node.else_statement}"))
+
         for n in node.case_list:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
         for n in node.default_stmnts:
@@ -755,6 +764,10 @@ class TypesVisitor(Visitor):
         if node.statement_type == ast.StatementTypes.IF:
             if node.expr.type != ast.TypeTypes.BOOL:
                 self.error_messages.append(f"if statement requires bool, got {node.expr.type}")
+                self.isErrorState = True
+        if node.statement_type == ast.StatementTypes.WHILE:
+            if node.expr.type != ast.TypeTypes.BOOL:
+                self.error_messages.append(f"while statement requires bool, got {node.expr.type}")
                 self.isErrorState = True
         super().visitStmnt(node)
 
