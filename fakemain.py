@@ -45,6 +45,8 @@ def main(args):
     compunit.accept(lessorgreater)
     whiletoif = cv.WhileToIf()
     compunit.accept(whiletoif)
+    switchtoif = cv.SwitchToIf()
+    compunit.accept(switchtoif)
 
     compunit.accept(printvisitor)
     printvisitor.makeTree()

@@ -23,7 +23,12 @@ void kxi2022 main() {
         case 2: 2;
         case 3: {
         2 + 2;
+        break;
         }
-        default: 1;
+        default: {
+            1;
+            2;
+            3;
+        }
     }
 }

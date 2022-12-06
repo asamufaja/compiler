@@ -174,9 +174,12 @@ class WhileToIf(sv.Visitor):
 
 
 class SwitchToIf(sv.Visitor):
+    """I realized that switch's default should be just like the if's optional else but not optional
+    but it is a little different, oops"""
     def visitStmnt(self, node: ast.Statement):
         if node.statement_type == ast.StatementTypes.SWITCH:
-            node.statement_type = ast.StatementTypes.IF
+            # node.statement_type = ast.StatementTypes.IF
+            print(node.default_stmnts)
             # maybe not do that, and instead
             # probably have to go and make an if statement for each case, to check each one.
         super().visitStmnt(node)
@@ -205,7 +208,7 @@ class SetupDirectives(sv.Visitor):
             else:
                 line = f"{node.ident} .INT 0\n"
                 if node.init:  # should be a new
-                    print(node, node.init)
+                    # print(node, node.init)
                     numlines = node.init.index.value - 1  # - 1 for the first line already made
                     for x in range(numlines):
                         line += f" .INT 0\n"
