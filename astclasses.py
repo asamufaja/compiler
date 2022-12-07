@@ -124,6 +124,7 @@ class ClassAndMemberDeclaration(Node):
         self.class_members: list[ClassAndMemberDeclaration] = []
         self.array: bool = None
         self.init: Expression = None
+        self.classtype = None
         self.child: ClassAndMemberDeclaration = None
 
     def accept(self, v):

@@ -66,6 +66,8 @@ class Visitor:
         if node.class_members is not None:
             for decl in node.class_members:
                 decl.accept(self)
+        if node.init is not None:
+            node.init.accept(self)
         if node.child is not None:  # the only place I use child for this node type is comp unit
             node.child.accept(self)
 
@@ -152,6 +154,8 @@ class PrintAST(Visitor):
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
         for n in node.class_members:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{n}"))
+        if node.init is not None:
+            self.graph.add_edge(pydot.Edge(f"{node}", f"{node.init}"))
         if node.child is not None:
             self.graph.add_edge(pydot.Edge(f"{node}", f"{node.child}"))
 
@@ -407,6 +411,7 @@ class SymbolTableVisitor(Visitor):
         if node.member_type == ast.MemberTypes.DATAMEMBER:
             # self.sym_table[self.cur_class.ident][node.ident] \
             #     = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
+            node.classtype = self.cur_class.ident
             self.cur_method = None
         if node.ident == 'main':
             self.cur_class = node
@@ -660,7 +665,51 @@ class ExpressionTypeVisitor(Visitor):
             # else:
             node.type = ast.TypeTypes.INT
         if node.op_type in self.returns_bool:
-            if node.left.type != node.right.type:
+            dotindexargs = [ast.OpTypes.PERIOD, ast.OpTypes.INDEX, ast.OpTypes.ARGUMENTS]
+            if node.left.op_type == ast.OpTypes.INDEX and node.right not in dotindexargs:
+                if node.left.left.type != node.right.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.left.value} {node.right.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.right.op_type == ast.OpTypes.INDEX and node.left not in dotindexargs:
+                if node.left.type != node.right.left.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.value} {node.right.left.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.left.op_type == ast.OpTypes.PERIOD and node.right not in dotindexargs:
+                if node.left.right.type != node.right.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.value} {node.right.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.right.op_type == ast.OpTypes.PERIOD and node.left not in dotindexargs:
+                if node.left.type != node.right.right.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.value} {node.right.right.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.left.op_type == ast.OpTypes.ARGUMENTS and node.right not in dotindexargs:
+                # this is getting silly, I should rethink. lol
+                if node.left.left.right.type != node.right.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.value} {node.right.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.right.op_type == ast.OpTypes.ARGUMENTS and node.left not in dotindexargs:
+                if node.left.type != node.right.left.right.type:
+                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                                               f"{node.left.value} {node.right.value}, ")
+                    self.isErrorState = True
+                else:
+                    node.type = ast.TypeTypes.BOOL
+            elif node.left.type != node.right.type:
                 self.error_messages.append(f"wrong operands for {node.op_type.value}, "
                                            f"{node.left.value} {node.right.value}, "
                                            f"they must be the same type")
@@ -750,13 +799,17 @@ class TypesVisitor(Visitor):
             if node.index is not None and node.index.type != ast.TypeTypes.INT:
                 self.error_messages.append(f"can only index into array {node.left.value} with int")
                 self.isErrorState = True
-        if node.op_type == ast.OpTypes.EQUALS:
-            if node.left.type is not None and node.right.type is not None:  # probably an ident
+        if node.op_type in self.assn_ops:
+            if node.left.type is not None and node.right.type is not None:
                 if node.left.type != node.right.type:  # probably wrong?
                     self.error_messages.append(f"invalid types in assignment {node.left.value} = {node.right.value}")
                     self.isErrorState = True
             if node.left.array and node.right.op_type != ast.OpTypes.NEW:
-                self.error_messages.append(f"can only assign array {node.left} with a new array")
+                self.error_messages.append(f"can only assign array '{node.left.value}' with a new array")
+                self.isErrorState = True
+            if node.left.op_type == ast.OpTypes.PERIOD and node.right.op_type != ast.OpTypes.NEW \
+                    and node.left.right.array:
+                self.error_messages.append(f"can only assign array '{node.left.value}' with a new array")
                 self.isErrorState = True
             if node.left.op_type == ast.OpTypes.INDEX and node.left.index is not None:
                 ind = node.left
@@ -790,6 +843,12 @@ class TypesVisitor(Visitor):
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+
+        if node.init is not None and node.init.type is not None:
+            if node.ret_type != node.init.type and node.init.value != "null":
+                self.error_messages.append(f"did invalid assignment in initializer for {node}")
+                self.isErrorState = True
+
         super().visitMemberDecl(node)
 
     def visitCase(self, node: ast.Case):

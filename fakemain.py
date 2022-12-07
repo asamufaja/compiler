@@ -58,6 +58,8 @@ def main(args):
     compunit.accept(directivesgen)
     exprgen = cv.ExpressionGen(directivesgen.asmfile)
     compunit.accept(exprgen)
+    stmntgen = cv.StatementGen(exprgen.asmfile)
+    compunit.accept(stmntgen)
 
     # print(tablevisitor.sym_table)
     # for key, val in tablevisitor.sym_table.items():

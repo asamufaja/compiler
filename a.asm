@@ -1,8 +1,6 @@
 bus_sus .INT
-cool_bus .INT new
-MOVI R15, 4
-STR R15, cool
-MOVI R15, 9
-STR R15, cool
-MOVI R14, 20
-ADD R15, R14
+coo_bus .INT 1
+x .INT 5
+y .INT 0
+LDR R3, x
+TRP #1
