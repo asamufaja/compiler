@@ -337,7 +337,7 @@ class SymbolTableVisitor(Visitor):
         if node.op_type == ast.OpTypes.PERIOD:
             # check if node.left is valid, and then go see if the node.right is real
             # gotta be mindful of args, and indexes?
-            if node.left.op_type == ast.OpTypes.ARGUMENTS:  # TODO this is weird situation
+            if node.left.op_type == ast.OpTypes.ARGUMENTS:
                 # this probably only works for the situation q.Get_ul().x
                 # where Get_ul() returns an object with an x
                 is_in_sym, node_value = self.isInSym(node.left.left.right.value)
@@ -380,6 +380,10 @@ class SymbolTableVisitor(Visitor):
                 # vars not in main
                 self.sym_table[self.cur_class.ident][self.cur_method.ident][node.ident] \
                     = [node.type, 0, 0, node.is_param, node.array]
+                normaltypes = [x for x in ast.TypeTypes]
+                if node.type not in normaltypes:
+                    # probably an object var
+                    node.is_obj = True
             else:
                 # vars in main
                 self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, node.array]
@@ -493,10 +497,14 @@ class AssignmentVisitor(Visitor):
             # check for accessing private function
             if self.isInSym(node.left.right.value):
                 funcnode = node.left.right
-                _, nodeinfo = self.isInSym(funcnode.value)
-                if nodeinfo["self"][4] == ast.ModifierTypes.PRIVATE:
-                    self.error_messages.append(f"tried to call private function {funcnode.value}")
+                if funcnode.args != "method":
+                    self.error_messages.append(f"{funcnode} is not a method")
                     self.isErrorState = True
+                else:
+                    _, nodeinfo = self.isInSym(funcnode.value)
+                    if nodeinfo["self"][4] == ast.ModifierTypes.PRIVATE:
+                        self.error_messages.append(f"tried to call private function {funcnode.value}")
+                        self.isErrorState = True
             if node.left.args != "method" and node.left.right.args != "method":
                 # arguments nodes have a left, which is an expr
                 # exprs have .args, but usually only the arguments expression types use it.
@@ -661,7 +669,7 @@ class ExpressionTypeVisitor(Visitor):
                 node.type = ast.TypeTypes.BOOL
         # if node.op_type == ast.OpTypes.ARGUMENTS:
         #     if node.left.right.args == "method":
-        #         print("swaws")
+        #         print("sus")
 
     def visitStmnt(self, node: ast.Statement):
         if self.cur_method is not None and node.statement_type == ast.StatementTypes.RETURN:
@@ -714,9 +722,6 @@ class TypesVisitor(Visitor):
         ]
 
     def visitExpr(self, node: ast.Expression):
-        # if node.op_type in self.assn_ops:
-        #     if node.left.type != node.right.type:
-        #         self.error_messages.append("sussy")
         if node.op_type in self.math_ops:
             if node.right.op_type == ast.OpTypes.NEW:
                 pass  # TODO might want to figure out something like x = 3 + (new Test()).one()
@@ -758,6 +763,9 @@ class TypesVisitor(Visitor):
                 if ind.left.array and ind.left.type != node.right.type:
                     self.error_messages.append(f"invalid assignment {ind.left.value}[{ind.index.value}] = {node.right.type}")
                     self.isErrorState = True
+            if node.left.op_type in self.math_ops:
+                self.error_messages.append(f"invalid assignment to {node.left.op_type},  {node.right.value}")
+                self.isErrorState = True
         super().visitExpr(node)
 
     def visitStmnt(self, node: ast.Statement):

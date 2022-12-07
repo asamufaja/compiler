@@ -124,6 +124,7 @@ class BigParser(Parser):
 
     precedence = (
         ("right", EQUALS, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS),
+        ("left", PERIOD),
         ("left", OR),
         ("left", AND),
         ("left", DOUBLEEQUALS, NOTEQUALS),
@@ -256,6 +257,8 @@ class BigParser(Parser):
         memberdef.modifier = p.Modifier
         memberdef.member_type = ast.MemberTypes.DATAMEMBER
         memberdef.ident = p.VariableDeclaration.ident
+        memberdef.init = p.VariableDeclaration.init
+        memberdef.array = p.VariableDeclaration.array
         return memberdef
 
     @_('Modifier Type OptionalBrackets IDENTIFIER MethodSuffix')

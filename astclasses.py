@@ -88,7 +88,7 @@ class Expression(Node):
         self.index: Expression = None
         self.classtype: ClassAndMemberDeclaration = None  # for method expr identifiers
         self.array: bool = None
-        # self.parent = None
+        self.reg = None
 
     def accept(self, v):
         v.visitExpr(self)
@@ -123,6 +123,7 @@ class ClassAndMemberDeclaration(Node):
         self.body: list[Statement] = []
         self.class_members: list[ClassAndMemberDeclaration] = []
         self.array: bool = None
+        self.init: Expression = None
         self.child: ClassAndMemberDeclaration = None
 
     def accept(self, v):

@@ -33,6 +33,11 @@ class RegManager:
 
 
 """nodes to desugar
+        PLUS
+        MINUS
+        TIMES
+        DIVIDE
+        # these math should be one function that takes the op type and they basically work the same
         PLUSEQUALS
         MINUSEQUALS
         TIMESEQUALS
@@ -93,7 +98,7 @@ class RegManager:
         CIN
         # these are TRP 1-4 and use R3 for the data to go to/from
         SWITCH
-        # make it an if
+        # make it an if?
         # SwitchToIf
         BREAK
         # like a jump used in what are now ifs
@@ -158,12 +163,19 @@ class LessOrGreater(sv.Visitor):  # shockingly similar to the others, but small 
     def makeLessGreater(self, op, node):
         # node.left  # should be unchanged
         oldright = node.right
+        oldleft = node.left
         if oldright is not None:
             node.right = ast.Expression(ast.OpTypes.DOUBLEEQUALS)
-            node.right.left = node.left
+            node.right.left = oldleft
             node.right.right = oldright
-            node.right.type = oldright.type
-        node.op_type = op
+            node.right.type = node.type
+        if oldleft is not None:
+            node.left = ast.Expression(op)
+            node.left.left = oldleft
+            node.left.right = oldright
+            node.left.type = node.type
+        node.op_type = ast.OpTypes.OR
+
 
 
 class WhileToIf(sv.Visitor):
@@ -173,26 +185,58 @@ class WhileToIf(sv.Visitor):
         super().visitStmnt(node)
 
 
-class SwitchToIf(sv.Visitor):
-    """I realized that switch's default should be just like the if's optional else but not optional
-    but it is a little different, oops"""
-    def visitStmnt(self, node: ast.Statement):
-        if node.statement_type == ast.StatementTypes.SWITCH:
-            # node.statement_type = ast.StatementTypes.IF
-            print(node.default_stmnts)
-            # maybe not do that, and instead
-            # probably have to go and make an if statement for each case, to check each one.
-        super().visitStmnt(node)
+# class SwitchToIf(sv.Visitor):
+#     """I realized that switch's default should be just like the if's optional else but not optional
+#     but it is a little different, oops"""
+#     def __init__(self):
+#         self.cur_method: ast.ClassAndMemberDeclaration = None
+#         self.switch_ind = 0
+#         self.cur_switch = None
+#
+#     def visitStmnt(self, node: ast.Statement):
+#         if node.statement_type == ast.StatementTypes.SWITCH:
+#             self.switch_ind = self.cur_method.body.index(node)
+#             self.cur_switch = node
+#         super().visitStmnt(node)
+#
+#     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+#         if node.ident == "main" or node.member_type == ast.MemberTypes.METHOD \
+#                 or node.member_type == ast.MemberTypes.CONSTRUCTOR:
+#             self.cur_method = node
+#         super().visitMemberDecl(node)
+#
+#     def visitCase(self, node: ast.Case):
+#         # make a new if node
+#         # get the current switches expression
+#         # get the current case node's ident
+#         # make an expression that is a bool type for the new if node
+#         # set the new if node's substatement to the case node's substatement
+#         # any breaks inside will need to go to the end of the default
+#         # now I'm thinking maybe not desugar this more, just writing the code sounds easier
+#
+#         super().visitCase(node)
 
-    def visitCase(self, node: ast.Case):
 
-        super().visitCase(node)
+class AddThisVisitor(sv.Visitor):
+    def __init__(self):
+        pass
+
+    def visitExpr(self, node: ast.Expression):
+        # I gotta make it so that there can be local variable with same name as attribute in method
+        # and if that is case then without the "this" it should default to the local one
+        super().visitExpr(node)
+
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+
+        super().visitMemberDecl(node)
 
 
 class SetupDirectives(sv.Visitor):
-    def __init__(self, filename="a.asm"):
+    def __init__(self, sym_table, filename="a.asm"):
         self.asmfile = open(filename, "w+")
         self.in_main = False
+        self.sym_table = sym_table
+        self.memberlines = {}
 
     def visitVarDecl(self, node: ast.VariableDeclaration):
         # if node.type == ast.TypeTypes.VOID:  # I don't think there should be void var decls
@@ -218,7 +262,7 @@ class SetupDirectives(sv.Visitor):
             if not node.array:
                 line = f"{node.ident} .BYT "
                 if node.init:
-                    line += f"'{node.init.value}'\n"
+                    line += f"{node.init.value}\n"
                 self.asmfile.write(line)
             else:
                 line = f"{node.ident} .BYT\n"
@@ -250,23 +294,86 @@ class SetupDirectives(sv.Visitor):
 
         if node.is_obj:  # because I have node.type as the class ident if it's an object
             # give it all of it's fields
-            pass
-
-        # if node.type == ast.TypeTypes.METHOD:  # regular var decls aren't methods
-        #     pass
+            if node.init:
+                fields = [x for x in self.sym_table[node.type].items()]  # gives the names of attrs and methods
+                line = f"{node.ident}_{node.type} .INT\n"  # have its label be its ident and type
+                for f in fields:
+                    if isinstance(f[1], list):  # is attr
+                        # what if I made a "line" for every member decl and when I get an object
+                        # I just get the line for its init
+                        if f[1][0] == ast.TypeTypes.INT:
+                            line += f"{f[0]}_{node.ident} .INT {node.init.value}\n"  # TODO this is wrong node.init
+                    elif isinstance(f[1], dict):  # is method
+                        pass
+                self.asmfile.write(line)
         super().visitVarDecl(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
         if node.ident == "main":
             self.in_main = True
+
         if node.member_type == ast.MemberTypes.CLASS:
             pass
+
         if node.member_type == ast.MemberTypes.DATAMEMBER:
-            pass
+            if node.ret_type == ast.TypeTypes.INT:
+                # TODO make this less like the var version, for purpose of making objects
+                if not node.array:
+                    line = f"{node.ident} .INT "
+                    if node.init:
+                        line += f"{node.init.value}\n"
+                    else:
+                        line += "\n"
+                    self.memberlines[node.ident] = line
+                else:
+                    line = f"{node.ident} .INT 0\n"
+                    if node.init:  # should be a new
+                        # print(node, node.init)
+                        numlines = node.init.index.value - 1  # - 1 for the first line already made
+                        for x in range(numlines):
+                            line += f" .INT 0\n"
+                    self.asmfile.write(line)
+
+            # if node.type == ast.TypeTypes.CHAR:
+            #     if not node.array:
+            #         line = f"{node.ident} .BYT "
+            #         if node.init:
+            #             line += f"{node.init.value}\n"
+            #         self.asmfile.write(line)
+            #     else:
+            #         line = f"{node.ident} .BYT\n"
+            #         if node.init:  # should be a new
+            #             numlines = node.init.index.value - 1  # - 1 for the first line already made
+            #             for x in range(numlines):
+            #                 line += f" .BYT \n"
+            #         self.asmfile.write(line)
+            #
+            # if node.type == ast.TypeTypes.BOOL:
+            #     line = f"{node.ident} .INT "
+            #     if node.init:
+            #         if node.init.value == "true":
+            #             line += f"1\n"
+            #         elif node.init.value == "false":
+            #             line += f"0\n"
+            #     else:
+            #         line += "\n"
+            #     self.asmfile.write(line)
+            #
+            # if node.type == ast.TypeTypes.STRING:
+            #     if node.init:
+            #         line = f"{node.ident}"
+            #         for c in node.init.value[1:]:
+            #             line += f" .BYT '{c}'\n"
+            #     else:
+            #         line = ""
+            #     self.asmfile.write(line)
+
         if node.member_type == ast.MemberTypes.METHOD:
             pass
+
         if node.member_type == ast.MemberTypes.CONSTRUCTOR:
             pass
+
         super().visitMemberDecl(node)
 
 
@@ -277,32 +384,44 @@ class ExpressionGen(sv.Visitor):
         self.expr_reg_result = None
 
     def visitExpr(self, node: ast.Expression):
-        """PLUS
-        MINUS
-        TIMES
-        DIVIDE
-        # these math should be one function that takes the op type and they basically work the same"""
+        super().visitExpr(node)
         if node.op_type == ast.OpTypes.PLUS:
-            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.PLUS)
+            self.expr_reg_result = self.mathExpr(node, "ADD")
         if node.op_type == ast.OpTypes.MINUS:
-            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.MINUS)
+            self.expr_reg_result = self.mathExpr(node, "SUB")
         if node.op_type == ast.OpTypes.TIMES:
-            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.TIMES)
+            self.expr_reg_result = self.mathExpr(node, "MUL")
         if node.op_type == ast.OpTypes.DIVIDE:
-            self.expr_reg_result = self.mathExpr(node, ast.OpTypes.DIVIDE)
+            self.expr_reg_result = self.mathExpr(node, "DIV")
+
         if node.op_type == ast.OpTypes.EQUALS:
-            pass
+            line = ""
+            if node.left.type == ast.TypeTypes.INT and node.right.reg is not None:
+                line += f"STR {node.right.reg}, {node.left.value}\n"
+                self.regs.freeReg(node.right.reg)
+            elif node.left.type == ast.TypeTypes.INT and node.right.reg is None:
+                # could be an int literal, could be dot with class attr, could be args with a dot and method
+                if node.right.op_type == ast.OpTypes.NUM_LITERAL:
+                    reg1 = self.regs.getReg()
+                    line += f"MOVI {reg1}, {node.right.value}\n"
+                    line += f"STR {reg1}, {node.left.value}\n"
+                    self.regs.freeReg(reg1)
+                if node.right.op_type == ast.OpTypes.PERIOD:
+                    # value = self.sym_table[node.right.left][node.right.right]
+                    # node.right.left is an object in scope that has a data member
+                    # so I gotta go to that object and get its data member's value
+                    # TODO do that above stuff
+                    reg1 = self.regs.getReg()
+                    line += f"MOVI {reg1}, {node.right.value}\n"
+                    line += f"STR {reg1}, {node.left.value}\n"
+                    self.regs.freeReg(reg1)
+            self.asmfile.write(line)
+
         if node.op_type == ast.OpTypes.DOUBLEEQUALS:
-            pass
-        if node.op_type == ast.OpTypes.NOTEQUALS:
             pass
         if node.op_type == ast.OpTypes.LESSTHAN:
             pass
         if node.op_type == ast.OpTypes.GREATERTHAN:
-            pass
-        if node.op_type == ast.OpTypes.LESSOREQUAL:
-            pass
-        if node.op_type == ast.OpTypes.GREATEROREQUAL:
             pass
         if node.op_type == ast.OpTypes.AND:
             pass
@@ -326,7 +445,7 @@ class ExpressionGen(sv.Visitor):
             pass
         if node.op_type == ast.OpTypes.ARGUMENTS:
             pass
-        super().visitExpr(node)
+        # super().visitExpr(node)
 
     def mathExpr(self, node, op):
         line = ""
@@ -344,7 +463,7 @@ class ExpressionGen(sv.Visitor):
         # keep reg 1 for giving to the assign or whatever?
         self.regs.freeReg(reg2)
         self.asmfile.write(line)
-        return reg1
+        node.reg = reg1
 
 
 class StatementGen(sv.Visitor):
@@ -353,23 +472,6 @@ class StatementGen(sv.Visitor):
 
     def visitStmnt(self, node: ast.Statement):
 
-        super().visitStmnt(node)
-
-    def visitVarDecl(self, node: ast.VariableDeclaration):
-        super().visitVarDecl(node)
-
-    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
-        super().visitMemberDecl(node)
-
-    def visitCase(self, node: ast.Case):
-        super().visitCase(node)
-
-
-class CallFunctionsGen(sv.Visitor):
-    def visitExpr(self, node: ast.Expression):
-        super().visitExpr(node)
-
-    def visitStmnt(self, node: ast.Statement):
         super().visitStmnt(node)
 
     def visitVarDecl(self, node: ast.VariableDeclaration):

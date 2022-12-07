@@ -2,15 +2,14 @@ import starting_lexer_parser as lp
 import semanticvisitors as v
 import codegenvisitors as cv
 import sys
-import pydot
 
 
 def dashC(kxi, lexer, parser):
-    compunit = dashS(kxi, lexer, parser)
+    compunit, sym_table = dashS(kxi, lexer, parser)
     if not compunit:
         print("cannot compile due to error in semantics")
         return
-    setupdir = cv.SetupDirectives()
+    setupdir = cv.SetupDirectives(sym_table)
     compunit.accept(setupdir)
     exprgen = cv.ExpressionGen(setupdir.asmfile)
     compunit.accept(exprgen)
@@ -23,7 +22,7 @@ def dashS(kxi, lexer, parser):
     compunit.accept(pretablevisitor)
     if pretablevisitor.isErrorState:
         raise Exception()
-    tablevisitor = v.SymbolTableVisitor()
+    tablevisitor = v.SymbolTableVisitor(pretablevisitor.sym_table)
     compunit.accept(tablevisitor)
     if tablevisitor.isErrorState:
         print("error at table visitor", tablevisitor.error_messages)
@@ -53,7 +52,7 @@ def dashS(kxi, lexer, parser):
     if typesvisitor.isErrorState:
         print("types error", typesvisitor.error_messages)
         return
-    return compunit
+    return compunit, tablevisitor.sym_table
 
 
 def dashP(kxi, lexer, parser):
@@ -67,6 +66,7 @@ def dashP(kxi, lexer, parser):
 def dashL(kxi, lexer):
     tokens = lexer.tokenize(kxi.read())
     return tokens
+
 
 def main(args):
     lexer = lp.BigLexer()

@@ -2,6 +2,7 @@ import starting_lexer_parser as lp
 import semanticvisitors as v
 import sys
 import codegenvisitors as cv
+import astclasses as ast
 
 
 def main(args):
@@ -9,7 +10,7 @@ def main(args):
     parser = lp.BigParser()
 
     kxi = open(args[0], 'r')
-    compunit = parser.parse(lexer.tokenize(kxi.read()))
+    compunit: ast.ClassAndMemberDeclaration = parser.parse(lexer.tokenize(kxi.read()))
 
     printvisitor = v.PrintAST()
     # compunit.accept(printvisitor)
@@ -45,13 +46,15 @@ def main(args):
     compunit.accept(lessorgreater)
     whiletoif = cv.WhileToIf()
     compunit.accept(whiletoif)
-    switchtoif = cv.SwitchToIf()
-    compunit.accept(switchtoif)
+    # switchtoif = cv.SwitchToIf()
+    # compunit.accept(switchtoif)
+    addthis = cv.AddThisVisitor()
+    compunit.accept(addthis)
 
     compunit.accept(printvisitor)
     printvisitor.makeTree()
 
-    directivesgen = cv.SetupDirectives()
+    directivesgen = cv.SetupDirectives(tablevisitor.sym_table)
     compunit.accept(directivesgen)
     exprgen = cv.ExpressionGen(directivesgen.asmfile)
     compunit.accept(exprgen)
@@ -70,30 +73,6 @@ def main(args):
     #                 print('  ', val1)
     #     else:
     #         print('  ', val)
-'''
-{
-    <astclasses.ClassAndMemberDeclaration object at 0x0000020366FABEB0>: {
-        <astclasses.ClassAndMemberDeclaration object at 0x0000020366FABFA0>: [<TypeTypes.INT: 'int'>, 0, 0], 
-        <astclasses.ClassAndMemberDeclaration object at 0x0000020366FABF70>: [<TypeTypes.INT: 'int'>, 0, 0]
-    }, 
-    <astclasses.ClassAndMemberDeclaration object at 0x00000203670A95B0>: {
-        <astclasses.ClassAndMemberDeclaration object at 0x00000203670A9040>: [<TypeTypes.CLASS: 'class'>, 0, 0], 
-        <astclasses.ClassAndMemberDeclaration object at 0x00000203670A91C0>: [<TypeTypes.CLASS: 'class'>, 0, 0], 
-        <astclasses.ClassAndMemberDeclaration object at 0x00000203670A90A0>: [<TypeTypes.INT: 'int'>, 0, 0], 
-        <astclasses.ClassAndMemberDeclaration object at 0x00000203670A9160>: {}, 
-        <astclasses.ClassAndMemberDeclaration object at 0x00000203670A93D0>: {
-            <astclasses.VariableDeclaration object at 0x00000203670A92E0>: [<TypeTypes.INT: 'int'>, 0, 0], 
-            <astclasses.VariableDeclaration object at 0x00000203670A94C0>: [<TypeTypes.CHAR: 'char'>, 0, 0], 
-            <astclasses.VariableDeclaration object at 0x00000203670A9190>: [<TypeTypes.BOOL: 'bool'>, 0, 0], 
-            <astclasses.VariableDeclaration object at 0x00000203670A9640>: [<TypeTypes.INT: 'int'>, 0, 0]
-        }
-    }, 
-    <astclasses.ClassAndMemberDeclaration object at 0x00000203670A9AF0>: {
-        <astclasses.VariableDeclaration object at 0x00000203670A9820>: [<TypeTypes.CLASS: 'class'>, 0, 0], 
-        <astclasses.VariableDeclaration object at 0x00000203670A9C40>: [<TypeTypes.INT: 'int'>, 0, 0]
-    }
-}
-'''
 
 
 if __name__ == '__main__':

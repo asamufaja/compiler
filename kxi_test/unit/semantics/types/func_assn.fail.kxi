@@ -4,7 +4,7 @@ class Test {
 
 void kxi2022 main() {
     int hi;
-    hi = (new Test()).function;
+    hi = (new Test()).function();
     (new Test()).function = 1;
     int hi_ = (new Test()).function;
 }

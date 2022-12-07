@@ -1,6 +1,20 @@
+
+class sus {
+    public int cool;
+    public void do() {
+        cool = 4;
+        cool = 9;
+        this.cool += 20;
+    }
+}
+
 void kxi2022 main() {
+    sus bus = new sus();
 //    int x = 1;
 //    x += 2;
+//    cout << x;
+//    int a;
+//    a = bus.cool;
 //    x != 2;
 //    1 >= 2;
 //    bool x = false;
@@ -16,19 +30,19 @@ void kxi2022 main() {
 //    if(false) {
 //    }
 //    else 1;
-    switch (2) {
-        case 1: {
-        "hi";
-        }
-        case 2: 2;
-        case 3: {
-        2 + 2;
-        break;
-        }
-        default: {
-            1;
-            2;
-            3;
-        }
-    }
+//    switch (2) {
+//        case 1: {
+//        "hi";
+//        }
+//        case 2: 2;
+//        case 3: {
+//        2 + 2;
+//        break;
+//        }
+//        default: {
+//            1;
+//            2;
+//            3;
+//        }
+//    }
 }
