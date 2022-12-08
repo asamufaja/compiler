@@ -62,6 +62,8 @@ class StatementTypes(Enum):
     SWITCH = "switch"
     BREAK = "break"
     VAR_DECL = "var_decl"
+    IF_TRUE = "if_true"
+    IF_FALSE = "if_false"
 
 
 class ModifierTypes(Enum):
@@ -89,6 +91,7 @@ class Expression(Node):
         self.classtype: ClassAndMemberDeclaration = None  # for method expr identifiers
         self.array: bool = None
         self.reg = None
+        self.line = None
 
     def accept(self, v):
         v.visitExpr(self)
@@ -105,6 +108,7 @@ class Statement(Node):
         self.else_statement: Statement = None
         self.case_list: list[Case] = []
         self.default_stmnts: list[Statement] = []
+        self.is_while = False
 
     def accept(self, v):
         v.visitStmnt(self)

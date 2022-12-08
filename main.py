@@ -9,7 +9,8 @@ def dashC(kxi, lexer, parser):
     if not compunit:
         print("cannot compile due to error in semantics")
         return
-    setupdir = cv.SetupDirectives(sym_table)
+    # TODO out of date calls ehre
+    setupdir = cv.VarsAndMembers(sym_table)
     compunit.accept(setupdir)
     exprgen = cv.ExpressionGen(setupdir.asmfile)
     compunit.accept(exprgen)

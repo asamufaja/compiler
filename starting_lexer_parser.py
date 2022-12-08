@@ -602,6 +602,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.PLUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
+        expr.value = "+"
         return expr
 
     @_('Expression MINUS Expression')
@@ -611,6 +612,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.MINUS)
         expr.left = p.Expression0
         expr.right = p.Expression1
+        expr.value = "-"
         return expr
 
     @_('Expression TIMES Expression')
@@ -620,6 +622,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.TIMES)
         expr.left = p.Expression0
         expr.right = p.Expression1
+        expr.value = "*"
         return expr
 
     @_('Expression DIVIDE Expression')
@@ -629,6 +632,7 @@ class BigParser(Parser):
         expr = ast.Expression(ast.OpTypes.DIVIDE)
         expr.left = p.Expression0
         expr.right = p.Expression1
+        expr.value = "/"
         return expr
 
     @_('Expression DOUBLEEQUALS Expression')

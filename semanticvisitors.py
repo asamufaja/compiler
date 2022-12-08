@@ -791,6 +791,11 @@ class TypesVisitor(Visitor):
                 self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
                                            f"{node.left.type.value} {node.right.type.value}")
                 self.isErrorState = True
+        if node.op_type == ast.OpTypes.EXCLAMATIONMARK:
+            if node.right.type != ast.TypeTypes.BOOL:
+                self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
+                                           f"{node.right.type.value}")
+                self.isErrorState = True
         if node.op_type == ast.OpTypes.NEW:
             if node.index is not None and node.index.type != ast.TypeTypes.INT:
                 self.error_messages.append(f"can only index with int {node}")
