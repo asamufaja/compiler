@@ -333,71 +333,8 @@ class VarsAndMembers(sv.Visitor):
             # self.asmfile.write(f"main MOV R0, R0")
             self.in_main = True
 
-        if node.member_type == ast.MemberTypes.CLASS:
-            pass
-
-        if node.member_type == ast.MemberTypes.DATAMEMBER:
-            def quickfunc(node):
-                try:
-                    self.memberlines[node.classtype][node.ident] = line
-                except:
-                    self.memberlines[node.classtype] = {}
-                    self.memberlines[node.classtype][node.ident] = line
-
-            if node.ret_type == ast.TypeTypes.INT:
-                if not node.array:
-                    line = f" .INT "  # leaving out the label to be added later
-                    if node.init:
-                        line += f"{node.init.value}\n"
-                    else:
-                        line += "\n"
-                    quickfunc(node)
-                else:
-                    line = f" .INT 0\n"  # still leave out ident to assign later
-                    if node.init:  # should be a new
-                        numlines = node.init.index.value - 1  # - 1 for the first line already made
-                        for x in range(numlines):
-                            line += f" .INT 0\n"
-                    quickfunc(node)
-
-            if node.ret_type == ast.TypeTypes.CHAR:
-                if not node.array:
-                    line = f" .BYT "
-                    if node.init:
-                        line += f"{node.init.value}\n"
-                    else:
-                        line += "\n"
-                    quickfunc(node)
-                else:
-                    line = f" .BYT\n"
-                    if node.init:  # should be a new
-                        numlines = node.init.index.value - 1  # - 1 for the first line already made
-                        for x in range(numlines):
-                            line += f" .BYT \n"
-                    quickfunc(node)
-
-            if node.ret_type == ast.TypeTypes.BOOL:
-                line = f" .INT "
-                if node.init:
-                    self.boolInit(node)
-                else:
-                    line += "\n"
-                quickfunc(node)
-
-            if node.ret_type == ast.TypeTypes.STRING:
-                if node.init:
-                    line = ""
-                    for c in node.init.value[1:]:  # terminate strings with the ". I figured that would be fine
-                        line += f" .BYT '{c}'\n"
-                else:
-                    line = f" .BYT\n"
-                quickfunc(node)
-
-        if node.member_type == ast.MemberTypes.METHOD:
-            pass
-
-        if node.member_type == ast.MemberTypes.CONSTRUCTOR:
-            pass
+        # one idea I had here was to make a self.memberlines dict,
+        # it would be like the sym table but it would have init values in it (get it?)
 
         super().visitMemberDecl(node)
 
@@ -423,17 +360,17 @@ class CodeGen(sv.Visitor):
     def visitExpr(self, node: ast.Expression):
         super().visitExpr(node)
         if node.op_type == ast.OpTypes.PLUS:
-            self.expr_reg_result = self.mathExpr(node, "ADD")
+            self.mathExpr(node, "ADD")
         if node.op_type == ast.OpTypes.MINUS:
-            self.expr_reg_result = self.mathExpr(node, "SUB")
+            self.mathExpr(node, "SUB")
         if node.op_type == ast.OpTypes.TIMES:
-            self.expr_reg_result = self.mathExpr(node, "MUL")
+            self.mathExpr(node, "MUL")
         if node.op_type == ast.OpTypes.DIVIDE:
-            self.expr_reg_result = self.mathExpr(node, "DIV")
+            self.mathExpr(node, "DIV")
 
         if node.op_type == ast.OpTypes.EQUALS:
             line = ""
-            reg1 = self.regs.getReg()
+
             if node.left.type == ast.TypeTypes.INT and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is not None:
                 # this SHOULD cover like if the right is everything except just a num lit
@@ -445,8 +382,10 @@ class CodeGen(sv.Visitor):
                 # could be an int literal, could be dot with class attr, could be args with a dot and method
                 # maybe
                 if node.right.op_type == ast.OpTypes.NUM_LITERAL:
+                    reg1 = self.regs.getReg()
                     line += f"MOVI {reg1}, #{node.right.value}\n"
                     line += f"STR {reg1}, {node.left.value}\n"
+                    self.regs.freeReg(reg1)
                 if node.right.op_type == ast.OpTypes.PERIOD:
                     # value = self.sym_table[node.right.left][node.right.right]
                     # node.right.left is an object in scope that has a data member
@@ -464,46 +403,21 @@ class CodeGen(sv.Visitor):
             elif node.left.type == ast.TypeTypes.BOOL and node.right.reg is None:
                 if node.right.op_type == ast.OpTypes.TRUE:
                     line += f"MOVI "
-            self.regs.freeReg(reg1)
+
             self.asmfile.write(line)
 
         if node.op_type == ast.OpTypes.DOUBLEEQUALS:
-            # reasonably used for ifs and assignment to bools in init or the expr =
-            def chooseLeftRight(nodeLR, reg):
-                line = ""
-                if nodeLR.op_type == ast.OpTypes.IDENTIFIER and \
-                        (nodeLR.type == ast.TypeTypes.INT or nodeLR.type == ast.TypeTypes.BOOL):
-                    line += f"LDR {reg}, {nodeLR.value}\n"
-                elif nodeLR.op_type == ast.OpTypes.IDENTIFIER and nodeLR.type == ast.TypeTypes.CHAR:
-                    line += f"LDB {reg}, {nodeLR.value}\n"
-                elif nodeLR.op_type == ast.OpTypes.NUM_LITERAL and \
-                        (nodeLR.type == ast.TypeTypes.INT or nodeLR.type == ast.TypeTypes.BOOL):
-                    line += f"MOVI {reg}, #{nodeLR.value}\n"
-                elif nodeLR.op_type == ast.OpTypes.CHAR_LITERAL and nodeLR.type == ast.TypeTypes.CHAR:
-                    line += f"MOVI {reg}, #{nodeLR.value}\n"
-                # no comparing strings I don't think
-                # TODO nodes could be like any expression I think...
-                # I think if the nodes are index, args (with dot), or dot then they will get accessed in those expr
-                # instead of accessing them here and everywhere else they could be used
-                return line
-
-            reg1 = self.regs.getReg()
-            reg2 = self.regs.getReg()
-            line = chooseLeftRight(node.left, reg1)
-            line += chooseLeftRight(node.right, reg2)
-            line += f"CMP {reg1}, {reg2}\n"
-            node.reg = reg1
-            self.regs.freeReg(reg2)
-            # self.asmfile.write(line)
-            node.line = line
-            # TODO make the above a method for lessthan and greaterthan to use too
+            self.cmpExprs(node)
 
         if node.op_type == ast.OpTypes.LESSTHAN:
-            pass  # currently, should make these not write to file, but write to their node.line
+            # currently, should make these not write to file, but write to their node.line
             # also IDK but these are probably just the same as the == but maybe they only do int?
+            self.cmpExprs(node)
+
         if node.op_type == ast.OpTypes.GREATERTHAN:
-            pass  # currently, should make these not write to file, but write to their node.line
+            # currently, should make these not write to file, but write to their node.line
             # also IDK but these are probably just the same as the == but maybe they only do int?
+            self.cmpExprs(node)
 
         if node.op_type == ast.OpTypes.AND:
             # currently, should make these not write to file, but write to their node.line
@@ -564,19 +478,27 @@ class CodeGen(sv.Visitor):
 
         if node.statement_type == ast.StatementTypes.COUT:
             if node.expr.type == ast.TypeTypes.INT and node.expr.op_type != ast.OpTypes.NUM_LITERAL:
-                line = f"LDR R3, {node.expr.value}\n"
-                line += f"TRP #1\n"
+                line = f"LDR R3, {node.expr.value}\n" \
+                       f"LDR R3, R3\n" \
+                       f"TRP #1\n"
             elif node.expr.type == ast.TypeTypes.INT and node.expr.op_type == ast.OpTypes.NUM_LITERAL:
                 line = f"MOVI R3, #{node.expr.value}\n"
                 line += f"TRP #1\n"
             elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type != ast.OpTypes.CHAR_LITERAL:
-                line = f"LDB R3, {node.expr.value}\n"
-                line += f"TRP #3\n"
+                line = f"LDR R3, {node.expr.value}\n" \
+                       f"LDR R3, R3\n" \
+                       f"TRP #3\n"
             elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
                 line = f"MOVI R3, {node.expr.value}\n"
                 line += f"TRP #3\n"
-            else:
-                line = ""
+            else:  # TODO I guess node.expr is a very variety of possibilities
+                node.expr.accept(self)  # early traversal
+                line = node.expr.line
+                reg1 = node.expr.reg
+                line += f"MOV R3, {reg1}\n"
+                self.regs.freeReg(node.expr.reg)
+                node.expr.reg = None
+                line += "TRP #1\n"
             self.asmfile.write(line)
 
         if node.statement_type == ast.StatementTypes.CIN:
@@ -767,7 +689,6 @@ class CodeGen(sv.Visitor):
         # self.asmfile.write(line)
         node.line = line
         node.reg = reg1
-        # TODO maybe make this just put the line in it's node.line
 
     def ifCheckExpr(self, node, tORf):
         line = node.expr.line
@@ -779,6 +700,32 @@ class CodeGen(sv.Visitor):
             pass
         # TODO add all the things that could be an if expr
         self.asmfile.write(line)  # I forgot that doing this func won't actually modify line outside of this
+
+    def cmpExprs(self, node, ):
+        def chooseLeftRight(nodeLR, reg):
+            line = ""
+            if nodeLR.op_type == ast.OpTypes.IDENTIFIER:
+                line += f"LDR {reg}, {nodeLR.value}\n" \
+                        f"LDR {reg}, {reg}\n"
+            elif nodeLR.op_type == ast.OpTypes.NUM_LITERAL:
+                line += f"MOVI {reg}, #{nodeLR.value}\n"
+            elif nodeLR.op_type == ast.OpTypes.CHAR_LITERAL:
+                line += f"MOVI {reg}, {nodeLR.value}\n"
+            # no comparing strings I don't think
+            # TODO nodes could be like any expression I think...
+            # I think if the nodes are index, args (with dot), or dot then they will get accessed in those expr
+            # instead of accessing them here and everywhere else they could be used
+            return line
+
+        reg1 = self.regs.getReg()
+        reg2 = self.regs.getReg()
+        line = chooseLeftRight(node.left, reg1)
+        line += chooseLeftRight(node.right, reg2)
+        line += f"CMP {reg1}, {reg2}\n"
+        node.reg = reg1
+        self.regs.freeReg(reg2)
+        # self.asmfile.write(line)
+        node.line = line
 
 
 class CloseFileVisitor(sv.Visitor):
