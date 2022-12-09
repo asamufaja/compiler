@@ -224,20 +224,6 @@ class IfTrueFalse(sv.Visitor):
         pass
 
     def visitStmnt(self, node: ast.Statement):
-        # how to get if's true branch and false branch separate?
-        # currently the exprs get written when visited
-        # except for the conditional, if.expr, I think I'll set those to just use node.line and store
-        # expr nodes can write their lines to their node.line and be used later, like I'm doing here
-        # I could make a stmnt, like for if's true branch currently it's not that special
-        # make it like a stmnt make a stmnt type if_true and if_false
-        # when those get visited, could just write a IF{self.if_count}true MOV R0, R0
-        # and the false branch would have one to write the IF{self.if_count}false MOV R0, R0
-        # the false should also write the jump to the end?
-        # actually could have the true do that, or the true would check for if it's a while-if
-        # and it would write the code to loop instead
-        # if there's no else, would need to add a if-false stmnt
-        # it would just be no asm between the IF{self.if_count}false MOV R0, R0
-        # and the IF{self.if_count}end MOV R0, R0 that's written here
         if node.statement_type == ast.StatementTypes.IF:
             iftrue = ast.Statement(ast.StatementTypes.IF_TRUE)
             node.substatement.insert(0, iftrue)
@@ -247,11 +233,9 @@ class IfTrueFalse(sv.Visitor):
             iffalse.expr = node.expr
             node.substatement.append(iffalse)
 
-        # TODO don't forget to check if condition again?  for the whiles that are ifs
-        # like, the if's you shouldn't check the condition and go again... but the whiles you should?
-        # I guess I shouldn't just turn the while node into an if node,
-        # how would I know whether or not to put in a line that says to loop?
-        # maybe I'll just add an attribute to the if that was a while, and check for it here
+        if node.statement_type == ast.StatementTypes.SWITCH:
+            endcase = ast.Statement(ast.StatementTypes.END_CASE)
+            node.case_list.append(endcase)
         super().visitStmnt(node)
 
 
@@ -345,6 +329,7 @@ class CodeGen(sv.Visitor):
         self.regs = RegManager()
         self.expr_reg_result = None
         self.if_count = 0
+        self.switch_count = 0
         self.math_ops = [
             ast.OpTypes.PLUS, ast.OpTypes.MINUS, ast.OpTypes.TIMES, ast.OpTypes.DIVIDE
         ]
@@ -404,7 +389,8 @@ class CodeGen(sv.Visitor):
                 if node.right.op_type == ast.OpTypes.TRUE:
                     line += f"MOVI "
 
-            self.asmfile.write(line)
+            # self.asmfile.write(line)
+            node.line = line
 
         if node.op_type == ast.OpTypes.DOUBLEEQUALS:
             self.cmpExprs(node)
@@ -477,34 +463,36 @@ class CodeGen(sv.Visitor):
             pass
 
         if node.statement_type == ast.StatementTypes.COUT:
-            if node.expr.type == ast.TypeTypes.INT and node.expr.op_type != ast.OpTypes.NUM_LITERAL:
-                line = f"LDR R3, {node.expr.value}\n" \
-                       f"LDR R3, R3\n" \
-                       f"TRP #1\n"
-            elif node.expr.type == ast.TypeTypes.INT and node.expr.op_type == ast.OpTypes.NUM_LITERAL:
-                line = f"MOVI R3, #{node.expr.value}\n"
-                line += f"TRP #1\n"
-            elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type != ast.OpTypes.CHAR_LITERAL:
-                line = f"LDR R3, {node.expr.value}\n" \
-                       f"LDR R3, R3\n" \
-                       f"TRP #3\n"
-            elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
-                line = f"MOVI R3, {node.expr.value}\n"
-                line += f"TRP #3\n"
-            else:  # TODO I guess node.expr is a very variety of possibilities
-                node.expr.accept(self)  # early traversal
-                line = node.expr.line
-                reg1 = node.expr.reg
-                line += f"MOV R3, {reg1}\n"
-                self.regs.freeReg(node.expr.reg)
-                node.expr.reg = None
-                line += "TRP #1\n"
-            self.asmfile.write(line)
+            self.cinout(node, ("#1", "#3"))
 
         if node.statement_type == ast.StatementTypes.CIN:
-            pass
+            self.cinout(node, ("#2", "#4"))
+
         if node.statement_type == ast.StatementTypes.SWITCH:
-            pass
+            line = f"SWITCH{self.switch_count}start MOV R0, R0\n"
+
+            def hashtagOrNot(notnode, hashtag):
+                # write comparisons for each case's "ident"
+                reg1 = self.regs.getReg()
+                switchval = notnode.expr.value
+                notline = ""
+                for c in notnode.case_list:
+                    if isinstance(c, ast.Case):
+                        notline += f"MOVI {reg1}, {hashtag}{switchval}\n" \
+                           f"CMPI {reg1}, {hashtag}{c.ident}\n" \
+                           f"BRZ {reg1}, SWITCH{self.switch_count}case{c.ident}\n"
+                self.regs.freeReg(reg1)
+                notline += f"JMP DEFAULT{self.switch_count}start\n"
+                return notline
+
+            if node.expr.op_type == ast.OpTypes.NUM_LITERAL:
+                line += hashtagOrNot(node, "#")
+            elif node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
+                line += hashtagOrNot(node, "")
+            self.asmfile.write(line)
+        if node.statement_type == ast.StatementTypes.END_CASE:
+            self.asmfile.write(f"DEFAULT{self.switch_count}start MOV R0, R0\n")
+
         if node.statement_type == ast.StatementTypes.BREAK:
             pass
 
@@ -528,6 +516,7 @@ class CodeGen(sv.Visitor):
 
         if node.statement_type == ast.StatementTypes.BRACES:
             pass
+
         if node.statement_type == ast.StatementTypes.EXPRESSION:
             pass
 
@@ -541,7 +530,9 @@ class CodeGen(sv.Visitor):
             pass
 
         if node.statement_type == ast.StatementTypes.SWITCH:
-            pass
+            self.asmfile.write(f"SWITCH{self.switch_count}end MOV R0, R0\n")
+            self.switch_count += 1
+
         if node.statement_type == ast.StatementTypes.BREAK:
             pass
 
@@ -658,7 +649,9 @@ class CodeGen(sv.Visitor):
             self.asmfile.write("TRP #0\n")
 
     def visitCase(self, node: ast.Case):
+        self.asmfile.write(f"SWITCH{self.switch_count}case{node.ident} MOV R0, R0\n")
         super().visitCase(node)
+        # self.asmfile.write(f"SWITCH{self.switch_count}case{node.ident}end MOV R0, R0\n")
 
     def mathExpr(self, node, op):
         line = ""
@@ -667,7 +660,8 @@ class CodeGen(sv.Visitor):
         math_expr = [ast.OpTypes.PLUS, ast.OpTypes.MINUS, ast.OpTypes.TIMES, ast.OpTypes.DIVIDE]
         # TODO add functionality for function return values and data members
         if node.left.op_type == ast.OpTypes.IDENTIFIER:
-            line += f"LDR {reg1}, {node.left.value}\n"
+            line += f"LDR {reg1}, {node.left.value}\n" \
+                    f"LDR {reg1}, {reg1}\n"
         elif node.left.op_type == ast.OpTypes.NUM_LITERAL:
             line += f"MOVI {reg1}, #{node.left.value}\n"
         elif node.left.op_type in math_expr:
@@ -675,7 +669,8 @@ class CodeGen(sv.Visitor):
             self.regs.freeReg(node.left.reg)
             node.left.reg = None
         if node.right.op_type == ast.OpTypes.IDENTIFIER:
-            line += f"LDR {reg2}, {node.right.value}\n"
+            line += f"LDR {reg2}, {node.right.value}\n" \
+                    f"LDR {reg2}, {reg2}\n"
         elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
             line += f"MOVI {reg2}, #{node.right.value}\n"
         elif node.right.op_type in math_expr:
@@ -726,6 +721,31 @@ class CodeGen(sv.Visitor):
         self.regs.freeReg(reg2)
         # self.asmfile.write(line)
         node.line = line
+
+    def cinout(self, node, param):
+        if node.expr.type == ast.TypeTypes.INT and node.expr.op_type == ast.OpTypes.IDENTIFIER:
+            line = f"LDR R3, {node.expr.value}\n" \
+                   f"LDR R3, R3\n" \
+                   f"TRP {param[0]}\n"
+        elif node.expr.type == ast.TypeTypes.INT and node.expr.op_type == ast.OpTypes.NUM_LITERAL:
+            line = f"MOVI R3, #{node.expr.value}\n"
+            line += f"TRP {param[0]}\n"
+        elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.IDENTIFIER:
+            line = f"LDR R3, {node.expr.value}\n" \
+                   f"LDR R3, R3\n" \
+                   f"TRP {param[1]}\n"
+        elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
+            line = f"MOVI R3, {node.expr.value}\n"
+            line += f"TRP {param[1]}\n"
+        else:  # TODO I guess node.expr is a very variety of possibilities
+            node.expr.accept(self)  # early traversal
+            line = node.expr.line
+            reg1 = node.expr.reg
+            line += f"MOV R3, {reg1}\n"
+            self.regs.freeReg(node.expr.reg)
+            node.expr.reg = None
+            line += f"TRP {param[0]}\n"
+        self.asmfile.write(line)
 
 
 class CloseFileVisitor(sv.Visitor):

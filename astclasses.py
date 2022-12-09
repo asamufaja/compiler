@@ -64,6 +64,7 @@ class StatementTypes(Enum):
     VAR_DECL = "var_decl"
     IF_TRUE = "if_true"
     IF_FALSE = "if_false"
+    END_CASE = "end_case"
 
 
 class ModifierTypes(Enum):
@@ -109,6 +110,7 @@ class Statement(Node):
         self.case_list: list[Case] = []
         self.default_stmnts: list[Statement] = []
         self.is_while = False
+        self.line = None
 
     def accept(self, v):
         v.visitStmnt(self)
