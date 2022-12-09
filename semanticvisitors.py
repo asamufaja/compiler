@@ -299,10 +299,13 @@ class SymbolTableVisitor(Visitor):
         if node.op_type == ast.OpTypes.IDENTIFIER:
             is_in_sym, node_value = self.isInSym(node.value)
             # TODO gotta make this check local function scope first, for shadowing in functions
-            print(node_value)
-            print(self.sym_table)
-            if self.cur_method is not None and self.sym_table[]
-            if is_in_sym:
+            if self.cur_method is not None and \
+                    node.value in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
+                node_value = self.sym_table[self.cur_class.ident][self.cur_method.ident][node.value]
+                node.type = node_value[0]
+                node.classtype = node_value[3]  # or rather, is_param
+                node.array = node_value[4]
+            elif is_in_sym:
                 # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?, modifier]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
