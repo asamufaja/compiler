@@ -823,6 +823,12 @@ class TypesVisitor(Visitor):
                     and node.left.right.array:
                 self.error_messages.append(f"can only assign array '{node.left.value}' with a new array")
                 self.isErrorState = True
+            if node.left.op_type == ast.OpTypes.PERIOD and node.left.left.op_type == ast.OpTypes.THIS:
+                is_in_sym, node_value = self.isInSym(node.left.right.value)
+                if is_in_sym:
+                    if node_value[0] != node.right.type:
+                        self.error_messages.append(f"wrong types in assignment to this.{node.left.right.value}")
+                        self.isErrorState = True
             if node.left.op_type == ast.OpTypes.INDEX and node.left.index is not None:
                 ind = node.left
                 if ind.left.array and ind.left.type != node.right.type:

@@ -4,6 +4,7 @@ class sus {
     public void do() {
         char coo;
         coo = 'a';
+        this.coo = 42;
     }
 }
 
