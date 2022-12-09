@@ -298,8 +298,12 @@ class SymbolTableVisitor(Visitor):
     def visitExpr(self, node: ast.Expression):
         if node.op_type == ast.OpTypes.IDENTIFIER:
             is_in_sym, node_value = self.isInSym(node.value)
+            # TODO gotta make this check local function scope first, for shadowing in functions
+            print(node_value)
+            print(self.sym_table)
+            if self.cur_method is not None and self.sym_table[]
             if is_in_sym:
-                # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?]
+                # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?, modifier]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
                     node.classtype = node_value[3]
