@@ -359,9 +359,12 @@ class CodeGen(sv.Visitor):
             if node.left.type == ast.TypeTypes.INT and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is not None:
                 # this SHOULD cover like if the right is everything except just a num lit
-                line += f"STR {node.right.reg}, {node.left.value}\n"
+                reg1 = self.regs.getReg()
+                line += f"LDR {reg1}, {node.left.value}\n"  # get the address
+                line += f"STR {node.right.reg}, {reg1}\n"  # put data at address
                 self.regs.freeReg(node.right.reg)
-                node.right.reg = None
+                node.right.reg = Nonegi
+                self.regs.freeReg(reg1)
             elif node.left.type == ast.TypeTypes.INT and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is None:
                 # could be an int literal, could be dot with class attr, could be args with a dot and method
