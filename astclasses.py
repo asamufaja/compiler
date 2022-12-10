@@ -137,6 +137,11 @@ class ClassAndMemberDeclaration(Node):
     def accept(self, v):
         v.visitMemberDecl(self)
 
+    def calcSize(self):
+        # I think just give every datamember and function an int on heap,
+        # functions get one int to store addr, datas get that space for their value
+        return len(self.class_members)
+
     def __str__(self):
         return f"class/member:{self.ident} at:{self.__repr__()[-10:-1]}"
 

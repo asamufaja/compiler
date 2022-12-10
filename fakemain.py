@@ -56,25 +56,25 @@ def main(args):
     # compunit.accept(printvisitor)
     # printvisitor.makeTree()
 
-    vars = cv.VarsAndMembers(tablevisitor.sym_table)
-    compunit.accept(vars)
-    stmntgen = cv.CodeGen(vars.asmfile)
-    compunit.accept(stmntgen)
+    # vars = cv.VarsAndMembers(tablevisitor.sym_table)
+    # compunit.accept(vars)
+    # stmntgen = cv.CodeGen(vars.asmfile)
+    # compunit.accept(stmntgen)
 
     # print(tablevisitor.sym_table)
-    # for key, val in tablevisitor.sym_table.items():
-    #     print(key)
-    #     if isinstance(val, dict):
-    #         for key1, val1 in val.items():
-    #             print(key1)
-    #             if isinstance(val1, dict):
-    #                 for key2, val2 in val1.items():
-    #                     print(key2)
-    #                     print('  ', val2)
-    #             else:
-    #                 print('  ', val1)
-    #     else:
-    #         print('  ', val)
+    for key, val in tablevisitor.sym_table.items():
+        print(key)
+        if isinstance(val, dict):
+            for key1, val1 in val.items():
+                print(key1)
+                if isinstance(val1, dict):
+                    for key2, val2 in val1.items():
+                        print(key2)
+                        print('  ', val2)
+                else:
+                    print('  ', val1)
+        else:
+            print('  ', val)
 
 
 if __name__ == '__main__':

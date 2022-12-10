@@ -1,25 +1,10 @@
-x .INT 
-MOV R15, SP
-STR R15, x
-MOVI R15, #5
-STR R15, SP
-ADI SP, #-4
-IF0start MOV R0, R0
-LDR R15, x
-LDR R15, R15
+coo .INT 
+bus .INT 
+JMP main
+MOVI R15, 'a'
+LDR R14, coo
+STR R15, R14
+main MOV R0, R0
 MOVI R14, #1
-CMP R15, R14
-BNZ R15, IF0false
-IF0true MOV R0 R0
-LDR R3, x
-LDR R3, R3
-TRP #1
-MOVI R14, #1
-LDR R13, x
-STR R14, R13
-JMP IF0end
-IF0false MOV R0 R0
-MOVI R3, #2
-TRP #1
-IF0end MOV R0, R0
-TRP #0
+MOVI R15, #1
+ADD R14, R15	;doing ADD with 1, 1
