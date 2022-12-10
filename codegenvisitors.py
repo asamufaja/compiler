@@ -355,15 +355,16 @@ class CodeGen(sv.Visitor):
 
         if node.op_type == ast.OpTypes.EQUALS:
             line = ""
-
-            if node.left.type == ast.TypeTypes.INT and node.left.op_type == ast.OpTypes.IDENTIFIER \
+            if (node.left.type == ast.TypeTypes.INT or node.left.type == ast.TypeTypes.BOOL) \
+                    and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is not None:
                 # this SHOULD cover like if the right is everything except just a num lit
                 reg1 = self.regs.getReg()
+                line += node.right.line
                 line += f"LDR {reg1}, {node.left.value}\n"  # get the address
                 line += f"STR {node.right.reg}, {reg1}\n"  # put data at address
                 self.regs.freeReg(node.right.reg)
-                node.right.reg = Nonegi
+                node.right.reg = None
                 self.regs.freeReg(reg1)
             elif node.left.type == ast.TypeTypes.INT and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is None:
@@ -371,9 +372,12 @@ class CodeGen(sv.Visitor):
                 # maybe
                 if node.right.op_type == ast.OpTypes.NUM_LITERAL:
                     reg1 = self.regs.getReg()
-                    line += f"MOVI {reg1}, #{node.right.value}\n"
-                    line += f"STR {reg1}, {node.left.value}\n"
+                    reg2 = self.regs.getReg()
+                    line += f"MOVI {reg1}, #{node.right.value}\n" \
+                            f"LDR {reg2}, {node.left.value}\n" \
+                            f"STR {reg1}, {reg2}\n"
                     self.regs.freeReg(reg1)
+                    self.regs.freeReg(reg2)
                 if node.right.op_type == ast.OpTypes.PERIOD:
                     # value = self.sym_table[node.right.left][node.right.right]
                     # node.right.left is an object in scope that has a data member
@@ -382,17 +386,10 @@ class CodeGen(sv.Visitor):
                     # TODO or maybe just make it so the . will make it's own line to get the info
                     # if it's datamember, not func
                     pass
-
-            elif node.left.type == ast.TypeTypes.BOOL and node.right.reg is not None:
-                line += node.right.line
-                line += f"STR {node.right.reg}, {node.left.value}\n"
-                self.regs.freeReg(node.right.reg)
-                node.right.reg = None
             elif node.left.type == ast.TypeTypes.BOOL and node.right.reg is None:
                 if node.right.op_type == ast.OpTypes.TRUE:
-                    line += f"MOVI "
+                    line += f"MOVI \n"  # TODO something missing here obvioiusly
 
-            # self.asmfile.write(line)
             node.line = line
 
         if node.op_type == ast.OpTypes.DOUBLEEQUALS:
@@ -410,8 +407,29 @@ class CodeGen(sv.Visitor):
 
         if node.op_type == ast.OpTypes.AND:
             # currently, should make these not write to file, but write to their node.line
-            # reg1 =
-            pass
+            line = ""
+            if node.left.line:
+                line += node.left.line
+            if node.right.line:
+                line += node.right.line
+            if node.left.op_type == ast.OpTypes.IDENTIFIER:
+                line += f"LDR {reg1}, {node.left.value}\n" \
+                        f"LDR {reg1}, {reg1}\n"
+            elif node.left.op_type == ast.OpTypes.NUM_LITERAL:
+                line += f"MOVI {reg1}, #{node.left.value}\n"
+            elif node.left.reg:
+                line += f"MOV {reg1}, {node.left.reg}\n"
+                self.regs.freeReg(node.left.reg)
+                node.left.reg = None
+            if node.right.op_type == ast.OpTypes.IDENTIFIER:
+                line += f"LDR {reg2}, {node.right.value}\n" \
+                        f"LDR {reg2}, {reg2}\n"
+            elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
+                line += f"MOVI {reg2}, #{node.right.value}\n"
+            elif node.right.reg:
+                line += f"MOV {reg2}, {node.right.reg}\n"
+                self.regs.freeReg(node.right.reg)
+                node.right.reg = None
 
         if node.op_type == ast.OpTypes.OR:
             pass  # currently, should make these not write to file, but write to their node.line
@@ -451,11 +469,6 @@ class CodeGen(sv.Visitor):
         # super().visitExpr(node)
 
     def visitStmnt(self, node: ast.Statement):
-        if node.statement_type == ast.StatementTypes.BRACES:
-            pass
-        if node.statement_type == ast.StatementTypes.EXPRESSION:
-            pass
-
         if node.statement_type == ast.StatementTypes.IF:
             line = f"IF{self.if_count}start MOV R0, R0\n"
             self.asmfile.write(line)
@@ -521,7 +534,7 @@ class CodeGen(sv.Visitor):
             pass
 
         if node.statement_type == ast.StatementTypes.EXPRESSION:
-            pass
+            self.asmfile.write(node.expr.line)
 
         if node.statement_type == ast.StatementTypes.IF:
             # now we are below the super() call
@@ -662,12 +675,16 @@ class CodeGen(sv.Visitor):
         reg2 = self.regs.getReg()
         math_expr = [ast.OpTypes.PLUS, ast.OpTypes.MINUS, ast.OpTypes.TIMES, ast.OpTypes.DIVIDE]
         # TODO add functionality for function return values and data members
+        if node.left.line:
+            line += node.left.line
+        if node.right.line:
+            line += node.right.line
         if node.left.op_type == ast.OpTypes.IDENTIFIER:
             line += f"LDR {reg1}, {node.left.value}\n" \
                     f"LDR {reg1}, {reg1}\n"
         elif node.left.op_type == ast.OpTypes.NUM_LITERAL:
             line += f"MOVI {reg1}, #{node.left.value}\n"
-        elif node.left.op_type in math_expr:
+        elif node.left.reg:
             line += f"MOV {reg1}, {node.left.reg}\n"
             self.regs.freeReg(node.left.reg)
             node.left.reg = None
@@ -676,13 +693,12 @@ class CodeGen(sv.Visitor):
                     f"LDR {reg2}, {reg2}\n"
         elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
             line += f"MOVI {reg2}, #{node.right.value}\n"
-        elif node.right.op_type in math_expr:
+        elif node.right.reg:
             line += f"MOV {reg2}, {node.right.reg}\n"
             self.regs.freeReg(node.right.reg)
             node.right.reg = None
         line += f"{op} {reg1}, {reg2}\t;doing {op} with {node.left.value}, {node.right.value}\n"
         # line += f"TRP #99\n"
-        # keep reg 1 for giving to the assign or whatever?
         self.regs.freeReg(reg2)
         # self.asmfile.write(line)
         node.line = line

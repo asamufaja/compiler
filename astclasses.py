@@ -62,6 +62,7 @@ class StatementTypes(Enum):
     SWITCH = "switch"
     BREAK = "break"
     VAR_DECL = "var_decl"
+
     IF_TRUE = "if_true"
     IF_FALSE = "if_false"
     END_CASE = "end_case"
