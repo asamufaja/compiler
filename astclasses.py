@@ -112,6 +112,9 @@ class Statement(Node):
         self.default_stmnts: list[Statement] = []
         self.is_while = False
         self.line = None
+        self.reg = None
+        self.if_count = None
+        self.switch_count = None
 
     def accept(self, v):
         v.visitStmnt(self)
@@ -133,6 +136,8 @@ class ClassAndMemberDeclaration(Node):
         self.init: Expression = None
         self.classtype = None
         self.child: ClassAndMemberDeclaration = None
+        self.reg = None
+        self.reglist = []
 
     def accept(self, v):
         v.visitMemberDecl(self)
@@ -141,9 +146,22 @@ class ClassAndMemberDeclaration(Node):
         # I think just give every datamember and function an int on heap,
         # functions get one int to store addr, datas get that space for their value
         return len(self.class_members)
+    def calcFuncSize(self):
+        vars = [s for s in self.body if isinstance(s, VariableDeclaration) or isinstance(s, ClassAndMemberDeclaration)]
+        try:
+            params = [p for p in self.params]
+        except:
+            params = []
+        return 4 * (len(vars) + len(params) + 2)  # maybe not very accurate...
 
     def __str__(self):
         return f"class/member:{self.ident} at:{self.__repr__()[-10:-1]}"
+
+    def hasConstruct(self):
+        for n in self.class_members:
+            if n.ident == self.ident:
+                return True
+        return False
 
 
 class VariableDeclaration(Node):
@@ -166,6 +184,7 @@ class Case(Node):
     def __init__(self, ident):
         self.ident: str = ident
         self.statements: list[Statement] = []
+        self.switch_count = None
 
     def accept(self, v):
         v.visitCase(self)

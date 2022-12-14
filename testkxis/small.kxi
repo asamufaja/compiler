@@ -1,19 +1,66 @@
 
 class sus {
     public int coo = 1;
-    public void do() {
-        char coo;
-        coo = 'a';
-        this.coo = 42;
+    public char e;
+//    sus() {}
+
+//    public void do() {
+//        char coo;
+//        coo = 'a';
+//        this.coo = 42;
+//        cout << coo;
+//        this.do();
+////        cout << e;  //TODO
+////        coo = e;  //TODO
+//    }
+    public int fib(int x) {
+        int tmp1;
+        int tmp2;
+        if (x == 0) {
+            return 0;
+        }
+        if (x == 1) {
+            return 1;
+        }
+//        return x+1;
+//        return this.fib(x-1);
+//        return this.fib(x-1) + 2;
+
+//        tmp1 = this.fib(x-1);
+//        cout << tmp1;
+//        cout << ' ';
+//        tmp2 = this.fib(x-2);
+//        cout << ' ';
+//        cout << tmp2;
+//        cout << ' ';
+//        cout << tmp1 + tmp2;
+//        cout << ' ';
+//        return (tmp1) + (tmp2);  // TODO should make local func vars have a fp offset stored instead of addr
+//        cout << x;
+        return this.fib(x-1) + this.fib(x-2);  // TODO I think the issue is that the ADD needs to store temp vars
+        // and if it's doing that instead of pulling from the stack frame then it's got the wrong values
     }
 }
+//class uhh {
+//    uhh(int a, char b, bool c) {
+//        cout << a;
+//        cout << b;
+//        cout << c;
+//
+//    }
+//}
 
 void kxi2022 main() {
-    1+1;
     sus bus = new sus();
+    int swes = bus.fib(10);
+    cout << swes;
+//    uhh um = new uhh(2+2, 'E', true);
+//    cout << 'F';
+//    bus.do();
 //    int x = 5;
 //    x = 2+5*5-5+4+4*5+5-5*5-5+4+54-5*5-54+(45-45)*54-45+45-54*54-45+45-(54*45-45+45-45)*4-45*4-45*4-45*4-45*45+4+54-55+4+54-55+(4+54-55+4+54-55+4+54)-55+4+54-55+4+54-55+4+(54-55+4)+54-55+4+54-55+4+54-55+(4+54-55+4+54-55+4+54-55+4+54-55+4+54-55+4+54)-55+4+54-5;
 //        // the above should be -14917
+//    x = 3+4*-5;
 //    cout << x;
 //    char a = 'b';
 //    char b = 'e';
@@ -25,6 +72,9 @@ void kxi2022 main() {
 //    if (x == 1) {
 //        cout << x;
 //        x = 1;
+//        if (x == 1) {
+//            cout << x;
+//        }
 //    }
 //    else {
 //        cout << 2;
@@ -59,6 +109,15 @@ void kxi2022 main() {
 //        }
 //        case 2:
 //            cout << 2;
+//            switch (1) {
+//                case 1:
+//                    cout << 1;
+//                    break;
+//
+//                default:
+//                    cout << 2;
+//                    break;
+//            }
 //        case 3:
 //            cout << 3;
 //            break;

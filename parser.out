@@ -1,7 +1,7 @@
 Grammar:
 
 Rule 0     S' -> CompilationUnit
-Rule 1     CompilationUnit -> _1_ClassDefinition_repeat VOID KXI2022 MAIN LPAREN RPAREN MethodBody
+Rule 1     CompilationUnit -> _1_ClassDefinition_repeat VOID KXI2022 MAIN LPAREN RPAREN MethodBody  [precedence=left, level=13]
 Rule 2     _1_ClassDefinition_repeat -> _1_ClassDefinition_items
 Rule 3     _1_ClassDefinition_repeat -> <empty>
 Rule 4     _1_ClassDefinition_items -> _1_ClassDefinition_items _1_ClassDefinition_item
@@ -21,7 +21,7 @@ Rule 17    Type -> INT
 Rule 18    Type -> VOID
 Rule 19    Expression -> Expression Arguments
 Rule 20    Expression -> Expression PERIOD IDENTIFIER  [precedence=left, level=10]
-Rule 21    Expression -> THIS  [precedence=left, level=13]
+Rule 21    Expression -> THIS
 Rule 22    Expression -> NEW Type Index  [precedence=left, level=9]
 Rule 23    Expression -> NEW Type Arguments  [precedence=left, level=9]
 Rule 24    Expression -> Expression Index
@@ -32,27 +32,27 @@ Rule 28    Expression -> TRUE
 Rule 29    Expression -> STRING_LITERAL
 Rule 30    Expression -> CHAR_LITERAL
 Rule 31    Expression -> NUM_LITERAL
-Rule 32    Expression -> MINUS Expression  [precedence=left, level=7]
-Rule 33    Expression -> PLUS Expression  [precedence=left, level=7]
+Rule 32    Expression -> MINUS Expression  [precedence=right, level=8]
+Rule 33    Expression -> PLUS Expression  [precedence=right, level=8]
 Rule 34    Expression -> EXCLAMATIONMARK Expression  [precedence=left, level=9]
-Rule 35    Expression -> Expression OR Expression  [precedence=left, level=3]
-Rule 36    Expression -> Expression AND Expression  [precedence=left, level=4]
-Rule 37    Expression -> Expression GREATEROREQUAL Expression  [precedence=left, level=6]
-Rule 38    Expression -> Expression LESSOREQUAL Expression  [precedence=left, level=6]
-Rule 39    Expression -> Expression GREATERTHAN Expression  [precedence=left, level=6]
-Rule 40    Expression -> Expression LESSTHAN Expression  [precedence=left, level=6]
-Rule 41    Expression -> Expression NOTEQUALS Expression  [precedence=left, level=5]
-Rule 42    Expression -> Expression DOUBLEEQUALS Expression  [precedence=left, level=5]
-Rule 43    Expression -> Expression DIVIDE Expression  [precedence=left, level=8]
-Rule 44    Expression -> Expression TIMES Expression  [precedence=left, level=8]
-Rule 45    Expression -> Expression MINUS Expression  [precedence=left, level=7]
-Rule 46    Expression -> Expression PLUS Expression  [precedence=left, level=7]
+Rule 35    Expression -> Expression OR Expression  [precedence=left, level=2]
+Rule 36    Expression -> Expression AND Expression  [precedence=left, level=3]
+Rule 37    Expression -> Expression GREATEROREQUAL Expression  [precedence=left, level=5]
+Rule 38    Expression -> Expression LESSOREQUAL Expression  [precedence=left, level=5]
+Rule 39    Expression -> Expression GREATERTHAN Expression  [precedence=left, level=5]
+Rule 40    Expression -> Expression LESSTHAN Expression  [precedence=left, level=5]
+Rule 41    Expression -> Expression NOTEQUALS Expression  [precedence=left, level=4]
+Rule 42    Expression -> Expression DOUBLEEQUALS Expression  [precedence=left, level=4]
+Rule 43    Expression -> Expression DIVIDE Expression  [precedence=left, level=7]
+Rule 44    Expression -> Expression TIMES Expression  [precedence=left, level=7]
+Rule 45    Expression -> Expression MINUS Expression  [precedence=left, level=6]
+Rule 46    Expression -> Expression PLUS Expression  [precedence=left, level=6]
 Rule 47    Expression -> Expression DIVIDEEQUALS Expression  [precedence=right, level=1]
 Rule 48    Expression -> Expression TIMESEQUALS Expression  [precedence=right, level=1]
 Rule 49    Expression -> Expression MINUSEQUALS Expression  [precedence=right, level=1]
 Rule 50    Expression -> Expression PLUSEQUALS Expression  [precedence=right, level=1]
 Rule 51    Expression -> Expression EQUALS Expression  [precedence=right, level=1]
-Rule 52    Expression -> LPAREN Expression RPAREN
+Rule 52    Expression -> LPAREN Expression RPAREN  [precedence=left, level=13]
 Rule 53    Expression -> IDENTIFIER Index  [precedence=left, level=10]
 Rule 54    Modifier -> PRIVATE
 Rule 55    Modifier -> PUBLIC
@@ -65,7 +65,7 @@ Rule 61    OptionalBrackets -> empty
 Rule 62    OptionalBrackets -> LRBRACKET  [precedence=left, level=11]
 Rule 63    ConstructorDeclaration -> IDENTIFIER MethodSuffix  [precedence=left, level=10]
 Rule 64    Initializer -> EQUALS Expression  [precedence=right, level=1]
-Rule 65    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody
+Rule 65    MethodSuffix -> LPAREN _3_ParameterList_optional RPAREN MethodBody  [precedence=left, level=13]
 Rule 66    _3_ParameterList_optional -> ParameterList
 Rule 67    _3_ParameterList_optional -> <empty>
 Rule 68    MethodBody -> LBRACE _4_Statement_repeat RBRACE
@@ -86,12 +86,12 @@ Rule 82    _6_Initializer_optional -> Initializer
 Rule 83    _6_Initializer_optional -> <empty>
 Rule 84    Statement -> VariableDeclaration
 Rule 85    Statement -> BREAK SEMICOLON
-Rule 86    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock
+Rule 86    Statement -> SWITCH LPAREN Expression RPAREN CaseBlock  [precedence=left, level=13]
 Rule 87    Statement -> CIN RIGHTSHIFT Expression SEMICOLON
 Rule 88    Statement -> COUT LEFTSHIFT Expression SEMICOLON
 Rule 89    Statement -> RETURN OptionalExpression SEMICOLON
-Rule 90    Statement -> WHILE LPAREN Expression RPAREN Statement
-Rule 91    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement
+Rule 90    Statement -> WHILE LPAREN Expression RPAREN Statement  [precedence=left, level=13]
+Rule 91    Statement -> IF LPAREN Expression RPAREN Statement OptionalElseStatement  [precedence=left, level=13]
 Rule 92    Statement -> Expression SEMICOLON
 Rule 93    Statement -> LBRACE _7_Statement_repeat RBRACE
 Rule 94    _7_Statement_repeat -> _7_Statement_items
@@ -126,7 +126,7 @@ Rule 122   _11_Statement_repeat -> <empty>
 Rule 123   _11_Statement_items -> _11_Statement_items _11_Statement_item
 Rule 124   _11_Statement_items -> _11_Statement_item
 Rule 125   _11_Statement_item -> Statement
-Rule 126   Arguments -> LPAREN _12_ArgumentList_optional RPAREN
+Rule 126   Arguments -> LPAREN _12_ArgumentList_optional RPAREN  [precedence=left, level=13]
 Rule 127   _12_ArgumentList_optional -> ArgumentList
 Rule 128   _12_ArgumentList_optional -> <empty>
 Rule 129   ArgumentList -> Expression _13_COMMA_Expression_repeat
@@ -3769,7 +3769,6 @@ state 133
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 32 (Expression -> MINUS Expression .)
-    PERIOD          reduce using rule 32 (Expression -> MINUS Expression .)
     OR              reduce using rule 32 (Expression -> MINUS Expression .)
     AND             reduce using rule 32 (Expression -> MINUS Expression .)
     GREATEROREQUAL  reduce using rule 32 (Expression -> MINUS Expression .)
@@ -3778,6 +3777,8 @@ state 133
     LESSTHAN        reduce using rule 32 (Expression -> MINUS Expression .)
     NOTEQUALS       reduce using rule 32 (Expression -> MINUS Expression .)
     DOUBLEEQUALS    reduce using rule 32 (Expression -> MINUS Expression .)
+    DIVIDE          reduce using rule 32 (Expression -> MINUS Expression .)
+    TIMES           reduce using rule 32 (Expression -> MINUS Expression .)
     MINUS           reduce using rule 32 (Expression -> MINUS Expression .)
     PLUS            reduce using rule 32 (Expression -> MINUS Expression .)
     DIVIDEEQUALS    reduce using rule 32 (Expression -> MINUS Expression .)
@@ -3785,12 +3786,11 @@ state 133
     MINUSEQUALS     reduce using rule 32 (Expression -> MINUS Expression .)
     PLUSEQUALS      reduce using rule 32 (Expression -> MINUS Expression .)
     EQUALS          reduce using rule 32 (Expression -> MINUS Expression .)
-    LPAREN          reduce using rule 32 (Expression -> MINUS Expression .)
     RPAREN          reduce using rule 32 (Expression -> MINUS Expression .)
     COMMA           reduce using rule 32 (Expression -> MINUS Expression .)
     RBRACKET        reduce using rule 32 (Expression -> MINUS Expression .)
-    DIVIDE          shift and go to state 112
-    TIMES           shift and go to state 113
+    PERIOD          shift and go to state 102
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -3822,7 +3822,6 @@ state 134
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 33 (Expression -> PLUS Expression .)
-    PERIOD          reduce using rule 33 (Expression -> PLUS Expression .)
     OR              reduce using rule 33 (Expression -> PLUS Expression .)
     AND             reduce using rule 33 (Expression -> PLUS Expression .)
     GREATEROREQUAL  reduce using rule 33 (Expression -> PLUS Expression .)
@@ -3831,6 +3830,8 @@ state 134
     LESSTHAN        reduce using rule 33 (Expression -> PLUS Expression .)
     NOTEQUALS       reduce using rule 33 (Expression -> PLUS Expression .)
     DOUBLEEQUALS    reduce using rule 33 (Expression -> PLUS Expression .)
+    DIVIDE          reduce using rule 33 (Expression -> PLUS Expression .)
+    TIMES           reduce using rule 33 (Expression -> PLUS Expression .)
     MINUS           reduce using rule 33 (Expression -> PLUS Expression .)
     PLUS            reduce using rule 33 (Expression -> PLUS Expression .)
     DIVIDEEQUALS    reduce using rule 33 (Expression -> PLUS Expression .)
@@ -3838,12 +3839,11 @@ state 134
     MINUSEQUALS     reduce using rule 33 (Expression -> PLUS Expression .)
     PLUSEQUALS      reduce using rule 33 (Expression -> PLUS Expression .)
     EQUALS          reduce using rule 33 (Expression -> PLUS Expression .)
-    LPAREN          reduce using rule 33 (Expression -> PLUS Expression .)
     RPAREN          reduce using rule 33 (Expression -> PLUS Expression .)
     COMMA           reduce using rule 33 (Expression -> PLUS Expression .)
     RBRACKET        reduce using rule 33 (Expression -> PLUS Expression .)
-    DIVIDE          shift and go to state 112
-    TIMES           shift and go to state 113
+    PERIOD          shift and go to state 102
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -3875,7 +3875,6 @@ state 135
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
-    PERIOD          reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     OR              reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     AND             reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     GREATEROREQUAL  reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
@@ -3893,10 +3892,11 @@ state 135
     MINUSEQUALS     reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     PLUSEQUALS      reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     EQUALS          reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
-    LPAREN          reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     RPAREN          reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     COMMA           reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
     RBRACKET        reduce using rule 34 (Expression -> EXCLAMATIONMARK Expression .)
+    PERIOD          shift and go to state 102
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4190,17 +4190,16 @@ state 143
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 35 (Expression -> Expression OR Expression .)
-    PERIOD          reduce using rule 35 (Expression -> Expression OR Expression .)
     OR              reduce using rule 35 (Expression -> Expression OR Expression .)
     DIVIDEEQUALS    reduce using rule 35 (Expression -> Expression OR Expression .)
     TIMESEQUALS     reduce using rule 35 (Expression -> Expression OR Expression .)
     MINUSEQUALS     reduce using rule 35 (Expression -> Expression OR Expression .)
     PLUSEQUALS      reduce using rule 35 (Expression -> Expression OR Expression .)
     EQUALS          reduce using rule 35 (Expression -> Expression OR Expression .)
-    LPAREN          reduce using rule 35 (Expression -> Expression OR Expression .)
     RPAREN          reduce using rule 35 (Expression -> Expression OR Expression .)
     COMMA           reduce using rule 35 (Expression -> Expression OR Expression .)
     RBRACKET        reduce using rule 35 (Expression -> Expression OR Expression .)
+    PERIOD          shift and go to state 102
     AND             shift and go to state 105
     GREATEROREQUAL  shift and go to state 106
     LESSOREQUAL     shift and go to state 107
@@ -4212,6 +4211,7 @@ state 143
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4243,7 +4243,6 @@ state 144
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 36 (Expression -> Expression AND Expression .)
-    PERIOD          reduce using rule 36 (Expression -> Expression AND Expression .)
     OR              reduce using rule 36 (Expression -> Expression AND Expression .)
     AND             reduce using rule 36 (Expression -> Expression AND Expression .)
     DIVIDEEQUALS    reduce using rule 36 (Expression -> Expression AND Expression .)
@@ -4251,10 +4250,10 @@ state 144
     MINUSEQUALS     reduce using rule 36 (Expression -> Expression AND Expression .)
     PLUSEQUALS      reduce using rule 36 (Expression -> Expression AND Expression .)
     EQUALS          reduce using rule 36 (Expression -> Expression AND Expression .)
-    LPAREN          reduce using rule 36 (Expression -> Expression AND Expression .)
     RPAREN          reduce using rule 36 (Expression -> Expression AND Expression .)
     COMMA           reduce using rule 36 (Expression -> Expression AND Expression .)
     RBRACKET        reduce using rule 36 (Expression -> Expression AND Expression .)
+    PERIOD          shift and go to state 102
     GREATEROREQUAL  shift and go to state 106
     LESSOREQUAL     shift and go to state 107
     GREATERTHAN     shift and go to state 108
@@ -4265,6 +4264,7 @@ state 144
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4296,7 +4296,6 @@ state 145
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
-    PERIOD          reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     OR              reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     AND             reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     GREATEROREQUAL  reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
@@ -4310,14 +4309,15 @@ state 145
     MINUSEQUALS     reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     PLUSEQUALS      reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     EQUALS          reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
-    LPAREN          reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     RPAREN          reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     COMMA           reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
     RBRACKET        reduce using rule 37 (Expression -> Expression GREATEROREQUAL Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4349,7 +4349,6 @@ state 146
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
-    PERIOD          reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     OR              reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     AND             reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     GREATEROREQUAL  reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
@@ -4363,14 +4362,15 @@ state 146
     MINUSEQUALS     reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     PLUSEQUALS      reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     EQUALS          reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
-    LPAREN          reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     RPAREN          reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     COMMA           reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
     RBRACKET        reduce using rule 38 (Expression -> Expression LESSOREQUAL Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4402,7 +4402,6 @@ state 147
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
-    PERIOD          reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     OR              reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     AND             reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     GREATEROREQUAL  reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
@@ -4416,14 +4415,15 @@ state 147
     MINUSEQUALS     reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     PLUSEQUALS      reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     EQUALS          reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
-    LPAREN          reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     RPAREN          reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     COMMA           reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
     RBRACKET        reduce using rule 39 (Expression -> Expression GREATERTHAN Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4455,7 +4455,6 @@ state 148
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
-    PERIOD          reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     OR              reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     AND             reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     GREATEROREQUAL  reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
@@ -4469,14 +4468,15 @@ state 148
     MINUSEQUALS     reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     PLUSEQUALS      reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     EQUALS          reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
-    LPAREN          reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     RPAREN          reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     COMMA           reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
     RBRACKET        reduce using rule 40 (Expression -> Expression LESSTHAN Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4508,7 +4508,6 @@ state 149
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
-    PERIOD          reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     OR              reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     AND             reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     NOTEQUALS       reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
@@ -4518,10 +4517,10 @@ state 149
     MINUSEQUALS     reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     PLUSEQUALS      reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     EQUALS          reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
-    LPAREN          reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     RPAREN          reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     COMMA           reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
     RBRACKET        reduce using rule 41 (Expression -> Expression NOTEQUALS Expression .)
+    PERIOD          shift and go to state 102
     GREATEROREQUAL  shift and go to state 106
     LESSOREQUAL     shift and go to state 107
     GREATERTHAN     shift and go to state 108
@@ -4530,6 +4529,7 @@ state 149
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4561,7 +4561,6 @@ state 150
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
-    PERIOD          reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     OR              reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     AND             reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     NOTEQUALS       reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
@@ -4571,10 +4570,10 @@ state 150
     MINUSEQUALS     reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     PLUSEQUALS      reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     EQUALS          reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
-    LPAREN          reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     RPAREN          reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     COMMA           reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
     RBRACKET        reduce using rule 42 (Expression -> Expression DOUBLEEQUALS Expression .)
+    PERIOD          shift and go to state 102
     GREATEROREQUAL  shift and go to state 106
     LESSOREQUAL     shift and go to state 107
     GREATERTHAN     shift and go to state 108
@@ -4583,6 +4582,7 @@ state 150
     TIMES           shift and go to state 113
     MINUS           shift and go to state 114
     PLUS            shift and go to state 115
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4614,7 +4614,6 @@ state 151
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
-    PERIOD          reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     OR              reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     AND             reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     GREATEROREQUAL  reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
@@ -4632,10 +4631,11 @@ state 151
     MINUSEQUALS     reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     PLUSEQUALS      reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     EQUALS          reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
-    LPAREN          reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     RPAREN          reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     COMMA           reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
     RBRACKET        reduce using rule 43 (Expression -> Expression DIVIDE Expression .)
+    PERIOD          shift and go to state 102
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4667,7 +4667,6 @@ state 152
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 44 (Expression -> Expression TIMES Expression .)
-    PERIOD          reduce using rule 44 (Expression -> Expression TIMES Expression .)
     OR              reduce using rule 44 (Expression -> Expression TIMES Expression .)
     AND             reduce using rule 44 (Expression -> Expression TIMES Expression .)
     GREATEROREQUAL  reduce using rule 44 (Expression -> Expression TIMES Expression .)
@@ -4685,10 +4684,11 @@ state 152
     MINUSEQUALS     reduce using rule 44 (Expression -> Expression TIMES Expression .)
     PLUSEQUALS      reduce using rule 44 (Expression -> Expression TIMES Expression .)
     EQUALS          reduce using rule 44 (Expression -> Expression TIMES Expression .)
-    LPAREN          reduce using rule 44 (Expression -> Expression TIMES Expression .)
     RPAREN          reduce using rule 44 (Expression -> Expression TIMES Expression .)
     COMMA           reduce using rule 44 (Expression -> Expression TIMES Expression .)
     RBRACKET        reduce using rule 44 (Expression -> Expression TIMES Expression .)
+    PERIOD          shift and go to state 102
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4720,7 +4720,6 @@ state 153
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 45 (Expression -> Expression MINUS Expression .)
-    PERIOD          reduce using rule 45 (Expression -> Expression MINUS Expression .)
     OR              reduce using rule 45 (Expression -> Expression MINUS Expression .)
     AND             reduce using rule 45 (Expression -> Expression MINUS Expression .)
     GREATEROREQUAL  reduce using rule 45 (Expression -> Expression MINUS Expression .)
@@ -4736,12 +4735,13 @@ state 153
     MINUSEQUALS     reduce using rule 45 (Expression -> Expression MINUS Expression .)
     PLUSEQUALS      reduce using rule 45 (Expression -> Expression MINUS Expression .)
     EQUALS          reduce using rule 45 (Expression -> Expression MINUS Expression .)
-    LPAREN          reduce using rule 45 (Expression -> Expression MINUS Expression .)
     RPAREN          reduce using rule 45 (Expression -> Expression MINUS Expression .)
     COMMA           reduce using rule 45 (Expression -> Expression MINUS Expression .)
     RBRACKET        reduce using rule 45 (Expression -> Expression MINUS Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4773,7 +4773,6 @@ state 154
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 46 (Expression -> Expression PLUS Expression .)
-    PERIOD          reduce using rule 46 (Expression -> Expression PLUS Expression .)
     OR              reduce using rule 46 (Expression -> Expression PLUS Expression .)
     AND             reduce using rule 46 (Expression -> Expression PLUS Expression .)
     GREATEROREQUAL  reduce using rule 46 (Expression -> Expression PLUS Expression .)
@@ -4789,12 +4788,13 @@ state 154
     MINUSEQUALS     reduce using rule 46 (Expression -> Expression PLUS Expression .)
     PLUSEQUALS      reduce using rule 46 (Expression -> Expression PLUS Expression .)
     EQUALS          reduce using rule 46 (Expression -> Expression PLUS Expression .)
-    LPAREN          reduce using rule 46 (Expression -> Expression PLUS Expression .)
     RPAREN          reduce using rule 46 (Expression -> Expression PLUS Expression .)
     COMMA           reduce using rule 46 (Expression -> Expression PLUS Expression .)
     RBRACKET        reduce using rule 46 (Expression -> Expression PLUS Expression .)
+    PERIOD          shift and go to state 102
     DIVIDE          shift and go to state 112
     TIMES           shift and go to state 113
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4826,7 +4826,6 @@ state 155
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 47 (Expression -> Expression DIVIDEEQUALS Expression .)
-    LPAREN          reduce using rule 47 (Expression -> Expression DIVIDEEQUALS Expression .)
     RPAREN          reduce using rule 47 (Expression -> Expression DIVIDEEQUALS Expression .)
     COMMA           reduce using rule 47 (Expression -> Expression DIVIDEEQUALS Expression .)
     RBRACKET        reduce using rule 47 (Expression -> Expression DIVIDEEQUALS Expression .)
@@ -4848,6 +4847,7 @@ state 155
     MINUSEQUALS     shift and go to state 118
     PLUSEQUALS      shift and go to state 119
     EQUALS          shift and go to state 120
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4879,7 +4879,6 @@ state 156
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 48 (Expression -> Expression TIMESEQUALS Expression .)
-    LPAREN          reduce using rule 48 (Expression -> Expression TIMESEQUALS Expression .)
     RPAREN          reduce using rule 48 (Expression -> Expression TIMESEQUALS Expression .)
     COMMA           reduce using rule 48 (Expression -> Expression TIMESEQUALS Expression .)
     RBRACKET        reduce using rule 48 (Expression -> Expression TIMESEQUALS Expression .)
@@ -4901,6 +4900,7 @@ state 156
     MINUSEQUALS     shift and go to state 118
     PLUSEQUALS      shift and go to state 119
     EQUALS          shift and go to state 120
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4932,7 +4932,6 @@ state 157
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 49 (Expression -> Expression MINUSEQUALS Expression .)
-    LPAREN          reduce using rule 49 (Expression -> Expression MINUSEQUALS Expression .)
     RPAREN          reduce using rule 49 (Expression -> Expression MINUSEQUALS Expression .)
     COMMA           reduce using rule 49 (Expression -> Expression MINUSEQUALS Expression .)
     RBRACKET        reduce using rule 49 (Expression -> Expression MINUSEQUALS Expression .)
@@ -4954,6 +4953,7 @@ state 157
     MINUSEQUALS     shift and go to state 118
     PLUSEQUALS      shift and go to state 119
     EQUALS          shift and go to state 120
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -4985,7 +4985,6 @@ state 158
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 50 (Expression -> Expression PLUSEQUALS Expression .)
-    LPAREN          reduce using rule 50 (Expression -> Expression PLUSEQUALS Expression .)
     RPAREN          reduce using rule 50 (Expression -> Expression PLUSEQUALS Expression .)
     COMMA           reduce using rule 50 (Expression -> Expression PLUSEQUALS Expression .)
     RBRACKET        reduce using rule 50 (Expression -> Expression PLUSEQUALS Expression .)
@@ -5007,6 +5006,7 @@ state 158
     MINUSEQUALS     shift and go to state 118
     PLUSEQUALS      shift and go to state 119
     EQUALS          shift and go to state 120
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101
@@ -5038,7 +5038,6 @@ state 159
     (126) Arguments -> . LPAREN _12_ArgumentList_optional RPAREN
     (135) Index -> . LBRACKET Expression RBRACKET
     SEMICOLON       reduce using rule 51 (Expression -> Expression EQUALS Expression .)
-    LPAREN          reduce using rule 51 (Expression -> Expression EQUALS Expression .)
     RPAREN          reduce using rule 51 (Expression -> Expression EQUALS Expression .)
     COMMA           reduce using rule 51 (Expression -> Expression EQUALS Expression .)
     RBRACKET        reduce using rule 51 (Expression -> Expression EQUALS Expression .)
@@ -5060,6 +5059,7 @@ state 159
     MINUSEQUALS     shift and go to state 118
     PLUSEQUALS      shift and go to state 119
     EQUALS          shift and go to state 120
+    LPAREN          shift and go to state 121
     LBRACKET        shift and go to state 122
 
     Arguments                      shift and go to state 101

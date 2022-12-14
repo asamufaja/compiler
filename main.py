@@ -9,12 +9,27 @@ def dashC(kxi, lexer, parser):
     if not compunit:
         print("cannot compile due to error in semantics")
         return
-    # TODO out of date calls ehre
-    setupdir = cv.VarsAndMembers(sym_table)
-    compunit.accept(setupdir)
-    exprgen = cv.ExpressionGen(setupdir.asmfile)
-    compunit.accept(exprgen)
-    setupdir.asmfile.close()
+    mathassndesugar = cv.MathAssignDesugar()
+    compunit.accept(mathassndesugar)
+    notequals = cv.NotEqualsVisitor()
+    compunit.accept(notequals)
+    lessorgreater = cv.LessOrGreater()
+    compunit.accept(lessorgreater)
+    whiletoif = cv.WhileToIf()
+    compunit.accept(whiletoif)
+    # switchtoif = cv.SwitchToIf()
+    # compunit.accept(switchtoif)
+    iftruefalse = cv.IfTrueFalse()
+    compunit.accept(iftruefalse)
+    addthis = cv.AddThisVisitor(sym_table)
+    compunit.accept(addthis)
+    varinits = cv.VarInitToEquals()
+    compunit.accept(varinits)
+
+    vars = cv.VarsAndMembers(sym_table)
+    compunit.accept(vars)
+    codegen = cv.CodeGen(vars.asmfile, sym_table)
+    compunit.accept(codegen)
 
 
 def dashS(kxi, lexer, parser):
@@ -60,7 +75,7 @@ def dashP(kxi, lexer, parser):
     compunit = parser.parse(dashL(kxi, lexer))
     printvisitor = v.PrintAST()
     compunit.accept(printvisitor)
-    printvisitor.makeTree()
+    # printvisitor.makeTree()
     return compunit
 
 

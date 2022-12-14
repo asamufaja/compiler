@@ -190,13 +190,14 @@ class PreSymbolTableVisitor(Visitor):
         if not self.isDuplicate(node):
             if node.member_type == ast.MemberTypes.CLASS:
                 self.cur_class = node
-                self.sym_table[self.cur_class.ident] = {}
+                self.sym_table[self.cur_class.ident] = {"self": [node.calcSize(), node.hasConstruct()]}
                 self.cur_method = None
             if node.member_type == ast.MemberTypes.METHOD \
                     or node.member_type == ast.MemberTypes.CONSTRUCTOR:
                 self.cur_method = node
+                node.classtype = self.cur_class.ident
                 self.sym_table[self.cur_class.ident][self.cur_method.ident] \
-                    = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
+                    = {"self": [node.ret_type, 0, node.calcFuncSize(), self.cur_class.ident, node.modifier]}
             if node.member_type == ast.MemberTypes.DATAMEMBER:
                 self.sym_table[self.cur_class.ident][node.ident] \
                     = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
@@ -298,7 +299,6 @@ class SymbolTableVisitor(Visitor):
     def visitExpr(self, node: ast.Expression):
         if node.op_type == ast.OpTypes.IDENTIFIER:
             is_in_sym, node_value = self.isInSym(node.value)
-            # TODO gotta make this check local function scope first, for shadowing in functions
             if self.cur_method is not None and \
                     node.value in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
                 node_value = self.sym_table[self.cur_class.ident][self.cur_method.ident][node.value]
@@ -789,7 +789,7 @@ class TypesVisitor(Visitor):
                 self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
                                            f"{node.left.value} {node.right.value}")
                 self.isErrorState = True
-            elif node.right is not None and node.right.type != ast.TypeTypes.INT:
+            elif node.right is not None and node.right.type != ast.TypeTypes.INT and node.right.op_type != ast.OpTypes.ARGUMENTS:  # TODO this != args is sus workaround
                 self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
                                            f"{node.left} {node.right}")
                 self.isErrorState = True

@@ -27,7 +27,7 @@ class BigLexer(Lexer):
     # except " (34), ' (39), or \ (92)
     # ESCAPED_CHAR = r"(\r|\n|\t|\\)"
     # CHAR = r"(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))"
-    CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\r|\n|\t|\\))|\"|\\')'"
+    CHAR_LITERAL = r"'(?:(?:[^\"'\\\n\t\r]|(\\r|\\n|\\t|\\))|\"|\\')'"
     STRING_LITERAL = r'"(?:(?:[^\"\'\\\n\t\r]|(\r|\n|\t|\\))|\'|\\")*"'
     NUM_LITERAL = r"(?:0|[1-9])[0-9]*"
 
@@ -115,7 +115,7 @@ class BigLexer(Lexer):
 
     def error(self, t):
         self.index += 1
-        raise Exception(f"Illegal character {t.value[0]}")
+        raise Exception(f"Illegal character {t.value[0]}, {self.lineno}")
 
 
 class BigParser(Parser):
@@ -124,20 +124,20 @@ class BigParser(Parser):
 
     precedence = (
         ("right", EQUALS, PLUSEQUALS, MINUSEQUALS, TIMESEQUALS, DIVIDEEQUALS),
-        ("left", PERIOD),
         ("left", OR),
         ("left", AND),
         ("left", DOUBLEEQUALS, NOTEQUALS),
         ("left", LESSTHAN, GREATERTHAN, LESSOREQUAL, GREATEROREQUAL),
         ('left', PLUS, MINUS),
         ('left', TIMES, DIVIDE),
+        ('right', UMINUS),
         ("left", NEW, EXCLAMATIONMARK),
         ("left", IDENTIFIER),  #
         ("left", LRBRACKET),  #
         ("left", LBRACKET, RBRACKET),  #
-        ("left", THIS),
+        # ("left", THIS),
         # ("left", LBRACKET, RBRACKET),
-        # ("left", LPAREN, RPAREN),
+        ("left", LPAREN, RPAREN, PERIOD),
     )
 
     def error(self, p):
@@ -215,7 +215,7 @@ class BigParser(Parser):
     # @_('IDENTIFIER')
     # def Type(self, p):
     #     """Type ::= identifier"""
-    #     # print("Type IDENTIFIER")
+#         # print("Type IDENTIFIER")
     #     # return ast.TypeTypes.CLASS
     #     return p.IDENTIFIER
 
@@ -320,12 +320,12 @@ class BigParser(Parser):
     # @_('ParameterList')
     # def OptionalParameterList(self, p):
     #     """OptionalParameterList = ParameterList"""
-    #     print("OptionalParameterList = ParameterList")
+#     #     print("OptionalParameterList = ParameterList")
 
     # @_('empty')
     # def OptionalParameterList(self, p):
     #     """OptionalParameterList = empty"""
-    #     print("OptionalParameterList = empty")
+#     #     print("OptionalParameterList = empty")
 
     # @_('LBRACE RepeatStatement RBRACE')
     @_('LBRACE { Statement } RBRACE')
@@ -339,12 +339,12 @@ class BigParser(Parser):
     # @_('RepeatStatement Statement')
     # def RepeatStatement(self, p):
     #     """RepeatStatement = RepeatStatement Statement"""
-    #     print("RepeatStatement = RepeatStatement Statement")
+#     #     print("RepeatStatement = RepeatStatement Statement")
 
     # @_('empty')
     # def RepeatStatement(self, p):
     #     """RepeatStatement = empty"""
-    #     print("RepeatStatement = empty")
+#     #     print("RepeatStatement = empty")
 
     # @_('Parameter RepeatCommaParameter')
     @_('Parameter { COMMA Parameter }')
@@ -358,12 +358,12 @@ class BigParser(Parser):
     # @_('RepeatCommaParameter COMMA Parameter')
     # def RepeatCommaParameter(self, p):
     #     """RepeatCommaParameter = RepeatCommaParameter , Parameter"""
-    #     print("RepeatCommaParameter = RepeatCommaParameter , Parameter")
+#     #     print("RepeatCommaParameter = RepeatCommaParameter , Parameter")
 
     # @_('empty')
     # def RepeatCommaParameter(self, p):
     #     """RepeatCommaParameter = empty"""
-    #     print("epeatCommaParameter = empty")
+#     #     print("epeatCommaParameter = empty")
 
     @_('Type OptionalBrackets IDENTIFIER')
     def Parameter(self, p):
@@ -390,12 +390,12 @@ class BigParser(Parser):
     # @_('Initializer')
     # def OptionalInitializer(self, p):
     #     """OptionalInitializer = Initializer"""
-    #     print("OptionalInitializer = Initializer")
+#     #     print("OptionalInitializer = Initializer")
 
     # @_('empty')
     # def OptionalInitializer(self, p):
     #     """OptionalInitializer = empty"""
-    #     print("OptionalInitializer = empty")
+#     #     print("OptionalInitializer = empty")
 
     # @_('LBRACE RepeatStatement RBRACE')
     @_('LBRACE { Statement } RBRACE')
@@ -517,12 +517,12 @@ class BigParser(Parser):
     # @_('RepeatCase Case')
     # def RepeatCase(self, p):
     #     """RepeatCase = RepeatCase Case"""
-    #     print("RepeatCase = RepeatCase Case")
+#     #     print("RepeatCase = RepeatCase Case")
 
     # @_('empty')
     # def RepeatCase(self, p):
     #     """RepeatCase = empty"""
-    #     print("RepeatCase = empty")
+#     #     print("RepeatCase = empty")
 
     # @_('CASE NUM_LITERAL COLON RepeatStatement')
     @_('CASE NUM_LITERAL COLON { Statement }')
@@ -603,6 +603,7 @@ class BigParser(Parser):
         expr.left = p.Expression0
         expr.right = p.Expression1
         expr.value = "+"
+        expr.type = ast.TypeTypes.INT
         return expr
 
     @_('Expression MINUS Expression')
@@ -613,6 +614,7 @@ class BigParser(Parser):
         expr.left = p.Expression0
         expr.right = p.Expression1
         expr.value = "-"
+        expr.type = ast.TypeTypes.INT
         return expr
 
     @_('Expression TIMES Expression')
@@ -623,6 +625,7 @@ class BigParser(Parser):
         expr.left = p.Expression0
         expr.right = p.Expression1
         expr.value = "*"
+        expr.type = ast.TypeTypes.INT
         return expr
 
     @_('Expression DIVIDE Expression')
@@ -633,6 +636,7 @@ class BigParser(Parser):
         expr.left = p.Expression0
         expr.right = p.Expression1
         expr.value = "/"
+        expr.type = ast.TypeTypes.INT
         return expr
 
     @_('Expression DOUBLEEQUALS Expression')
@@ -716,7 +720,7 @@ class BigParser(Parser):
         expr.type = p.Expression.type
         return expr
 
-    @_('PLUS Expression')
+    @_('PLUS Expression %prec UMINUS')
     def Expression(self, p):
         """| + Expression"""
         # print("| + Expression")
@@ -725,7 +729,7 @@ class BigParser(Parser):
         expr.type = p.Expression.type
         return expr
 
-    @_('MINUS Expression')
+    @_('MINUS Expression %prec UMINUS')
     def Expression(self, p):
         """| - Expression"""
         # print("| - Expression")
@@ -857,7 +861,7 @@ class BigParser(Parser):
     # @_('Expression Index')
     # def Expression(self, p):
     #     """| Expression Index"""
-    #     # print("| Expression Index")
+#         # print("| Expression Index")
     #     expr = ast.Expression(ast.OpTypes.INDEX)
     #     expr.left = p.Expression
     #     expr.index = p.Index
@@ -882,12 +886,12 @@ class BigParser(Parser):
     # @_('ArgumentList')
     # def OptionalArgumentList(self, p):
     #     """OptionalArgumentList = ArgumentList"""
-    #     print("OptionalArgumentList = ArgumentList")
+#     #     print("OptionalArgumentList = ArgumentList")
 
     # @_('empty')
     # def OptionalArgumentList(self, p):
     #     """OptionalArgumentList = empty"""
-    #     print("OptionalArgumentList = empty")
+#     #     print("OptionalArgumentList = empty")
 
     # @_('Expression RepeatCommaExpression')
     @_('Expression { COMMA Expression }')
@@ -901,12 +905,12 @@ class BigParser(Parser):
     # @_('RepeatCommaExpression COMMA Expression')
     # def RepeatCommaExpression(self, p):
     #     """RepeatCommaExpression = RepeatCommaExpression , Expression"""
-    #     print("RepeatCommaExpression = RepeatCommaExpression , Expression")
+#     #     print("RepeatCommaExpression = RepeatCommaExpression , Expression")
     #
     # @_('empty')
     # def RepeatCommaExpression(self, p):
     #     """RepeatCommaExpression = empty"""
-    #     print("RepeatCommaExpression = empty")
+#     #     print("RepeatCommaExpression = empty")
 
     @_('LBRACKET Expression RBRACKET')
     def Index(self, p):

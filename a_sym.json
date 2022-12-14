@@ -1,1 +1,1 @@
-{"coo": 4, "bus": 8, "code_segment_start": 12, "sussy": 12, "code_segment_end": 36}
+{"tmp1_sus_fib": 4, "tmp2_sus_fib": 8, "bus": 12, "swes": 16, "code_segment_start": 20, "fib_sus": 32, "IF0start": 116, "equal0": 224, "equal0end": 236, "IF0true": 260, "IF0false": 344, "IF0end": 356, "IF1start": 368, "equal2": 476, "equal2end": 488, "IF1true": 512, "IF1false": 596, "IF1end": 608, "main": 1736, "STACKOVERFLOW": 2228, "STACKUNDERFLOW": 2252, "code_segment_end": 2276}
