@@ -189,18 +189,21 @@ class PreSymbolTableVisitor(Visitor):
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
         if not self.isDuplicate(node):
             if node.member_type == ast.MemberTypes.CLASS:
-                self.cur_class = node
-                self.sym_table[self.cur_class.ident] = {"self": [node.calcSize(), node.hasConstruct()]}
+                self.cur_class = node                                             # empty list is for datamembers vals
+                self.sym_table[self.cur_class.ident] = {"self": [node.calcSize(), node.hasConstruct(), []]}
                 self.cur_method = None
             if node.member_type == ast.MemberTypes.METHOD \
                     or node.member_type == ast.MemberTypes.CONSTRUCTOR:
                 self.cur_method = node
                 node.classtype = self.cur_class.ident
                 self.sym_table[self.cur_class.ident][self.cur_method.ident] \
-                    = {"self": [node.ret_type, 0, node.calcFuncSize(), self.cur_class.ident, node.modifier]}
+                    = {"self": [node.ret_type, 0, node.calcFuncSize(), self.cur_class.ident, node.modifier, node.params]}
+                self.sym_table[self.cur_class.ident]['self'][2].append(None)  # just to pad the list
             if node.member_type == ast.MemberTypes.DATAMEMBER:
                 self.sym_table[self.cur_class.ident][node.ident] \
                     = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
+                self.sym_table[self.cur_class.ident]['self'][2].append(node)
+                # put init in there for default constructor
                 self.cur_method = None
             if node.ident == 'main':
                 self.cur_class = node
@@ -248,6 +251,7 @@ class SymbolTableVisitor(Visitor):
         self.cur_class: ast.ClassAndMemberDeclaration = None
         self.cur_method: ast.ClassAndMemberDeclaration = None
         self.isErrorState = False
+        self.in_args = []
         self.error_messages: list[str] = []
         '''
         how about for sym table, a list of dict so instead of it all in a dict 
@@ -298,14 +302,18 @@ class SymbolTableVisitor(Visitor):
 
     def visitExpr(self, node: ast.Expression):
         if node.op_type == ast.OpTypes.IDENTIFIER:
-            is_in_sym, node_value = self.isInSym(node.value)
+            # is_in_sym, node_value = self.isInSym(node.value)
+            # TODO if stuff has type issues, here's where it gets assigned kinda funny-like
             if self.cur_method is not None and \
                     node.value in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
                 node_value = self.sym_table[self.cur_class.ident][self.cur_method.ident][node.value]
                 node.type = node_value[0]
                 node.classtype = node_value[3]  # or rather, is_param
                 node.array = node_value[4]
-            elif is_in_sym:
+            else:  # elif is_in_sym:
+                for k, v in self.sym_table.items():
+                    if node.value in self.sym_table[k]:
+                        node_value = self.sym_table[k][node.value]
                 # get the node it's type, node_value is [type, size, offset, classtype/isparam, isarray?, modifier]
                 if isinstance(node_value, list):
                     node.type = node_value[0]
@@ -315,10 +323,11 @@ class SymbolTableVisitor(Visitor):
                     node.type = node_value["self"][0]
                     node.args = "method"  # maybe a dumb way to mark this identifier as a method
                     node.classtype = node_value["self"][3]
+                    node.param_list = node_value["self"][5]
                 # now that q is a Quad, gotta see about allowing it to access Quad's stuff
-            else:
+            # else:
                 # print("Possibly an undeclared variable")
-                self.error_messages.append("Possibly an undeclared variable")
+                # self.error_messages.append("Possibly an undeclared variable")
 
         # if node.op_type == ast.OpTypes.IDENTIFIER:
             # check if variable is undeclared
@@ -338,14 +347,24 @@ class SymbolTableVisitor(Visitor):
         # check for accessing private datamember
         if node.op_type == ast.OpTypes.PERIOD:
             is_in_sym, node_value = self.isInSym(node.right.value)
-            if is_in_sym and len(node_value) > 4 and node_value[5] == ast.ModifierTypes.PRIVATE \
-                    and self.cur_class.ident != node_value[3]:
-                self.error_messages.append(f"tried to access private data member {node.right.value}")
-                self.isErrorState = True
+            if is_in_sym and len(node_value) > 5 and isinstance(node_value, list):
+                if node_value[5] == ast.ModifierTypes.PRIVATE and self.cur_class.ident != node_value[3]:
+                    self.error_messages.append(f"tried to access private data member {node.right.value}")
+                    self.isErrorState = True
+
+
+        if node.op_type == ast.OpTypes.ARGUMENTS:
+            self.in_args.append(node)
 
         super().visitExpr(node)
 
+        if node.op_type == ast.OpTypes.ARGUMENTS:
+            self.in_args.pop()
+
         if node.op_type == ast.OpTypes.PERIOD:
+            if node.right.args == "method" and not self.in_args:
+                self.error_messages.append(f"used {node.right.value} without ()'s")
+                self.isErrorState = True
             # check if node.left is valid, and then go see if the node.right is real
             # gotta be mindful of args, and indexes?
             if node.left.op_type == ast.OpTypes.ARGUMENTS:
@@ -397,7 +416,10 @@ class SymbolTableVisitor(Visitor):
                     node.is_obj = True
             else:
                 # vars in main
-                self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, node.array]
+                if node.type == ast.TypeTypes.STRING and node.init:  # I'm just gonna give the string it's length
+                    self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, len(node.init.value)]
+                else:
+                    self.sym_table[self.cur_class.ident][node.ident] = [node.type, 0, 0, None, node.array]
                 normaltypes = [x for x in ast.TypeTypes]
                 if node.type not in normaltypes:
                     # probably an object var
@@ -482,6 +504,7 @@ class AssignmentVisitor(Visitor):
         self.isErrorState = False
         self.error_messages: list[str] = []
         self.keywords = set(k.value for k in ast.Keywords)
+        self.cur_class = None
         self.assignment_operators = [
             ast.OpTypes.EQUALS,
             ast.OpTypes.PLUSEQUALS,
@@ -507,24 +530,29 @@ class AssignmentVisitor(Visitor):
             # one issue is that with the dot operator, when there's args they get put above dot in ast
             # so the args .left is the dot, and the dot's left and right are var and method (hopefully)
             # check for accessing private function
-            if self.isInSym(node.left.right.value):
+            if self.isInSym(node.left.value) or self.isInSym(node.left.right.value):
                 funcnode = node.left.right
+                if funcnode is None:
+                    funcnode = node.left
                 if funcnode.args != "method":
-                    self.error_messages.append(f"{funcnode} is not a method")
+                    self.error_messages.append(f"{funcnode} is not a method1")
                     self.isErrorState = True
                 else:
                     _, nodeinfo = self.isInSym(funcnode.value)
-                    if nodeinfo["self"][4] == ast.ModifierTypes.PRIVATE:
+                    if nodeinfo["self"][4] == ast.ModifierTypes.PRIVATE and nodeinfo["self"][3] != self.cur_class.ident:
                         self.error_messages.append(f"tried to call private function {funcnode.value}")
                         self.isErrorState = True
             if node.left.args != "method" and node.left.right.args != "method":
+                print(node, node.left, node.left.left.right)
                 # arguments nodes have a left, which is an expr
                 # exprs have .args, but usually only the arguments expression types use it.
                 # identifiers also set it to be == "method" if they are a method's identifier
-                self.error_messages.append(f"'{node.left.right.value}' is not a method")
+                self.error_messages.append(f"'{node.left.right.value}' is not a method2")
                 self.isErrorState = True
             else:
                 funcnode = node.left.right  # the expr ident node for the method being called
+                if funcnode is None:
+                    funcnode = node.left
                 reqdparams = []  # a list of all reqd params ident and values
                 # print(node.args)  # args used to call the method
                 # print(node.left.right.args)  # should be "method"
@@ -560,6 +588,7 @@ class AssignmentVisitor(Visitor):
             if not node.left.array:
                 self.error_messages.append(f"var {node.left.value} was indexed but is not an array")
                 self.isErrorState = True
+            # TODO ?
             # is_in_sym, node_val = self.isInSym(node.left.value)
             # if is_in_sym:
             #     print(node_val)
@@ -568,10 +597,17 @@ class AssignmentVisitor(Visitor):
             # self.isErrorState = True
         super().visitExpr(node)
 
+    def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):
+        if node.member_type == ast.MemberTypes.CLASS:
+            self.cur_class = node
+        if node.ident == "main":
+            self.cur_class = node
+        super().visitMemberDecl(node)
+
     def checkFuncParams(self, reqdparams, node, funcnode):
         try:
             for i in range(len(reqdparams)):
-                if reqdparams[i][1][0] != node.args[i].type:
+                if reqdparams[i][1][0] != node.args[i].type and reqdparams[i][1][0] != node.args[i].right.type:
                     # print(reqdparams[i][0], node.args[i].value)
                     # print(reqdparams[i][1][0], node.args[i].type)
                     self.error_messages.append(f"invalid parameters for {funcnode.value}, {node.args[i].value}")
@@ -588,31 +624,31 @@ class AssignmentVisitor(Visitor):
 
 class BreakVisitor(Visitor):
     def __init__(self):
-        self.in_while: bool = False
-        self.in_case: bool = False
-        self.in_switch: bool = False
+        self.in_while = 0
+        self.in_case = 0
+        self.in_switch = 0
         self.isErrorState = False
         self.error_messages: list[str] = []
 
     def visitStmnt(self, node: ast.Statement):
         if node.statement_type == ast.StatementTypes.WHILE:
-            self.in_while = True
+            self.in_while += 1
         if node.statement_type == ast.StatementTypes.SWITCH:
-            self.in_switch = True
+            self.in_switch += 1
         if node.statement_type == ast.StatementTypes.BREAK:
             if not self.in_case and not self.in_while and not self.in_switch:
-                self.error_messages.append(f"break statement in an invalid place")
+                self.error_messages.append(f"invalid break statement")
                 self.isErrorState = True
         super().visitStmnt(node)
         if node.statement_type == ast.StatementTypes.WHILE:
-            self.in_while = False
+            self.in_while -= 1
         if node.statement_type == ast.StatementTypes.SWITCH:
-            self.in_switch = False
+            self.in_switch -= 1
 
     def visitCase(self, node: ast.Case):
-        self.in_case = True
+        self.in_case += 1
         super().visitCase(node)
-        self.in_case = False
+        self.in_case -= 1
 
 
 class CinVisitor(Visitor):
@@ -676,49 +712,49 @@ class ExpressionTypeVisitor(Visitor):
             if node.left.op_type == ast.OpTypes.INDEX and node.right not in dotindexargs:
                 if node.left.left.type != node.right.type:
                     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.left.value} {node.right.value}, ")
+                                               f"{node.left.left.value} {node.right.value}, 1")
                     self.isErrorState = True
                 else:
                     node.type = ast.TypeTypes.BOOL
             elif node.right.op_type == ast.OpTypes.INDEX and node.left not in dotindexargs:
                 if node.left.type != node.right.left.type:
                     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.value} {node.right.left.value}, ")
+                                               f"{node.left.value} {node.right.left.value}, 2")
                     self.isErrorState = True
                 else:
                     node.type = ast.TypeTypes.BOOL
             elif node.left.op_type == ast.OpTypes.PERIOD and node.right not in dotindexargs:
-                if node.left.right.type != node.right.type:
-                    self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.value} {node.right.value}, ")
-                    self.isErrorState = True
-                else:
-                    node.type = ast.TypeTypes.BOOL
+                # if node.left.right.type != node.right.type:
+                #     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
+                #                                f"{node.left.value} {node.right.value}, 3")
+                #     self.isErrorState = True
+                # else:
+                node.type = ast.TypeTypes.BOOL
             elif node.right.op_type == ast.OpTypes.PERIOD and node.left not in dotindexargs:
                 if node.left.type != node.right.right.type:
                     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.value} {node.right.right.value}, ")
+                                               f"{node.left.value} {node.right.right.value}, 4")
                     self.isErrorState = True
                 else:
                     node.type = ast.TypeTypes.BOOL
             elif node.left.op_type == ast.OpTypes.ARGUMENTS and node.right not in dotindexargs:
                 # this is getting silly, I should rethink. lol
-                if node.left.left.right.type != node.right.type:
+                if node.left.left.type != node.right.type and node.left.left.right.type != node.right.type:
                     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.value} {node.right.value}, ")
+                                               f"{node.left.value} {node.right.value}, 5")
                     self.isErrorState = True
                 else:
                     node.type = ast.TypeTypes.BOOL
             elif node.right.op_type == ast.OpTypes.ARGUMENTS and node.left not in dotindexargs:
                 if node.left.type != node.right.left.right.type:
                     self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                               f"{node.left.value} {node.right.value}, ")
+                                               f"{node.left.value} {node.right.value}, 6")
                     self.isErrorState = True
                 else:
                     node.type = ast.TypeTypes.BOOL
             elif node.left.type != node.right.type:
                 self.error_messages.append(f"wrong operands for {node.op_type.value}, "
-                                           f"{node.left.value} {node.right.value}, "
+                                           f"{node.left.value} {node.right.value}, 7"
                                            f"they must be the same type")
                 self.isErrorState = True
             else:
@@ -732,10 +768,11 @@ class ExpressionTypeVisitor(Visitor):
             realnode = ast.Expression(None)
             if node.expr.op_type == ast.OpTypes.ARGUMENTS:
                 realnode = node.expr.left.right
-            if node.expr.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0] \
-                    and realnode.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0]:
-                self.error_messages.append(f"wrong ret type for func {self.cur_method.ident}")
-                self.isErrorState = True
+            # TODO could have these semantics
+            # if node.expr.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0] \
+            #         and realnode.type != self.sym_table[self.cur_class.ident][self.cur_method.ident]["self"][0]:
+            #     self.error_messages.append(f"wrong ret type for func {self.cur_method.ident}")
+            #     self.isErrorState = True
         if self.cur_class.ident == "main" and node.statement_type == ast.StatementTypes.RETURN:
             if node.expr is not None:
                 self.error_messages.append(f"wrong ret type for func {self.cur_class.ident}")
@@ -789,10 +826,10 @@ class TypesVisitor(Visitor):
                 self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
                                            f"{node.left.value} {node.right.value}")
                 self.isErrorState = True
-            elif node.right is not None and node.right.type != ast.TypeTypes.INT and node.right.op_type != ast.OpTypes.ARGUMENTS:  # TODO this != args is sus workaround
-                self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
-                                           f"{node.left} {node.right}")
-                self.isErrorState = True
+            # elif node.right is not None and node.right.type != ast.TypeTypes.INT and node.right.op_type != ast.OpTypes.ARGUMENTS:  # TODO this != args is sus workaround
+            #     self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
+            #                                f"{node.left} {node.right}")
+            #     self.isErrorState = True
         if node.op_type in self.bool_ops:
             if node.left.type != ast.TypeTypes.BOOL and node.right.type != ast.TypeTypes.BOOL:
                 self.error_messages.append(f"illegal operand(s) for {node.op_type.value}, "
@@ -825,10 +862,10 @@ class TypesVisitor(Visitor):
                 self.isErrorState = True
             if node.left.op_type == ast.OpTypes.PERIOD and node.left.left.op_type == ast.OpTypes.THIS:
                 is_in_sym, node_value = self.isInSym(node.left.right.value)
-                if is_in_sym:
-                    if node_value[0] != node.right.type:
-                        self.error_messages.append(f"wrong types in assignment to this.{node.left.right.value}")
-                        self.isErrorState = True
+                # if is_in_sym:
+                #     if node_value[0] != node.right.type:
+                #         self.error_messages.append(f"wrong types in assignment to this.{node.left.right.value}")
+                #         self.isErrorState = True
             if node.left.op_type == ast.OpTypes.INDEX and node.left.index is not None:
                 ind = node.left
                 if ind.left.array and ind.left.type != node.right.type:

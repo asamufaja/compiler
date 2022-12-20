@@ -1,9 +1,12 @@
 class Test {
     public void someMethod(int a, char b) {
-
     }
+    public void sussy() {}
 }
 
 void kxi2022 main() {
     (new Test()).someMethod(1, 'b');
+//    Test test = new Test();
+//    test.someMethod;
+//    test.sussy();
 }

@@ -36,6 +36,10 @@ def dashS(kxi, lexer, parser):
     compunit = dashP(kxi, lexer, parser)
     pretablevisitor = v.PreSymbolTableVisitor({})
     compunit.accept(pretablevisitor)
+    # TODO maybe should leave this here
+    addthis = cv.AddThisVisitor(pretablevisitor.sym_table)
+    compunit.accept(addthis)
+
     if pretablevisitor.isErrorState:
         raise Exception()
     tablevisitor = v.SymbolTableVisitor(pretablevisitor.sym_table)

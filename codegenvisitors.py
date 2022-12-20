@@ -256,25 +256,31 @@ class AddThisVisitor(sv.Visitor):
         # I gotta make it so that there can be local variable with same name as attribute in method
         # and if that is case then without the "this" it should default to the local one
         if not self.in_main:
-            if node.op_type == ast.OpTypes.PERIOD:
-                pass  # want to skip traversal
+            if node.op_type == ast.OpTypes.PERIOD and node.left.op_type == ast.OpTypes.THIS:
+                node.left.type = self.cur_class.ident
             elif node.op_type == ast.OpTypes.IDENTIFIER:
                 if node.value not in self.sym_table[self.cur_class.ident][self.cur_method.ident]:
                     if isinstance(self.prev_node, ast.Statement):
                         dot = ast.Expression(ast.OpTypes.PERIOD)
                         self.prev_node.expr = dot
-                        dot.left = ast.Expression(ast.OpTypes.THIS)
+                        mythis = ast.Expression(ast.OpTypes.THIS)
+                        mythis.type = self.cur_class.ident
+                        dot.left = mythis
                         dot.right = node
                     if isinstance(self.prev_node, ast.Expression):
                         if self.prev_node.left == node:
                             dot = ast.Expression(ast.OpTypes.PERIOD)
                             self.prev_node.left = dot
-                            dot.left = ast.Expression(ast.OpTypes.THIS)
+                            mythis = ast.Expression(ast.OpTypes.THIS)
+                            mythis.type = self.cur_class.ident
+                            dot.left = mythis
                             dot.right = node
                         if self.prev_node.right == node:
                             dot = ast.Expression(ast.OpTypes.PERIOD)
                             self.prev_node.right = dot
-                            dot.left = ast.Expression(ast.OpTypes.THIS)
+                            mythis = ast.Expression(ast.OpTypes.THIS)
+                            mythis.type = self.cur_class.ident
+                            dot.left = mythis
                             dot.right = node
                 super().visitExpr(node)
             else:
@@ -343,18 +349,9 @@ class VarsAndMembers(sv.Visitor):
                 else:
                     line = f"{node.ident} .INT \n"  # this would be to store the FP offset to stack memory
                 self.asmfile.write(line)
-            if node.type == ast.TypeTypes.STRING:  # IDK if I wanna put strings on the stack
-                if node.init:
-                    line = f"{node.ident}"
-                    for c in node.init.value[1:]:
-                        line += f" .BYT '{c}'\n"
-                else:
-                    line = ""
-                self.asmfile.write(line)
-            if node.is_obj:
-                # I'm just gonna put an int and have it get assigned to the heap addr when it gets to that
-                line = f"{node.ident} .INT \n"
-                self.asmfile.write(line)
+            if node.type == ast.TypeTypes.STRING or node.is_obj:
+                self.asmfile.write(f"{node.ident} .INT\n")
+                self.asmfile.write(f"{node.ident}_{node.type}_{node.type} .INT\n")
         else:
             if node.type in self.primtypes:
                 line = ""
@@ -371,18 +368,8 @@ class VarsAndMembers(sv.Visitor):
                     line = f"{node.ident}_{self.cur_classname}_{self.cur_funcname} .INT \n"
                     # this would be to store the FP offset to stack memory
                 self.asmfile.write(line)
-            if node.type == ast.TypeTypes.STRING:  # IDK if I wanna put strings on the stack
-                if node.init:
-                    line = f"{node.ident}_{self.cur_classname}_{self.cur_funcname}"
-                    for c in node.init.value[1:]:
-                        line += f" .BYT '{c}'\n"
-                else:
-                    line = ""
-                self.asmfile.write(line)
-            if node.is_obj:
-                # I'm just gonna put an int and have it get assigned to the heap addr when it gets to that
-                line = f"{node.ident}_{self.cur_classname}_{self.cur_funcname} .INT \n"
-                self.asmfile.write(line)
+            if node.type == ast.TypeTypes.STRING or node.is_obj:
+                self.asmfile.write(f"{node.ident}_{self.cur_classname}_{self.cur_funcname} .INT \n")
 
         super().visitVarDecl(node)
 
@@ -404,8 +391,8 @@ class VarsAndMembers(sv.Visitor):
 
 class CodeGen(sv.Visitor):
     def __init__(self, asmfile, sym_table):
-        self.in_if = None
-        self.in_switch = None
+        self.in_if = []
+        self.in_switch = []
         self.in_main = False
         self.cur_funcname = None
         self.cur_classname = None
@@ -418,6 +405,7 @@ class CodeGen(sv.Visitor):
         self.less_count = 0
         self.greater_count = 0
         self.equals_count = 0
+        self.print_count = 0
         self.classnodes = {}
         self.funcnodes = {}
         self.math_ops = [
@@ -446,6 +434,7 @@ class CodeGen(sv.Visitor):
             # reg2 = self.regs.getReg()
 
         super().visitExpr(node)
+
         if node.op_type == ast.OpTypes.PLUS:
             self.mathExpr(node, "ADD")
         if node.op_type == ast.OpTypes.MINUS:
@@ -463,25 +452,30 @@ class CodeGen(sv.Visitor):
             if node.left.op_type == ast.OpTypes.IDENTIFIER and node.right.op_type == ast.OpTypes.IDENTIFIER:
                 reg1 = self.regs.getReg()
                 reg2 = self.regs.getReg()
-                if node.left.classtype is True:
+                if node.left.classtype is True:  # is param
                     offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][2]
                     line += f"MOV {reg1}, FP\n" \
                             f"ADI {reg1}, #{offset}\n"
-                elif not self.in_main:
-                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
-                else:
+                elif not self.in_main:  # func local
+                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg1}, FP\n"
+                else:  # main param
                     line += f"LDR {reg1}, {node.left.value}\n"
                 if node.right.classtype is True:
                     offset = self.sym_table[self.cur_classname][self.cur_funcname][node.right.value][2]
                     line += f"MOV {reg2}, FP\n" \
                             f"ADI {reg2}, #{offset}\n"
                 elif not self.in_main:
-                    line += f"LDR {reg2}, {node.right.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                    line += f"LDR {reg2}, {node.right.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg2}, FP\n"
                 else:
                     line += f"LDR {reg2}, {node.right.value}\n"
 
-                line += f"LDR {reg2}, {reg2}\n" \
-                        f"STR {reg2}, {reg1}\n"  # TODO IDK if works for strings...
+                if node.left.type == ast.TypeTypes.STRING:
+                    line += f"STR {reg2}, {node.left.value}\n"  # just copy the address over
+                else:
+                    line += f"LDR {reg2}, {reg2}\n" \
+                        f"STR {reg2}, {reg1}\n"
                 self.regs.freeReg(reg1)
                 self.regs.freeReg(reg2)
 
@@ -497,7 +491,8 @@ class CodeGen(sv.Visitor):
                     line += f"MOV {reg1}, FP\n" \
                             f"ADI {reg1}, #{offset}\n"
                 elif not self.in_main:
-                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                        f"ADD {reg1}, FP\n"
                 else:
                     line += f"LDR {reg1}, {node.left.value}\n"
                 line += f"STR {node.right.reg}, {reg1}\n"  # put data at address
@@ -519,7 +514,8 @@ class CodeGen(sv.Visitor):
                         line += f"MOV {reg2}, FP\n" \
                                 f"ADI {reg2}, #{offset}\n"
                     elif not self.in_main:
-                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg2}, FP\n"
                     else:
                         line += f"LDR {reg2}, {node.left.value}\n"
 
@@ -536,7 +532,8 @@ class CodeGen(sv.Visitor):
                         line += f"MOV {reg2}, FP\n" \
                                 f"ADI {reg2}, #{offset}\n"
                     elif not self.in_main:
-                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg2}, FP\n"
                     else:
                         line += f"LDR {reg2}, {node.left.value}\n"
                     line += f"STR {reg1}, {reg2}\n"
@@ -552,7 +549,8 @@ class CodeGen(sv.Visitor):
                         line += f"MOV {reg2}, FP\n" \
                                 f"ADI {reg2}, #{offset}\n"
                     elif not self.in_main:
-                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                                f"ADD {reg2}, FP\n"
                     else:
                         line += f"LDR {reg2}, {node.left.value}\n"
                     line += f"STR {reg1}, {reg2}\n"
@@ -571,14 +569,15 @@ class CodeGen(sv.Visitor):
                     line += f"MOV {reg1}, FP\n" \
                             f"ADI {reg1}, #{offset}\n"
                 elif not self.in_main:
-                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg1}, FP\n"
                 else:
                     line += f"LDR {reg1}, {node.left.value}\n"
                 line += f"STR {node.right.reg}, {reg1}\n"  # put data at address
                 self.regs.freeReg(node.right.reg)
                 node.right.reg = None
                 self.regs.freeReg(reg1)
-            elif node.left.type == ast.TypeTypes.CHAR \
+            elif node.left.type == ast.TypeTypes.CHAR or node.left.type == ast.TypeTypes.STRING \
                     and node.left.op_type == ast.OpTypes.IDENTIFIER \
                     and node.right.reg is None:
                 if node.right.op_type == ast.OpTypes.CHAR_LITERAL:
@@ -603,46 +602,156 @@ class CodeGen(sv.Visitor):
                         line += f"MOV {reg2}, FP\n" \
                                 f"ADI {reg2}, #{offset}\n"
                     elif not self.in_main:
-                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                        line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                                f"ADD {reg2}, FP\n"  # TODO I hope this local var defining is correct... lol
                     else:
                         line += f"LDR {reg2}, {node.left.value}\n"
+
                     line += f"STR {reg1}, {reg2}\n"
                     self.regs.freeReg(reg1)
                     self.regs.freeReg(reg2)
 
+                elif node.right.op_type == ast.OpTypes.STRING_LITERAL:  # assign str lit to var
+                    # strings are kept on "heap"!
+                    reg1 = self.regs.getReg()
+                    reg2 = self.regs.getReg()
+                    val = node.right.value
+                    val = re.sub(r'\\n', '\n', val)
+                    val = re.sub(r'\\t', '\t', val)
+                    val = re.sub(r'\\r', '\r', val)
+                    off = 0
+                    if self.in_main:
+                        self.sym_table[self.cur_classname][node.left.value][4] = len(val[1:-1])
+                    else:
+                        if node.left.value in self.sym_table[self.cur_classname]:
+                            self.sym_table[self.cur_classname][node.left.value][4] = len(val[1:-1])
+                        else:
+                            self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][4] = len(val[1:-1])
+                    for c in val[1:]:
+                        if c == '\n':
+                            line += f"MOVI {reg1}, #10\n"
+                        elif c == '\t':
+                            line += f"MOVI {reg1}, #9\n"
+                        elif c == '\r':
+                            line += f"MOVI {reg1}, #12\n"
+                        elif c == ' ':
+                            line += f"MOVI {reg1}, #32\n"
+                        else:
+                            line += f"MOVI {reg1}, '{c}'\n"
+                        if node.left.classtype is True:  # node is param
+                            # string param in a function and try to write to it, maybe this is illegal
+                            offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][2]
+                            line += f"MOV {reg2}, FP\n" \
+                                    f"ADI {reg2}, #{offset}\n"
+                        elif not self.in_main:
+                            line += f"LDR {reg2}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n"
+                        else:
+                            line += f"LDR {reg2}, {node.left.value}\n"
+                        line += f"ADI {reg2}, #{off}\n"
+                        line += f"STR {reg1}, {reg2}\n"
+                        off += 4
+                    self.regs.freeReg(reg1)
+                    self.regs.freeReg(reg2)
+
+            if node.right.op_type == ast.OpTypes.NEW:
+                line += node.right.line
+                if node.left.classtype is True:  # param
+                    pass  # this is just if I'm giving an object that was passed in a new.
+                elif not self.in_main:  # local func
+                    reg1 = self.regs.getReg()
+                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg1}, FP\n" \
+                            f"STR {node.right.reg}, {reg1}\n"
+                    self.regs.freeReg(reg1)
+                else:  # main param
+                    line += f"STR {node.right.reg}, {node.left.value}\n" \
+                            f"STR {node.right.reg}, {node.left.value}_{node.left.type}_{node.left.type}\n"
+                            # this one's for constructors to modify
+                self.regs.freeReg(node.right.reg)
+                node.right.reg = None
+
             def assnToDotArg(line, reg1):
                 line += node.left.line
+                # if an expr . called this, gotta get addr
+                reg2 = self.regs.getReg()
+                if node.left.op_type == ast.OpTypes.PERIOD:
+                    if node.left.left.classtype is True:
+                        offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.left.value][2]
+                        line += f"MOV {reg2}, FP\n" \
+                                f"ADI {reg2}, #{offset}\n" \
+                                f"LDR {reg2}, {reg2}\n"
+                    elif not self.in_main:
+                        if self.cur_classname == self.cur_funcname:  # if in constructor do something slightly different
+                            reg4 = self.regs.getReg()
+                            line += f"MOV {reg4}, FP\n" \
+                                    f"ADI {reg4}, #-8\n" \
+                                    f"LDR {reg4}, {reg4}\n" \
+                                    f"MOV {reg2}, {reg4}\n"
+                            self.regs.freeReg(reg4)
+                        else:
+                            print(node.left.left, "hello")
+                            line += f"LDR {reg2}, {node.left.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                                f"ADD {reg2}, FP\n" \
+                                f"LDR {reg2}, {reg2}\n"
+                    else:
+                        line += f"LDR {reg2}, {node.left.left.value}\n"
+                    # gotta offset reg2 to get to the right spot...
+                    memlist = list(self.sym_table[node.left.left.type].keys())[1:]
+                    off = memlist.index(node.left.right.value)
+                    line += f"ADI {reg2}, #{off * 4}\n"
+                else:  # node == ARGS
+                    pass
+
                 if node.right.reg:
                     line += node.right.line
-                    line += f"STR {node.right.reg}, {node.left.reg}\n"
+                    line += f"STR {node.right.reg}, {reg2}\n"
                     self.regs.freeReg(node.right.reg)
                     node.right.reg = None
                 elif node.right.op_type == ast.OpTypes.NUM_LITERAL:
                     line += f"MOVI {reg1}, #{node.right.value}\n"
-                    line += f"STR {reg1}, {node.left.reg}\n"
+                    line += f"STR {reg1}, {reg2}\n"
                 elif node.right.op_type == ast.OpTypes.CHAR_LITERAL:
                     if node.right.value == "' '":
                         line += f"MOVI {reg1}, #32\n"
                     else:
                         line += f"MOVI {reg1}, {node.right.value}\n" \
-                            f"STR {reg1}, {node.left.reg}\n"
+                            f"STR {reg1}, {reg2}\n"
                 elif node.right.op_type == ast.OpTypes.STRING_LITERAL:
                     pass  # TODO assign string lits to data members
                 elif node.right.op_type == ast.OpTypes.TRUE:
                     line += f"MOVI {reg1}, #1\n"
-                    line += f"STR {reg1}, {node.left.reg}\n"
+                    line += f"STR {reg1}, {reg2}\n"
                 elif node.right.op_type == ast.OpTypes.FALSE:
                     line += f"MOVI {reg1}, #0\n"
-                    line += f"STR {reg1}, {node.left.reg}\n"
+                    line += f"STR {reg1}, {reg2}\n"
+                elif node.right.op_type == ast.OpTypes.IDENTIFIER:
+                    if node.right.classtype is True:  # param
+                        offset = self.sym_table[self.cur_classname][self.cur_funcname][node.right.value][2]
+                        line += f"MOV {reg1}, FP\n" \
+                                f"ADI {reg1}, #{offset}\n" \
+                                f"LDR {reg1}, {reg1}\n" \
+                                f"STR {reg1}, {reg2}\n"
+                    elif not self.in_main:  # local
+                        line += f"LDR {reg1}, {node.right.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                                f"ADD {reg1}, FP\n" \
+                                f"LDR {reg1}, {reg1}\n" \
+                                f"STR {reg1}, {reg2}\n"
+                    else:  # in main
+                        line += f"LDR {reg1}, {node.right.value}\n" \
+                                f"LDR {reg1}, {reg1}\n" \
+                                f"STR {reg1}, {reg2}\n"
+                self.regs.freeReg(reg2)
+                return line
 
             if node.left.op_type == ast.OpTypes.PERIOD:
+                self.regs.freeReg(node.left.reg)
                 reg1 = self.regs.getReg()
-                assnToDotArg("", reg1)
+                line += assnToDotArg("", reg1)
                 self.regs.freeReg(reg1)
 
             if node.left.op_type == ast.OpTypes.ARGUMENTS:
                 reg1 = self.regs.getReg()
-                assnToDotArg("", reg1)
+                line += assnToDotArg("", reg1)
                 self.regs.freeReg(reg1)
 
             node.line = line
@@ -695,8 +804,11 @@ class CodeGen(sv.Visitor):
                     pline += f"LDR R3, {param.value}\n" \
                             f"LDR R3, R3\n"
                 elif not self.in_main and param.op_type == ast.OpTypes.IDENTIFIER and param.classtype is False:
+                    reg1 = self.regs.getReg()
                     pline += f"LDR R3, {param.value}_{self.cur_classname}_{self.cur_funcname}\n" \
-                            f"LDR R3, R3\n"
+                             f"ADD {reg1}, FP\n" \
+                             f"LDR R3, {reg1}\n"  # FP - offset to get value
+                    self.regs.freeReg(reg1)
                 elif not self.in_main and param.op_type == ast.OpTypes.IDENTIFIER and param.classtype is True:
                     offset = self.sym_table[self.cur_classname][self.cur_funcname][param.value][2]
                     pline += f"MOV R3, FP\n" \
@@ -737,6 +849,7 @@ class CodeGen(sv.Visitor):
             line = f"ALLC {reg0}, #{size}\n"
             # activation record goes from bottom up ret addr/val, prev frame ptr, param1 ...
             if constructor:
+                initlist = self.sym_table[node.type]["self"][2]
                 line += f"""
     MOV {reg1}, SP          ;save current SP into {reg1} so we can assign it to FP
     MOV {reg2}, SP          ;save sp
@@ -747,14 +860,18 @@ class CodeGen(sv.Visitor):
     ADI SP, #-4         ;reserve space for ret addr on stack
     STR FP, SP          ;store FP => 0, into PFP
     ADI SP, #-4         ;point to next int on stack
-    MOV FP, {reg1}          ;set FP == Former/Original SP
     ; params
+    ; first one gonna be addr of space on heap
+    STR {reg0}, SP
+    ADI SP, #-4
 """
                 if node.args:
                     for a in node.args:
                         line += write_param(a)
 
                 line += f"""
+    MOV FP, {reg1}          ;set FP == Former/Original SP
+    ; put that below params
     MOV {reg1}, SP          ;save sp - check for stack overflow
     CMP {reg1}, SL
     BLT {reg1}, STACKOVERFLOW
@@ -774,6 +891,74 @@ class CodeGen(sv.Visitor):
     CMP {reg2}, SB
     BGT {reg2}, STACKUNDERFLOW
 """
+            else:  # no constructor, gonna init things
+                def datamemberCode(node):
+                    # code that was in the if-datamember section
+                    def doInitReg():
+                        line = node.init.line
+                        line += f"MOV {reg1}, {node.init.reg}\n"
+                        self.regs.freeReg(node.init.reg)
+                        node.init.reg = None
+
+                    reg1 = self.regs.getReg()
+                    if node.init and node.ret_type == ast.TypeTypes.INT or node.ret_type == ast.TypeTypes.BOOL:
+                        if node.init.reg:
+                            line = doInitReg()
+                        else:
+                            line = f"MOVI {reg1}, #{node.init.value}\n"
+                    elif node.init and node.ret_type == ast.TypeTypes.CHAR:
+                        if node.init.reg:
+                            line = doInitReg()
+                        else:
+                            line = f"MOVI {reg1}, {node.init.value}\n"
+                    elif node.init and node.ret_type == ast.TypeTypes.STRING:
+                        line = f"ALLC {reg1}, #{len(node.init.value[1:])}\n"
+                        reg2 = self.regs.getReg()
+                        reg3 = self.regs.getReg()
+                        line += f"MOV {reg3}, {reg1}\n"
+                        val = node.init.value[1:]
+                        val = re.sub(r'\\n', '\n', val)
+                        val = re.sub(r'\\t', '\t', val)
+                        val = re.sub(r'\\r', '\r', val)
+                        off = 4
+                        for c in val:
+                            if c == '\n':
+                                line += f"MOVI {reg2}, #10\n"
+                            elif c == '\t':
+                                line += f"MOVI {reg2}, #9\n"
+                            elif c == '\r':
+                                line += f"MOVI {reg2}, #12\n"
+                            elif c == ' ':
+                                line += f"MOVI {reg2}, #32\n"
+                            else:
+                                line += f"MOVI {reg2}, '{c}'\n"
+                            line += f"STR {reg2}, {reg3}\n" \
+                                    f"ADI {reg3}, #{off}\n"
+                            off += 4
+                        self.regs.freeReg(reg2)
+                        self.regs.freeReg(reg3)
+                    else:
+                        line = f"MOVI {reg1}, #0\n"
+                    node.line = line
+                    node.reg = reg1
+                    # end of datamember code
+
+                # memlist = list(self.sym_table[node.type].items())[1:]
+                decllist = self.sym_table[node.type]["self"][2]
+                line += f"MOV {reg2}, {reg0}\n"
+                off = 4
+                for n in decllist:
+                    if n is not None:
+                        datamemberCode(n)
+                        line += n.line
+                        line += f"STR {n.reg}, {reg2}\n" \
+                                f"ADI {reg2}, #{off}\n"
+                        off += 4
+                        self.regs.freeReg(n.reg)
+                        n.reg = None
+                    else:  # functions put none in spot
+                        # just put a 0 in that spot
+                        line += f"ADI {reg2}, #{off}\n"
             node.line = line
             node.reg = reg0
             self.regs.freeReg(reg1)
@@ -781,22 +966,42 @@ class CodeGen(sv.Visitor):
 
         if node.op_type == ast.OpTypes.PERIOD:
             line = ""
-            if node.left.op_type == ast.OpTypes.THIS:
-                # TODO get the var that called the func that this is in, to access it's heap spot
-                # to access the data member or func that is node.right in this case
-
-                # node.right could be a func or datamember
-                if node.right.args == "method":
-                    pass  # actually want to not handle this, just go to dot node for a datamember
+            reg1 = self.regs.getReg()
+            if node.right.args == "method":
+                pass  # this is handled in expr arguments
             else:
-                pass  # TODO
-                # follow the node.left (an identifier) to the data member or func to call func or something
-                # actually doesn't need to do func, I already have expr args do func so that's good
+                # access the data member that is node.right
+                # follow the node.left (an identifier) to the data member
+                # I think should put value in reg to plug and play with rest of expressions
+                # except for the expr equals, will have to do same thing but not dereference
+                attrlist = list(self.sym_table[node.left.type].keys())[1:]
+                print(node.left, node.right, "send help")
+                heapoff = attrlist.index(node.right.value)
+                heapoff *= 4
+                if node.left.classtype is True:  # param obj
+                    offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][2]
+                    line += f"MOV {reg1}, FP\n" \
+                            f"ADI {reg1}, #{offset}\n" \
+                            f"LDR {reg1}, {reg1}\n" \
+                            f"ADI {reg1}, #{heapoff}\n" \
+                            f"LDR {reg1}, {reg1}\n"
+                elif not self.in_main:  # local func obj
+                    line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD {reg1}, FP\n" \
+                            f"LDR {reg1}, {reg1}\t;dereference to get the heap addr\n" \
+                            f"ADI {reg1}, #{heapoff}\n" \
+                            f"LDR {reg1}, {reg1}\n"
+                else:  # main decl'd obj
+                    line += f"LDR {reg1}, {node.left.value}\n" \
+                            f"ADI {reg1}, #{heapoff}\n" \
+                            f"LDR {reg1}, {reg1}\n"
+
             node.line = line
+            node.reg = reg1
 
 
         if node.op_type == ast.OpTypes.INDEX:
-            pass  # currently, should make these not write to file, but write to their node.line
+            pass  # should make these not write to file, but write to their node.line
 
         if node.op_type == ast.OpTypes.ARGUMENTS:
             def write_param(param):
@@ -805,12 +1010,21 @@ class CodeGen(sv.Visitor):
                 # it could be identifier, hopefully I'm not missing something here
                 pline = ""
                 if self.in_main and param.op_type == ast.OpTypes.IDENTIFIER:
-                    pline += f"LDR R3, {param.value}\n" \
+                    prims = [ast.TypeTypes.CHAR, ast.TypeTypes.BOOL, ast.TypeTypes.INT]
+                    if param.type == ast.TypeTypes.STRING or param.type not in prims:
+                        pline += f"LDR R3, {param.value}\n"
+                    else:
+                        pline += f"LDR R3, {param.value}\n" \
                              f"LDR R3, R3\n"
                 elif not self.in_main and param.op_type == ast.OpTypes.IDENTIFIER and param.classtype is False:
+                    # TODO pass strings to func that are local var
+                    reg1 = self.regs.getReg()
                     pline += f"LDR R3, {param.value}_{self.cur_classname}_{self.cur_funcname}\n" \
-                             f"LDR R3, R3\n"
+                             f"ADD {reg1}, FP\n" \
+                             f"LDR R3, {reg1}\n"  # FP - offset to get value
+                    self.regs.freeReg(reg1)
                 elif not self.in_main and param.op_type == ast.OpTypes.IDENTIFIER and param.classtype is True:
+                    # TODO pass strings to func that are param vars
                     offset = self.sym_table[self.cur_classname][self.cur_funcname][param.value][2]
                     pline += f"MOV R3, FP\n" \
                              f"ADI R3, #{offset}\n" \
@@ -824,7 +1038,7 @@ class CodeGen(sv.Visitor):
                     else:
                         pline += f"MOVI R3, {param.value}\n"
                 elif param.op_type == ast.OpTypes.STRING_LITERAL:
-                    pass  # TODO: make strings passable
+                    pass  # TODO: make string lits passable
                 elif param.op_type == ast.OpTypes.TRUE:
                     pline += f"MOVI R3, #1\n"
                 elif param.op_type == ast.OpTypes.FALSE:
@@ -845,10 +1059,8 @@ class CodeGen(sv.Visitor):
             reg3 = self.regs.getReg()
             line = ""
 
-            line += ";ADI SP, #-4          ; should be extra space for ret value to keep in this frame\n"
-            # I'm trying to figure out where to put the above line
-            if not self.in_main:
-                off = -8  # magic number, to skip past the ret addr spot and pfp spot
+            if not self.in_main and node.left.right == self.cur_funcname and node.args:
+                off = -12  # magic number, to skip past the ret addr spot and pfp spot
                 for a in node.args:
                     # this is like starting to build the next frame
                     line += f"MOV {reg1}, SP\t;trying to put old params on stack to recurse\n" \
@@ -871,13 +1083,16 @@ class CodeGen(sv.Visitor):
             ADI SP, #-4         ;reserve space for ret addr on stack
             STR FP, SP          ;store FP => 0, into PFP
             ADI SP, #-4         ;point to next int on stack
-            MOV FP, {reg1}          ;set FP == Former/Original SP
             ; params\n\n"""
+            # TODO add addr of "this" as first param, for possibly changing its data members
+            print(node.left.left, "hello there")
             if node.args:
                 for a in node.args:
                     line += write_param(a)
 
             line += f"""
+            MOV FP, {reg1}          ;set FP == Former/Original SP
+            ; I moved the above to below params, maybe works?
             MOV {reg1}, SP          ;save sp - check for stack overflow
             CMP {reg1}, SL
             BLT {reg1}, STACKOVERFLOW
@@ -896,14 +1111,7 @@ class CodeGen(sv.Visitor):
             LDR FP, {reg1}          ;FP = PFP
             MOV {reg2}, SP          ;check for stackunderflow
             CMP {reg2}, SB
-            BGT {reg2}, STACKUNDERFLOW
-            
-            ; before frame make
-            ;ADI SP, #-4          ; should be extra space for ret value to keep in this frame\n
-            ; after frame make
-            ;MOV {reg3}, FP         ; put the ret of fib(x-1) on stack
-            ;ADI {reg3}, #-12   ;-12 because FP is ret addr, FP-4 is PFP, FP-8 is the int x param
-            ;STR R3, {reg3}\n"""  # TODO these three lines are weird, and not always #-12
+            BGT {reg2}, STACKUNDERFLOW\n"""
             node.line = line
             node.reg = reg3
             self.regs.freeReg(reg1)
@@ -921,18 +1129,18 @@ class CodeGen(sv.Visitor):
             self.asmfile.write(line)
             node.expr.accept(self)  # this will cause an extra node visit... worth?
             self.ifCheckExpr(node, "false")
-            self.in_if = node
+            self.in_if.append(node)
 
         if node.statement_type == ast.StatementTypes.RETURN:
             # IDK if need something up here..
             reg0 = self.regs.getReg()
             node.reg = reg0
 
-        if node.statement_type == ast.StatementTypes.COUT:
-            self.cinout(node, ("#1", "#3"), "cout")
-
-        if node.statement_type == ast.StatementTypes.CIN:
-            self.cinout(node, ("#2", "#4"), "cin")
+        # if node.statement_type == ast.StatementTypes.COUT:
+        #     self.cinout(node, ("#1", "#3"), "cout")
+        #
+        # if node.statement_type == ast.StatementTypes.CIN:
+        #     self.cinout(node, ("#2", "#4"), "cin")
 
         if node.statement_type == ast.StatementTypes.SWITCH:
             node.switch_count = self.switch_count
@@ -940,8 +1148,7 @@ class CodeGen(sv.Visitor):
             for s in node.case_list:
                 s.switch_count = node.switch_count
             line = f"SWITCH{node.switch_count}start MOV R0, R0\n"
-            self.in_switch = node
-
+            self.in_switch.append(node)
             def hashtagOrNot(notnode, hashtag):
                 # write comparisons for each case's "ident"
                 reg1 = self.regs.getReg()
@@ -949,26 +1156,44 @@ class CodeGen(sv.Visitor):
                 notline = ""
                 for c in notnode.case_list:
                     if isinstance(c, ast.Case):
-                        notline += f"MOVI {reg1}, {hashtag}{switchval}\n" \
-                                   f"CMPI {reg1}, {hashtag}{c.ident}\n" \
+                        if notnode.expr.op_type == ast.OpTypes.IDENTIFIER:
+                            if self.in_main:
+                                notline += f"LDR {reg1}, {notnode.expr.value}\n" \
+                                        f"LDR {reg1}, {reg1}\n"
+                            elif not self.in_main and notnode.expr.classtype is False:
+                                notline += f"LDR {reg1}, {notnode.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                                        f"ADD {reg1}, FP\n" \
+                                        f"LDR {reg1}, {reg1}\n"
+                            elif not self.in_main and notnode.expr.classtype is True:
+                                offset = self.sym_table[self.cur_classname][self.cur_funcname][notnode.expr.value][2]
+                                notline += f"MOV {reg1}, FP\n" \
+                                        f"ADI {reg1}, #{offset}\n" \
+                                        f"LDR {reg1}, {reg1}\n"
+                            switchval = reg1  # which means we don't need it
+                        else:
+                            notline += f"MOVI {reg1}, {hashtag}{switchval}\n"
+
+                        notline += f"CMPI {reg1}, {hashtag}{c.ident}\n" \
                                    f"BRZ {reg1}, SWITCH{notnode.switch_count}case{c.ident}\n"
+
                 self.regs.freeReg(reg1)
                 notline += f"JMP DEFAULT{node.switch_count}start\n"
                 return notline
 
-            if node.expr.op_type == ast.OpTypes.NUM_LITERAL:
+            if node.expr.type == ast.TypeTypes.INT:
                 line += hashtagOrNot(node, "#")
-            elif node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
+            elif node.expr.type == ast.TypeTypes.CHAR:
                 line += hashtagOrNot(node, "")
             self.asmfile.write(line)
+
         if node.statement_type == ast.StatementTypes.END_CASE:
             self.asmfile.write(f"DEFAULT{node.switch_count}start MOV R0, R0\n")
 
         if node.statement_type == ast.StatementTypes.BREAK:
-            if self.in_if:  # TODO kidna sussy here
-                self.asmfile.write(f"JMP IF{self.in_if.if_count}end\n")
+            if self.in_if:
+                self.asmfile.write(f"JMP IF{self.in_if[-1].if_count}end\n")
             elif self.in_switch:
-                self.asmfile.write(f"JMP SWITCH{self.in_switch.switch_count}end\n")
+                self.asmfile.write(f"JMP SWITCH{self.in_switch[-1].switch_count}end\n")
 
         if node.statement_type == ast.StatementTypes.IF_TRUE:
             line = f"IF{node.if_count}true MOV R0 R0\n"
@@ -988,6 +1213,12 @@ class CodeGen(sv.Visitor):
 
         super().visitStmnt(node)
 
+        if node.statement_type == ast.StatementTypes.COUT:
+            self.cinout(node, ("#1", "#3"), "cout")
+
+        if node.statement_type == ast.StatementTypes.CIN:
+            self.cinout(node, ("#2", "#4"), "cin")
+
         if node.statement_type == ast.StatementTypes.BRACES:
             pass
 
@@ -1001,7 +1232,7 @@ class CodeGen(sv.Visitor):
             # now we are below the super() call
             line = f"IF{node.if_count}end MOV R0, R0\n"
             self.asmfile.write(line)
-            self.in_if = False
+            self.in_if.pop()
 
         if node.statement_type == ast.StatementTypes.RETURN:
             line = f"LDR {node.reg}, FP          ; load ret addr\n"
@@ -1015,9 +1246,8 @@ class CodeGen(sv.Visitor):
                 line += node.expr.line
                 line += f"MOV R3, {node.expr.reg}\n"
                 # TODO this doesn't work for NEW
-                if node.expr.left.op_type == ast.OpTypes.ARGUMENTS or node.expr.right.op_type == ast.OpTypes.ARGUMENTS:
+                if node.expr.left and (node.expr.left.op_type == ast.OpTypes.ARGUMENTS or node.expr.right.op_type == ast.OpTypes.ARGUMENTS):
                     line += f"LDR {node.reg}, FP\n"  # I just put this here because it can help... but not great solution
-
                 self.regs.freeReg(node.expr.reg)
                 node.expr.reg = None
             elif node.expr.op_type == ast.OpTypes.NUM_LITERAL:
@@ -1033,6 +1263,19 @@ class CodeGen(sv.Visitor):
                 line += f"MOVI R3, #1\n"
             elif node.expr.op_type == ast.OpTypes.FALSE:
                 line += f"MOVI R3, #0\n"
+
+            elif node.expr.op_type == ast.OpTypes.IDENTIFIER:
+                if node.expr.classtype is True:  # it's param
+                    offset = self.sym_table[self.cur_classname][self.cur_funcname][node.expr.value][2]
+                    line += f"MOV R3, FP\n" \
+                            f"ADI R3, #{offset}\n"
+                    if node.expr.type != ast.TypeTypes.STRING:  # just dereference if it's not a string
+                        line += f"LDR R3, R3\n"
+                elif not self.in_main:  # it's local var
+                    line += f"LDR R3, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                            f"ADD R3, FP\n"
+                    if node.expr.type != ast.TypeTypes.STRING:
+                        line += f"LDR R3, R3\n"
             line += f"""
             MOV {reg1}, R3          ; get ret val
             STR {reg1}, FP          ; store ret val where ret addr was\n"""
@@ -1048,7 +1291,7 @@ class CodeGen(sv.Visitor):
 
         if node.statement_type == ast.StatementTypes.SWITCH:
             self.asmfile.write(f"SWITCH{node.switch_count}end MOV R0, R0\n")
-            self.in_switch = False
+            self.in_switch.pop()
 
     def visitVarDecl(self, node: ast.VariableDeclaration):
         """ok so the variables gotta go on the stack, so in main, I guess not use FP much,
@@ -1057,15 +1300,41 @@ class CodeGen(sv.Visitor):
         """
         reg1 = self.regs.getReg()
         if not self.in_main and not node.is_param:
-            line = f"MOV {reg1}, SP\n" \
+            if node.type == ast.TypeTypes.STRING:
+                if node.init and node.init.right:
+                    strlen = len(node.init.right.value)  # might not always be there...
+                    line = f"ALLC {reg1}, #{strlen}\n" \
+                           f"STR {reg1}, {node.ident}_{self.cur_classname}_{self.cur_funcname}\n"
+                else:
+                    strlen = 32  # TODO just giving default length for string here
+                    line = f"ALLC {reg1}, #{strlen}\n" \
+                           f"STR {reg1}, {node.ident}_{self.cur_classname}_{self.cur_funcname}\n"
+            else:
+                line = f"MOV R3, FP\n" \
+                   f"MOV {reg1}, SP\n" \
+                   f"SUB {reg1}, R3\n" \
                    f"STR {reg1}, {node.ident}_{self.cur_classname}_{self.cur_funcname}\n" \
-                   f"ADI SP, #-4\n"
+                   f"ADI SP, #-4\n"  # trying to make local vars idents store their offset
+
         elif node.is_param:
             line = f""
+
         else:  # TODO ADI SP up here messes with arrays? maybe not if they're on heap
-            line = f"MOV {reg1}, SP\n" \
+            if node.type == ast.TypeTypes.STRING:
+                if node.init and node.init.right:
+                    strlen = len(node.init.right.value)  # might not always be there...
+                    line = f"ALLC {reg1}, #{strlen}\n" \
+                           f"STR {reg1}, {node.ident}\n"
+                else:
+                    strlen = 32  # TODO just giving default length for string here
+                    line = f"ALLC {reg1}, #{strlen}\n" \
+                           f"STR {reg1}, {node.ident}\n"
+            else:
+                line = f"MOV {reg1}, SP\n" \
                    f"STR {reg1}, {node.ident}\n" \
                    f"ADI SP, #-4\n"
+        #
+        # start calling their initializers
         if node.type == ast.TypeTypes.INT:
             if node.array:  # TODO should be on heap
                 if node.init:
@@ -1102,46 +1371,24 @@ class CodeGen(sv.Visitor):
                 node.init.accept(self)  # pre traversal watch out
                 line += node.init.line
 
-        # if node.type == ast.TypeTypes.STRING:  # TODO make this work in the expr EQUALS
-            # if node.array:  # then it's gotta be just new
-            #     if node.init:
-            #         numlines = node.init.index.value
-            #         # put the current SP address at the label created earlier for this var
-            #         reg1 = self.regs.getReg()
-            #         line = f"MOV {reg1}, SP\n" \
-            #                f"STR {reg1}, {node.ident}\n"
-            #         line += f"MOVI {reg1}, #{0}\t;put local var array {node.ident} on stack\n"
-            #         for x in range(numlines):
-            #             line += f"STR {reg1}, SP\n"
-            #             line += f"ADI SP, #-4\n"
-            #         self.regs.freeReg(reg1)
-            # if node.init:
-            #     if node.init.op_type == ast.OpTypes.STRING_LITERAL:
-            #         for i in range(len(node.init.value[1:-1])):
-            #             if i == " ":
-            #                 line += f"MOVI {reg1}, #32\n"
-            #             else:
-            #                 line += f"MOVI {reg1}, '{i}'\n"
-            #             line += f"STR {reg1}, SP\n" \
-            #                     f"ADI SP, #-4\n"
-            #     elif self.in_main and node.init.op_type == ast.OpTypes.IDENTIFIER:
-            #         line += f"LDR {reg1}, {node.init.value}\n" \
-            #                 f"LDR {reg1}, {reg1}\n" \
-            #                 f"STR {reg1}, SP\n" \
-            #                 f"ADI SP, #-4\n"
-            #     elif not self.in_main and node.init.op_type == ast.OpTypes.IDENTIFIER and node.init.classtype is False:
-            #         line += f"LDR {reg1}, {node.init.value}_{self.cur_classname}_{self.cur_funcname}\n" \
-            #                 f"LDR {reg1}, {reg1}\n" \
-            #                 f"STR {reg1}, SP\n" \
-            #                 f"ADI SP, #-4\n"
-            #     elif not self.in_main and node.init.op_type == ast.OpTypes.IDENTIFIER and node.init.classtype is True:
-            #         offset = self.sym_table[self.cur_classname][self.cur_funcname][node.init.value][2]
-            #         line += f"MOV {reg1}, FP\n" \
-            #                 f"ADI {reg1}, #{offset}\n" \
-            #                 f"LDR {reg1}, {reg1}\n" \
-            #                 f"STR {reg1}, SP\n" \
-            #                 f"ADI SP, #-4\n"
+        if node.type == ast.TypeTypes.STRING:
+            if node.array:  # then it's gotta be just new
+                if node.init:
+                    numlines = node.init.index.value
+                    # put the current SP address at the label created earlier for this var
+                    reg1 = self.regs.getReg()
+                    line = f"MOV {reg1}, SP\n" \
+                           f"STR {reg1}, {node.ident}\n"
+                    line += f"MOVI {reg1}, #{0}\t;put local var array {node.ident} on stack\n"
+                    for x in range(numlines):
+                        line += f"STR {reg1}, SP\n"
+                        line += f"ADI SP, #-4\n"
+                    self.regs.freeReg(reg1)
+            if node.init:
+                node.init.accept(self)
+                line += node.init.line
 
+        super().visitVarDecl(node)
 
         if node.is_obj:
             if node.array:  # then it's gotta be just new
@@ -1153,10 +1400,7 @@ class CodeGen(sv.Visitor):
                         line += f"STR {reg1}, SP\n"
                         line += f"ADI SP, #-4\n"
             elif node.init:
-                node.init.accept(self)  # pre traversal watch out
                 line += node.init.line
-
-        super().visitVarDecl(node)
 
         self.asmfile.write(line)
         self.regs.freeReg(reg1)
@@ -1170,25 +1414,18 @@ class CodeGen(sv.Visitor):
             self.classnodes[node.ident] = node
             self.cur_classname = node.ident
 
+        if node.member_type == ast.MemberTypes.DATAMEMBER:
+            pass
+
         if node.member_type == ast.MemberTypes.METHOD \
                 or node.member_type == ast.MemberTypes.CONSTRUCTOR:
             self.funcnodes[node.ident] = node
             self.cur_funcname = node.ident
             # gotta do the pre function things
             line = f"{node.ident}_{node.classtype} MOV R0, R0\n"
-#             if node.params:  # individual expr/stmnts have to find params if this not included
-#                 FPincrement = -8
-#                 for op in node.params:
-#                     node.reglist.append(self.regs.getReg())
-#                     line += f"""
-#     MOV {node.reglist[-1]}, FP         ; block for getting the operands
-#     ADI {node.reglist[-1]}, #{FPincrement}
-#     LDR {node.reglist[-1]}, {node.reglist[-1]}         ; op 1
-# """
-#                     FPincrement -= 4
             self.asmfile.write(line)
             # just gonna set offset values for function's params here
-            off = -8
+            off = -12  # 4 for ret addr/val, 4 for PFP, 4 for addr to 'this' on heap
             if node.params:
                 for n in node.params:
                     self.sym_table[node.classtype][node.ident][n.ident][2] = off
@@ -1231,20 +1468,24 @@ class CodeGen(sv.Visitor):
                 line += """\n; before frame make
             ADI SP, #-4          ; should be extra space for ret value to keep in this frame\n"""
             line += node.left.line
-            line += f"""
+            if node.left.op_type == ast.OpTypes.ARGUMENTS:
+                line += f"""
             ; after frame make
             MOV {reg1}, FP         ; put the ret of fib(x-1) on stack
-            ADI {reg1}, #-12   ;-12 because FP is ret addr, FP-4 is PFP, FP-8 is the int x param
-            STR R3, {reg1}\n"""  # TODO adjust the #-12, and maybe the R3
+            ADI {reg1}, #{4 * (-(len(node.left.args)) - 8)}   ;-12 because FP is ret addr, FP-4 is PFP, FP-8 is the int x param
+            STR R3, {reg1}\n"""
         if node.right.line:
             line += node.right.line
         if self.in_main and node.left and node.left.op_type == ast.OpTypes.IDENTIFIER:
             line += f"LDR {reg1}, {node.left.value}\n" \
                     f"LDR {reg1}, {reg1}\n"
-        elif not self.in_main and node.left.op_type == ast.OpTypes.IDENTIFIER and node.left.classtype is False:
+        elif not self.in_main and node.left and node.left.op_type == ast.OpTypes.IDENTIFIER \
+                and node.left.classtype is False:
             line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                    f"ADD {reg1}, FP\n" \
                     f"LDR {reg1}, {reg1}\n"
-        elif not self.in_main and node.left.op_type == ast.OpTypes.IDENTIFIER and node.left.classtype is True:
+        elif not self.in_main and node.left and node.left.op_type == ast.OpTypes.IDENTIFIER \
+                and node.left.classtype is True:
             offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][2]
             line += f"MOV {reg1}, FP\n" \
                     f"ADI {reg1}, #{offset}\n" \
@@ -1256,8 +1497,8 @@ class CodeGen(sv.Visitor):
                 # line += f"MOV {reg1}, {node.left.reg}\n" \
                 #         f"LDR {reg1}, {reg1}\n"
                 line += f"""\nMOV {reg1}, FP
-            ADI {reg1}, #-12  ; the offset I put on earlier
-            LDR {reg1}, {reg1}\n"""  # TODO change this #-12 with the above one
+            ADI {reg1}, #{4 * (-(len(node.left.args)) - 8)}  ; the offset I put on earlier
+            LDR {reg1}, {reg1}\n"""
             else:
                 line += f"MOV {reg1}, {node.left.reg}\n"
             self.regs.freeReg(node.left.reg)
@@ -1269,6 +1510,7 @@ class CodeGen(sv.Visitor):
                     f"LDR {reg2}, {reg2}\n"
         elif not self.in_main and node.right.op_type == ast.OpTypes.IDENTIFIER and node.right.classtype is False:
             line += f"LDR {reg2}, {node.right.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                    f"ADD {reg2}, FP\n" \
                     f"LDR {reg2}, {reg2}\n"
         elif not self.in_main and node.right.op_type == ast.OpTypes.IDENTIFIER and node.right.classtype is True:
             offset = self.sym_table[self.cur_classname][self.cur_funcname][node.right.value][2]
@@ -1284,15 +1526,7 @@ class CodeGen(sv.Visitor):
                 line += f"MOV {reg2}, {node.right.reg}\n"
             self.regs.freeReg(node.right.reg)
             node.right.reg = None
-        # if node.left.op_type == ast.OpTypes.ARGUMENTS and node.right.op_type == ast.OpTypes.ARGUMENTS:
-        #     line += f"{op}, R0, {reg1}\n" \
-        #             f"{op} R0, {reg2}\t;doing {op} with {node.left}, {node.right}\n"
-        #       this is just funny business
-        # elif node.left.op_type == ast.OpTypes.ARGUMENTS:
-        #     line += f"{op} R3, {reg2}\t;doing {op} with {node.left}, {node.right}\n"
-        # elif node.right.op_type == ast.OpTypes.ARGUMENTS:
-        #     line += f"{op} {reg1}, R3\t;doing {op} with {node.left}, {node.right}\n"
-        # else:
+
         line += f"{op} {reg1}, {reg2}\t;doing {op} with {node.left}, {node.right}\n"
         # line += f"TRP #99\n"
         self.regs.freeReg(reg2)
@@ -1324,6 +1558,7 @@ class CodeGen(sv.Visitor):
                         f"LDR {reg}, {reg}\n"
             elif not self.in_main and nodeLR.op_type == ast.OpTypes.IDENTIFIER and nodeLR.classtype is False:
                 line += f"LDR {reg}, {nodeLR.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                        f"ADD {reg}, FP\n" \
                         f"LDR {reg}, {reg}\n"
             elif not self.in_main and nodeLR.op_type == ast.OpTypes.IDENTIFIER and nodeLR.classtype is True:
                 offset = self.sym_table[self.cur_classname][self.cur_funcname][nodeLR.value][2]
@@ -1390,6 +1625,7 @@ class CodeGen(sv.Visitor):
                 reg1 = self.regs.getReg()
                 line = f"TRP {param[0]}\n" \
                        f"LDR {reg1}, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                       f"ADD {reg1}, FP\n" \
                        f"STR R3, {reg1}\n"
                 self.regs.freeReg(reg1)
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is True \
@@ -1412,6 +1648,7 @@ class CodeGen(sv.Visitor):
                 reg1 = self.regs.getReg()
                 line = f"TRP {param[1]}\n" \
                        f"LDR {reg1}, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                       f"ADD {reg1}, FP\n" \
                        f"STB R3, {reg1}\n"
                 self.regs.freeReg(reg1)
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is True \
@@ -1425,7 +1662,7 @@ class CodeGen(sv.Visitor):
                        f"STB R3, {reg1}\n"
                 self.regs.freeReg(reg1)
             else:
-                node.expr.accept(self)  # early traversal
+                # node.expr.accept(self)  # early traversal
                 line = node.expr.line
                 reg1 = node.expr.reg
                 line += f"MOV R3, {reg1}\n"
@@ -1442,6 +1679,7 @@ class CodeGen(sv.Visitor):
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is False \
                     and (node.expr.type == ast.TypeTypes.INT or node.expr.type == ast.TypeTypes.BOOL):
                 line = f"LDR R3, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                       f"ADD R3, FP\n" \
                         f"LDR R3, R3\n" \
                        f"TRP {param[0]}\n"
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is True \
@@ -1460,22 +1698,89 @@ class CodeGen(sv.Visitor):
             elif node.expr.type == ast.TypeTypes.BOOL and node.expr.op_type == ast.OpTypes.FALSE:
                 line = f"MOVI R3, #0\n"
                 line += f"TRP {param[0]}\n"
-            elif self.in_main and node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.IDENTIFIER:
-                line = f"LDR R3, {node.expr.value}\n" \
+
+            elif self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER \
+                    and (node.expr.type == ast.TypeTypes.CHAR or node.expr.type == ast.TypeTypes.STRING):
+                if node.expr.type == ast.TypeTypes.CHAR:
+                    line = f"LDR R3, {node.expr.value}\n" \
                        f"LDR R3, R3\n" \
                        f"TRP {param[1]}\n"
+                else:  # STRING
+                    off = 0  # going down the heap
+                    line = ""
+                    strlen = self.sym_table["main"][node.expr.value][4]
+                    # since this is just for nodes in main I can know where am in sym table
+                    for x in range(strlen):  # I put a number in its is_array to say how long
+                        line += f"LDR R3, {node.expr.value}\n" \
+                           f"ADI R3, #{off}\n" \
+                           f"LDR R3, R3\n" \
+                           f"TRP {param[1]}\n"
+                        off += 4
+                    if strlen is False:  # the assembly loop, because above loop didn't work
+                        reg1 = self.regs.getReg()
+                        reg2 = self.regs.getReg()
+                        line = f"MOVI {reg1}, #-4\n" \
+                               f"printstr{self.print_count} LDR R3, {node.expr.value}\n" \
+                               f"ADI {reg1}, #4\n" \
+                               f"ADD R3, {reg1}\t;offsetting through heap\n" \
+                               f"LDR R3, R3\n" \
+                               f"MOV {reg2}, R3\n" \
+                               f"CMPI {reg2}, '\"'\n" \
+                               f"BRZ {reg2}, printstr{self.print_count}end\n" \
+                               f"TRP {param[1]}\n" \
+                               f"JMP printstr{self.print_count}\n" \
+                               f"printstr{self.print_count}end MOV R0, R0\n"
+                        self.print_count += 1
+                        self.regs.freeReg(reg1)
+                        self.regs.freeReg(reg2)
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is False \
-                    and node.expr.type == ast.TypeTypes.CHAR:
-                line = f"LDR R3, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
-                       f"LDR R3, R3\n" \
-                       f"TRP {param[1]}\n"
+                    and (node.expr.type == ast.TypeTypes.CHAR or node.expr.type == ast.TypeTypes.STRING):
+                # for local function vars
+                if node.expr.type == ast.TypeTypes.CHAR:
+                    line = f"LDR R3, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                           f"ADD R3, FP\n" \
+                           f"LDR R3, R3\n" \
+                           f"TRP {param[1]}\n"
+                else:  # STRING
+                    off = 0  # going down the heap
+                    line = ""
+                    strlen = self.sym_table[self.cur_classname][self.cur_funcname][node.expr.value][4]
+                    for x in range(strlen):
+                        line += f"LDR R3, {node.expr.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                               f"ADI R3, #{off}\n" \
+                               f"LDR R3, R3\n" \
+                               f"TRP {param[1]}\n"
+                        off += 4
             elif not self.in_main and node.expr.op_type == ast.OpTypes.IDENTIFIER and node.expr.classtype is True \
-                    and node.expr.type == ast.TypeTypes.CHAR:
-                offset = self.sym_table[self.cur_classname][self.cur_funcname][node.expr.value][2]
-                line = f"MOV R3, FP\n" \
+                    and (node.expr.type == ast.TypeTypes.CHAR or node.expr.type == ast.TypeTypes.STRING):
+                # for parameter vars
+                if node.expr.type == ast.TypeTypes.CHAR:
+                    offset = self.sym_table[self.cur_classname][self.cur_funcname][node.expr.value][2]
+                    line = f"MOV R3, FP\n" \
                        f"ADI R3, #{offset}\n" \
                        f"LDR R3, R3\n" \
-                       f"TRP {param[0]}\n"
+                       f"TRP {param[1]}\n"
+                else:  # STRING
+                    offset = self.sym_table[self.cur_classname][self.cur_funcname][node.expr.value][2]
+                    reg1 = self.regs.getReg()
+                    reg2 = self.regs.getReg()
+                    # so I decided to write a loop to go until it reads the terminating " I put in strs
+                    line = f"MOVI {reg1}, #-4\n" \
+                           f"printstr{self.print_count} MOV R3, FP\n" \
+                           f"ADI R3, #{offset}\n" \
+                           f"LDR R3, R3\t;getting the address to the heap\n" \
+                           f"ADI {reg1}, #4\n" \
+                           f"ADD R3, {reg1}\t;offsetting through heap\n" \
+                           f"LDR R3, R3\n" \
+                           f"MOV {reg2}, R3\n" \
+                           f"CMPI {reg2}, '\"'\n" \
+                           f"BRZ {reg2}, printstr{self.print_count}end\n" \
+                           f"TRP {param[1]}\n" \
+                           f"JMP printstr{self.print_count}\n" \
+                           f"printstr{self.print_count}end MOV R0, R0\n"
+                    self.print_count += 1
+                    self.regs.freeReg(reg1)
+                    self.regs.freeReg(reg2)
             elif node.expr.type == ast.TypeTypes.CHAR and node.expr.op_type == ast.OpTypes.CHAR_LITERAL:
                 if node.expr.value == "' '":
                     line = f"MOVI R3, #32\n"
@@ -1504,15 +1809,43 @@ class CodeGen(sv.Visitor):
                     else:
                         line += f"MOVI R3, '{c}'\n"
                     line += f"TRP #3\n"
-
             else:
-                node.expr.accept(self)  # early traversal
+                # node.expr.accept(self)  # early traversal could probably avoid
                 line = node.expr.line
                 reg1 = node.expr.reg
-                line += f"MOV R3, {reg1}\n"
-                self.regs.freeReg(node.expr.reg)
-                node.expr.reg = None
-                line += f"TRP {param[0]}\n"
+                if node.expr.op_type == ast.OpTypes.ARGUMENTS and node.expr.left.right.type == ast.TypeTypes.STRING:
+                    # node.expr.left.right.type  # just looks awful
+                    # gotta dereference, func calls that return strings just return their addr
+                    reg3 = self.regs.getReg()
+                    line += f"LDR {reg1}, {reg1}\n" \
+                            f"MOV R3, {reg1}\n" \
+                            f"MOV {reg3}, {reg1}\n"
+                    # line += f"LDR {reg1}, {reg1}\n"  # turns out gotta dereference twice? gonna do later
+                    reg2 = self.regs.getReg()
+                    line += f"MOVI {reg1}, #-4\n" \
+                           f"printstr{self.print_count} MOV R3, {reg3}\n" \
+                            f"ADI {reg1}, #4\n" \
+                           f"ADD R3, {reg1}\t;offsetting through heap\n" \
+                           f"LDR R3, R3\n" \
+                           f"MOV {reg2}, R3\n" \
+                           f"CMPI {reg2}, '\"'\n" \
+                           f"BRZ {reg2}, printstr{self.print_count}end\n" \
+                           f"TRP {param[1]}\n" \
+                           f"JMP printstr{self.print_count}\n" \
+                           f"printstr{self.print_count}end MOV R0, R0\n"
+                    self.print_count += 1
+                    self.regs.freeReg(node.expr.reg)
+                    node.expr.reg = None
+                    self.regs.freeReg(reg2)
+                    self.regs.freeReg(reg3)
+                else:
+                    line += f"MOV R3, {reg1}\n"
+                    self.regs.freeReg(node.expr.reg)
+                    node.expr.reg = None
+                    if node.expr.op_type == ast.OpTypes.PERIOD and node.expr.right.type == ast.TypeTypes.CHAR:
+                        line += f"TRP {param[1]}\n"
+                    else:
+                        line += f"TRP {param[0]}\n"
 
         self.asmfile.write(line)
 
@@ -1530,6 +1863,7 @@ class CodeGen(sv.Visitor):
                     f"LDR {reg1}, {reg1}\n"
         elif not self.in_main and node.left.op_type == ast.OpTypes.IDENTIFIER and node.left.classtype is False:
             line += f"LDR {reg1}, {node.left.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                    f"ADD {reg1}, FP\n" \
                     f"LDR {reg1}, {reg1}\n"
         elif not self.in_main and node.left.op_type == ast.OpTypes.IDENTIFIER and node.left.classtype is True:
             offset = self.sym_table[self.cur_classname][self.cur_funcname][node.left.value][2]
@@ -1549,6 +1883,7 @@ class CodeGen(sv.Visitor):
                     f"LDR {reg2}, {reg2}\n"
         elif not self.in_main and node.right.op_type == ast.OpTypes.IDENTIFIER and node.right.classtype is False:
             line += f"LDR {reg2}, {node.right.value}_{self.cur_classname}_{self.cur_funcname}\n" \
+                    f"ADD {reg2}, FP\n" \
                     f"LDR {reg2}, {reg2}\n"
         elif not self.in_main and node.right.op_type == ast.OpTypes.IDENTIFIER and node.right.classtype is True:
             offset = self.sym_table[self.cur_classname][self.cur_funcname][node.right.value][2]

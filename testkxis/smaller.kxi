@@ -1,0 +1,12 @@
+class sus {
+    private int mysus;
+    public void editsus(int x) {
+        mysus = x;
+        cout << mysus;
+    }
+}
+
+void kxi2022 main() {
+    sus bus = new sus();
+    bus.editsus(1);
+}

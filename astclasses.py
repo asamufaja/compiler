@@ -94,6 +94,7 @@ class Expression(Node):
         self.array: bool = None
         self.reg = None
         self.line = None
+        self.param_list = []
 
     def accept(self, v):
         v.visitExpr(self)
@@ -137,7 +138,7 @@ class ClassAndMemberDeclaration(Node):
         self.classtype = None
         self.child: ClassAndMemberDeclaration = None
         self.reg = None
-        self.reglist = []
+        self.line = None
 
     def accept(self, v):
         v.visitMemberDecl(self)
