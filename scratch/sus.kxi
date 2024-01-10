@@ -1,0 +1,15 @@
+class wow {
+    public wow[] testArr() {
+        return new wow[1];
+    }
+    public int[] intArr() {
+        return new int[1];
+    }
+}
+
+void kxi2022 main() {
+    int[] x = new int[4];
+    x[1] = 4;
+    wow[] why = new wow();
+}
+//kxi_test/unit/semantics/types/assn_array_member.pass.kxi

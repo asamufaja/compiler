@@ -435,9 +435,11 @@ class SymbolTableVisitor(Visitor):
         if node.member_type == ast.MemberTypes.METHOD \
                 or node.member_type == ast.MemberTypes.CONSTRUCTOR:
             self.cur_method = node
+            # I moved these assignments to the pre-sym_table visitor
             # self.sym_table[self.cur_class.ident][self.cur_method.ident] \
             #     = {"self": [node.ret_type, 0, 0, self.cur_class.ident, node.modifier]}
         if node.member_type == ast.MemberTypes.DATAMEMBER:
+            # I moved these assignments to the pre-sym_table visitor
             # self.sym_table[self.cur_class.ident][node.ident] \
             #     = [node.ret_type, 0, 0, self.cur_class.ident, node.array, node.modifier]
             node.classtype = self.cur_class.ident
@@ -483,19 +485,6 @@ class SymbolTableVisitor(Visitor):
                 self.isErrorState = True
                 return True
         return False
-
-    # def isInSym(self, x):
-    #     if x in self.sym_table:
-    #         return True, self.sym_table[x]
-    #     for k, v in self.sym_table.items():
-    #         if isinstance(v, dict):
-    #             if x in v:
-    #                 return True, v[x]
-    #             for k1, v1 in v.items():
-    #                 if isinstance(v1, dict):
-    #                     if x in v1:
-    #                         return True, v1[x]
-    #     return False, None
 
 
 class AssignmentVisitor(Visitor):
@@ -562,11 +551,6 @@ class AssignmentVisitor(Visitor):
                     if v[3] == True:  # this could be True, False, or a class ident
                         # if true then it's a parameter variable
                         reqdparams.append((k, v))
-                # print("reqd", reqdparams)
-                # if node.args is not None:
-                #     print("given", [n.value for n in node.args])
-                # else:
-                #     print("none given")
                 self.checkFuncParams(reqdparams, node, funcnode)
 
         if node.op_type == ast.OpTypes.NEW and node.index is None:
@@ -588,13 +572,6 @@ class AssignmentVisitor(Visitor):
             if not node.left.array:
                 self.error_messages.append(f"var {node.left.value} was indexed but is not an array")
                 self.isErrorState = True
-            # TODO ?
-            # is_in_sym, node_val = self.isInSym(node.left.value)
-            # if is_in_sym:
-            #     print(node_val)
-            # self.sym_table[node.left]
-            # self.error_messages.append(f"new operator had args and indecies")
-            # self.isErrorState = True
         super().visitExpr(node)
 
     def visitMemberDecl(self, node: ast.ClassAndMemberDeclaration):

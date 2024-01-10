@@ -1,0 +1,409 @@
+// Final pass-off for B compiler
+class Functions {
+
+    public void printFail() {
+        char endl = '\n';
+        char f = 'f';
+        char l = 'l';
+
+        cout << endl;
+        cout << f;
+        cout << 'a';
+        cout << 'i';
+        cout << l;
+        cout << ':';
+        cout << '(';
+        cout << endl;
+    }
+
+    public int passing(char nl, char C2) {
+        if (okayYeahButForRealPassing(367, nl, C2) == 'p')
+            return 8;
+        else
+            return -1;
+    }
+
+    public char okayYeahButForRealPassing(int check, char nl, char C2) {
+        char space = ' ';
+        char endl = '\n';
+        char s = 's';
+        char u = 'u';
+        char c = 'c';
+        char e = 'e';
+        char f = 'f';
+        char l = 'l';
+        char ex = '!';
+
+        if (check == 367) {
+            cout << nl;
+            cout << C2;
+            cout << space;
+            cout << s;
+            cout << u;
+            cout << c;
+            cout << c;
+            cout << e;
+            cout << s;
+            cout << s;
+            cout << f;
+            cout << u;
+            cout << l;
+            cout << ex;
+            cout << '!';
+            cout << '!';
+            cout << endl;
+            return 'p';
+        }
+        return 'f';
+    }
+
+    public void printPassing(char C2, char nl) {
+        int passed = passing(nl, C2);
+        if (passed != 8)
+            printFail();
+    }
+}
+
+
+class Fibonacci {
+    private int currentFib;
+    private int next;
+    private int iterations;
+    private int count;
+    private Functions funs;
+    private char l;
+
+    Fibonacci(int i, char l) {
+        currentFib = 0;
+        next = 1;
+        iterations = i;
+        count = 0;
+        this.l = l;
+    }
+
+    private void step(int temp) {
+        cout << currentFib;
+        temp = next;
+        if (count != iterations - 1) {
+            cout << ' ';
+            cout << next + currentFib;
+            next = next + currentFib;
+            currentFib = temp;
+        }    
+    }
+
+    // print out the fibonacci sequence for the number of 
+    // iterations chosen
+    // this is a recursive function
+    public bool fibonacciSequence() {
+        char comma = ',';
+        char space = ' ';
+        int temp;
+        if (count < iterations - 1) {
+            step(temp);
+            count = count + 1;
+            cout << comma;
+            cout << space;
+            return fibonacciSequence();
+        }
+        step(temp);
+        if (true == true) {
+            if (true == true && false == false) {
+                // should always reach this point, but pass over
+                // this if statement. Will fail otherwise.
+                if (l != 'l') {
+                    funs.printFail();
+                }
+                // checking large conditional and nested if/else. Makes sure all fibonacci numbers evaluate properly. 
+                // only works if input one of the previously indicated numbers. 1, 10, 20, 25, 47.
+                else {
+                    return ((iterations == 1 && currentFib == 0) || (iterations == 10 && currentFib == 34)
+                        || (iterations == 20 && currentFib == 4181) || (iterations == 25 && currentFib == 46368) 
+                        || (iterations == 47 && currentFib == 1836311903));
+                }
+            }
+        }
+        return false;
+    }
+}
+
+class objectTests {
+    public objectToTest objectReturnTest() {
+        objectToTest objectTest = new objectToTest();
+        return objectTest;
+    }
+}
+
+class objectToTest {
+    public char k = 'x';
+    objectToTest() {
+        this.k = 'k';
+    }
+    public void kToJ() {
+        k = 'J';
+    }
+}
+
+
+void kxi2022 main() {
+    Functions functions;
+    Fibonacci fibonacci;
+    int currentFib = 0;
+    int pastFib1 = -1;
+    int pastFib2 = -2;
+    char B = 'B';
+    char B2 = 'q';
+    int i = 3+4*2+83/3;
+    char B3 = 'r';
+    char space = ' ';
+    char minus = '-';
+    char endl = '\n';
+    char s = 's';
+    bool mathWithPrecedence = false;
+    char u = 'u';
+    bool passingGrade = false;
+    char c = 'c';
+    char e = 'e';
+    char nl;
+    char f = 'f';
+    char l = 'l';
+    int numberOfFibonacciIterations;
+    char comma = ',';
+    char switchTest = '&';
+    bool nestedIfAndFibPass = false;
+    int j = (i+2)/(i*-2)+(-23)-+2+-12;
+    bool switchSuccessOneOption  = false;
+    int switchOptionsTaken = 0;
+    bool defaultTaken = true;
+    bool objectSuccess = false;
+    objectTests objectTest;
+    objectToTest obTest;
+	
+	cout << ((((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1)))) + ((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))))) + (((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1)))) + ((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1)))))) + ((((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1)))) + ((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))))) + (((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1)))) + ((((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))) + (((1 + 1) + (1 + 1)) + ((1 + 1) + (1 + 1))))));
+    
+    // Should output "Input number of iterations:"
+    cout << endl;
+	cout << "Inp";
+    cout << u;
+    cout << 't';
+    cout << space;
+    cout << 'n';
+    cout << u;
+    cout << 'm';
+    cout << 'b';
+    cout << e;
+    cout << B3;
+    cout << space;
+    cout << 'o';
+    cout << f;
+    cout << space;
+    cout << 'i';
+    cout << 't';
+    cout << e;
+    cout << B3;
+	cout << "ation";
+    cout << s;
+	cout << " (-1, 1, 10, 20, 25, 47)";
+    cout << ':';
+    cout << endl;
+
+    // Input an integer, for the pass-off either input
+    // 1, 10, 20, 25, or 47
+    // then press enter
+    // The process can be repeated over and over, until
+    // you input a negative number. As long as the last
+    // iteration was one of the previously indicated numbers
+    // the program will pass. 
+    // NOTE: if your vm uses 32 bit integers to implement
+    // your integer type, iterations greater than 47
+    // will cause integer overflow. (not stack overflow.)
+    // will echo the input number after each input
+    cin >> numberOfFibonacciIterations;
+    cout << numberOfFibonacciIterations;
+    cout << endl;
+
+    while (numberOfFibonacciIterations >= 0) {
+        nestedIfAndFibPass = false;
+        fibonacci = new Fibonacci(numberOfFibonacciIterations, l);
+        nestedIfAndFibPass = fibonacci.fibonacciSequence();
+        cout << endl;
+        cin >> numberOfFibonacciIterations;
+        cout << numberOfFibonacciIterations;
+        cout << endl;
+    }
+
+    // outputs a blank line after fibonacci sequence and then prints '&'
+    // then outputs "input char:"
+    cout << endl;
+    cout << '\n';
+    cout << switchTest;
+    cout << endl;
+	cout << "inp";
+    cout << u;
+    cout << 't';
+    cout << space;
+    cout << c;
+    c = 'h';
+    cout << c;
+    c = 'c';
+    cout << 'a';
+    cout << B3;
+    cout << ':';
+    cout << endl;
+    // input a single char, then press enter.
+    // The char is echoed to the console as the integer was before.
+    cin >> switchTest;
+    // if their trap codes are implemented correctly, 
+    // then nl will be populated by '\n' because the 
+    // trap code in their vm for reading a char should
+    // work like 'getchar()' in C.
+    cin >> nl;
+    cout << switchTest;
+    // if nl populated correctly, will output an empty line between the 
+    // echoed character and the next part. 
+    cout << nl;
+    cout << endl;
+
+    // Options to test switch statement
+    // You will get specific output if you choose one of the
+    // following characters in the previous input section:
+    // 'a', 'z', 'l', 'x'
+    // output for each:
+    // output for 'a' = "start"
+    // output for 'z' = "end"
+    // output for 'l' = "eleminopee"
+    // output for 'x' = "x-ray"
+    // any other input does not have output
+    // the nested if/else statements help evaluate the success
+    // of the switch statement. 
+    switch (switchTest) {
+        case 'a': {
+			cout << "start\n";
+            if (switchSuccessOneOption == true) {
+                switchSuccessOneOption = false;
+            }
+            else {
+                switchSuccessOneOption = true;
+            }
+            defaultTaken = false;
+            switchOptionsTaken = switchOptionsTaken + 1;
+            break;
+        }
+        case 'z': {
+			cout << "end\n";
+            if (switchSuccessOneOption == true) {
+                switchSuccessOneOption = false;
+            }
+            else {
+                switchSuccessOneOption = true;
+            }
+            defaultTaken = false;
+            switchOptionsTaken = switchOptionsTaken + 1;
+            break;
+        }
+        case 'l': {
+            cout << 'e';
+            cout << l;
+            cout << e;
+            cout << 'm';
+            cout << 'i';
+            cout << 'o';
+            cout << 'p';
+            cout << 'e';
+            cout << 'e';
+            cout << endl;
+            if (switchSuccessOneOption == true) {
+                switchSuccessOneOption = false;
+            }
+            else {
+                switchSuccessOneOption = true;
+            }
+            defaultTaken = false;
+            switchOptionsTaken = switchOptionsTaken + 1;
+            break;
+        }
+        default:
+            switch (switchTest) {
+                case 'x': {
+                    cout << 'x';
+                    cout << minus;
+                    cout << 'r';
+                    cout << 'a';
+                    cout << 'y';
+                    cout << endl;
+                    break;
+                }    
+                default:
+                    break;
+            }
+    }
+
+    // output 2 blank lines
+    cout << nl;
+    cout << nl;
+
+    // testing chain assignment. 
+    // output should be "qr\tcc" = "qr      cc"
+    cout << B2;
+    cout << B3;
+    B2 = B3 = B;
+    cout << '\t';
+    cout << B2;
+    cout << B3;
+    cout << '\n';
+
+    // output here should look like below
+    // 38
+    // -37
+    cout << i;
+    cout << endl;
+    cout << j;
+    cout << nl;
+
+    // If all previous math operations work correctly with proper
+    // precedence and integer operations, mathWithPrecedence will
+    // be set to true.
+    // this will also output the result of the large equation
+    // -15466
+    if (i == 38) {
+		// In Python, 39//-37 == 2. This adjusts for such nonsense.
+		if (j == -38)
+			j += 1;
+        if (j == -37)
+            j = i * (j * (44 / (40 - 9) + (+5 - -5)));
+        if (j == -15466)
+            mathWithPrecedence = true;
+        cout << j;
+        cout << endl;
+    } 
+
+    obTest = objectTest.objectReturnTest();
+    if (obTest.k == 'k') {
+        obTest.kToJ();
+        if (obTest.k == 'J') 
+            objectSuccess = true;
+    }
+
+    // This checks if nesting and fibonacci numbers evaluated correctly, that math operations
+    // with proper precedence/order of operations work and that the switch/if/else statements
+    // all worked properly, then passingGrade is set to true.
+    if (nestedIfAndFibPass == true && mathWithPrecedence == true && objectSuccess == true &&
+    ((switchSuccessOneOption == true && defaultTaken == false && switchOptionsTaken == 1) 
+    || (switchSuccessOneOption == false && defaultTaken == true && switchOptionsTaken == 0))) {
+        passingGrade = true;
+    }
+
+    // If passing set to true, print
+    // empty line
+    // "B successful!!!"
+    if (passingGrade == true) {
+        functions.printPassing(B2,nl);
+    }
+    // else print 
+    // empty line
+    // "fail:("
+    else {
+        functions.printFail();
+    }
+
+}

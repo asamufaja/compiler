@@ -1,23 +1,24 @@
 class sus {
     public int coo;// = 1;
     public char e;// = 'E';
-    public string swes;// = "swes\n";
+    public int woo;
     private uhh funs;
-//    sus() {
-//        this.coo = 1;
-//        e = 'e';
-//        swes = "swes\n";
-//    }
-
-    public void strs() {
-        char endl = '\n';
-        cout << endl;
+    sus(int i) {
+        this.coo = i;
+//        cout << coo;
+        e = 'E';
+//        cout << e;
+        woo = 2;
     }
 
-    public void do(sus deez) {
-        cout << deez.e;
-        deez.e = 'D';
-        cout << deez.e;
+    public void okay() {
+
+    }
+
+    public void do(int n) {
+        cout << n;
+        cout << coo;
+        cout << e;
     }
 
     public int fib(int x) {
@@ -53,7 +54,7 @@ class uhh {
 }
 
 void kxi2022 main() {
-    sus bus = new sus();
-    bus.strs();
+    sus bus = new sus(1);
+    bus.okay();
 //    uhh umm = new uhh();
 }

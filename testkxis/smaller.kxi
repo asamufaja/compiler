@@ -1,12 +1,68 @@
-class sus {
-    private int mysus;
-    public void editsus(int x) {
-        mysus = x;
-        cout << mysus;
+class Fibonacci {
+    private int currentFib;
+    private int next;
+    private int iterations;
+    private int count;
+    private char l;
+
+    Fibonacci(int i, char l) {
+        currentFib = 0;
+        next = 1;
+        iterations = i;
+        count = 0;
+        this.l = l;
+    }
+
+    private void step(int temp) {
+        cout << currentFib;
+        temp = next;
+        if (count != iterations - 1) {
+            next = next + currentFib;
+            currentFib = temp;
+        }
+    }
+
+    // print out the fibonacci sequence for the number of
+    // iterations chosen
+    // this is a recursive function
+    public bool fibonacciSequence() {
+        char comma = ',';
+        char space = ' ';
+        int temp;
+        if (count < iterations - 1) {
+            step(temp);
+            count = count + 1;
+
+//            cout << "count: ";
+//            cout << count;
+//            cout << '\n';
+
+            cout << comma;
+            cout << space;
+            return fibonacciSequence();
+        }
+        step(temp);
+        if (true == true) {
+            if (true == true && false == false) {
+                // should always reach this point, but pass over
+                // this if statement. Will fail otherwise.
+                if (l != 'l') {
+                    cout << "OOFERS\n";
+                }
+                // checking large conditional and nested if/else. Makes sure all fibonacci numbers evaluate properly.
+                // only works if input one of the previously indicated numbers. 1, 10, 20, 25, 47.
+                else {
+                    return ((iterations == 1 && currentFib == 0) || (iterations == 10 && currentFib == 34)
+                        || (iterations == 20 && currentFib == 4181) || (iterations == 25 && currentFib == 46368)
+                        || (iterations == 47 && currentFib == 1836311903));
+                }
+            }
+        }
+        return false;
     }
 }
 
 void kxi2022 main() {
-    sus bus = new sus();
-    bus.editsus(1);
+    Fibonacci fibonacci = new Fibonacci(10, 'l');
+    fibonacci.fibonacciSequence();
 }
